@@ -23,12 +23,8 @@ export async function upsertEpitaph(formData: FormData) {
   if (!session?.user?.id) redirect("/login");
 
   const content = formData.get("content");
-  if (typeof content !== "string" || content.trim().length === 0) {
-    return { error: "내용을 입력해주세요." };
-  }
-  if (content.trim().length > 100) {
-    return { error: "100자 이하로 작성해주세요." };
-  }
+  if (typeof content !== "string" || content.trim().length === 0) return;
+  if (content.trim().length > 100) return;
 
   const today = getTodayKST();
   const userId = session.user.id;

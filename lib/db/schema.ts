@@ -2,9 +2,9 @@ import {
   pgTable,
   text,
   integer,
+  boolean,
   timestamp,
   date,
-  varchar,
   primaryKey,
   unique,
 } from "drizzle-orm/pg-core";
@@ -16,10 +16,15 @@ export const users = pgTable("user", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  name: text("name"),
+  name: text("name"), // 카카오 프로필 닉네임 (Auth.js가 자동 저장)
   email: text("email").unique(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
+  // ─── 앱 커스텀 필드 ──────
+  realName: text("realName"),
+  nickname: text("nickname"),
+  cellId: text("cellId").references(() => cells.id),
+  onboardingCompleted: boolean("onboardingCompleted").default(false).notNull(),
 });
 
 export const accounts = pgTable(
@@ -62,7 +67,27 @@ export const verificationTokens = pgTable(
   (vt) => [primaryKey({ columns: [vt.identifier, vt.token] })]
 );
 
-// ─── App tables ─────────────────────────────────────────────────────────────
+// ─── 셀(소그룹) ────────────────────────────────────────────────────────────
+
+export const cells = pgTable("cell", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+});
+
+/** 셀 소속 명단 (사전 등록, 실명 매칭용) */
+export const cellMembers = pgTable("cell_member", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  cellId: text("cellId")
+    .notNull()
+    .references(() => cells.id, { onDelete: "cascade" }),
+  name: text("name").notNull(), // 실명
+});
+
+// ─── 묘비명 ─────────────────────────────────────────────────────────────────
 
 export const epitaphs = pgTable(
   "epitaph",
@@ -73,10 +98,59 @@ export const epitaphs = pgTable(
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    content: varchar("content", { length: 100 }).notNull(),
+    yesterday: text("yesterday").notNull(), // 어제 돌아보기
+    today: text("today").notNull(), // 오늘 기대함
     date: date("date").notNull(),
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
   },
   (epitaph) => [unique().on(epitaph.userId, epitaph.date)]
 );
+
+// ─── 꽃 키우기 ──────────────────────────────────────────────────────────────
+
+export const flowers = pgTable("flower", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  type: text("type").notNull(), // flower type id (tulip, rose, ...)
+  stage: integer("stage").default(1).notNull(), // 1=새싹, 2=봉우리, 3=꽃
+  waterCount: integer("waterCount").default(0).notNull(),
+  completedAt: timestamp("completedAt", { mode: "date" }),
+  placedInGarden: boolean("placedInGarden").default(false).notNull(),
+  createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+});
+
+/** 셀 공동 꽃밭 5×5 그리드 */
+export const gardenPlots = pgTable(
+  "garden_plot",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    cellId: text("cellId")
+      .notNull()
+      .references(() => cells.id, { onDelete: "cascade" }),
+    x: integer("x").notNull(),
+    y: integer("y").notNull(),
+    flowerId: text("flowerId").references(() => flowers.id),
+    placedBy: text("placedBy").references(() => users.id),
+    placedAt: timestamp("placedAt", { mode: "date" }),
+  },
+  (plot) => [unique().on(plot.cellId, plot.x, plot.y)]
+);
+
+/** 물뿌리개 보유량 */
+export const wateringCans = pgTable("watering_can", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" })
+    .unique(),
+  count: integer("count").default(0).notNull(),
+});

@@ -1,5 +1,4 @@
-import { signIn } from "@/lib/auth";
-import { auth } from "@/lib/auth";
+import { signIn, auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 export default async function LoginPage() {
@@ -7,17 +6,18 @@ export default async function LoginPage() {
   if (session) redirect("/");
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-8 text-center">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6">
+      <div className="w-full max-w-sm space-y-10 text-center">
         {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-stone-900">
-            ✝ 오늘의 묘비명
+        <div className="space-y-4">
+          <div className="text-5xl">⛪</div>
+          <h1 className="text-2xl font-bold tracking-tight text-white">
+            빈 무덤 프로젝트
           </h1>
-          <p className="text-stone-500 text-sm leading-relaxed">
-            신앙 안에서의 하루를
+          <p className="text-sm text-slate-400 leading-relaxed">
+            40일, 매일 죽고 예수로 사는
             <br />
-            한 문장으로 기록하고 나눕니다
+            삶의 실전편
           </p>
         </div>
 
@@ -30,16 +30,14 @@ export default async function LoginPage() {
         >
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-3 bg-[#FEE500] hover:bg-[#F0D800] text-stone-900 font-semibold py-3 px-6 rounded-xl transition-colors"
+            className="w-full flex items-center justify-center gap-3 bg-[#FEE500] hover:bg-[#F0D800] text-stone-900 font-semibold py-3.5 px-6 rounded-2xl transition-colors"
           >
             <KakaoIcon />
             카카오로 시작하기
           </button>
         </form>
 
-        <p className="text-xs text-stone-400">
-          셀 리더 커뮤니티 전용 서비스입니다
-        </p>
+        <p className="text-xs text-slate-500">셀 리더 커뮤니티 전용</p>
       </div>
     </div>
   );

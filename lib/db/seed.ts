@@ -1,4 +1,6 @@
-import "dotenv/config";
+import { config } from "dotenv";
+config({ path: ".env.local" });
+
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { cells, cellMembers, gardenPlots } from "./schema";
@@ -10,11 +12,11 @@ const db = drizzle(client);
 // ━━━ 셀 데이터 (여기에 실제 셀 이름과 구성원을 추가하세요) ━━━
 const CELL_DATA: { name: string; members: string[] }[] = [
   {
-    name: "1셀",
-    members: ["홍길동", "김철수", "이영희"],
+    name: "제완셀",
+    members: ["김제완", "김철수", "이영희"],
   },
   {
-    name: "2셀",
+    name: "혜원셀",
     members: ["박지민", "최수현", "정민호"],
   },
   // TODO: 실제 셀 데이터로 교체
@@ -38,7 +40,7 @@ async function seed() {
         cellData.members.map((name) => ({
           cellId: cell.id,
           name,
-        }))
+        })),
       );
       console.log(`    멤버 ${cellData.members.length}명 등록`);
     }

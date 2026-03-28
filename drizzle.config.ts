@@ -10,4 +10,7 @@ export default {
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
+  migrations: {
+    schema: "public",
+  },
 } satisfies Config;

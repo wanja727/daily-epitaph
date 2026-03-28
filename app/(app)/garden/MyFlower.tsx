@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { getFlowerEmoji, getFlowerType, FLOWER_TYPES } from "@/lib/utils/flower-types";
 import { WATER_THRESHOLDS, FLOWER_STAGES } from "@/lib/utils/constants";
 import { waterFlower, startNewFlower } from "./actions";
 import { useState } from "react";
+import FlowerIllustration from "@/app/components/FlowerIllustration";
 
 interface FlowerData {
   id: string;
@@ -13,6 +13,8 @@ interface FlowerData {
   waterCount: number;
   completedAt: Date | null;
 }
+
+const STAGE_LABELS = ["씨앗", "새싹", "봉우리", "만개"];
 
 export default function MyFlower({
   flower,
@@ -34,9 +36,9 @@ export default function MyFlower({
     setActing(false);
   }
 
-  async function handleNewFlower(typeId: string) {
+  async function handleNewFlower() {
     setActing(true);
-    await startNewFlower(typeId);
+    await startNewFlower();
     router.refresh();
     setActing(false);
   }
@@ -45,23 +47,26 @@ export default function MyFlower({
   if (!flower) {
     return (
       <div className="space-y-4">
-        <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-5 text-center space-y-4">
-          <p className="text-lg">🌱</p>
-          <p className="text-sm text-brown-mid">키울 꽃을 선택하세요</p>
+        <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-6 text-center space-y-6">
+          {/* 씨앗 일러스트 미리보기 */}
+          <FlowerIllustration waterCount={0} animate={false} />
 
-          <div className="grid grid-cols-3 gap-3">
-            {FLOWER_TYPES.map((ft) => (
-              <button
-                key={ft.id}
-                onClick={() => handleNewFlower(ft.id)}
-                disabled={acting}
-                className="rounded-[18px] border border-stone bg-[#F7F2E8] p-4 text-center space-y-2 hover:bg-sand transition-colors disabled:opacity-50"
-              >
-                <span className="text-3xl">{ft.stages[2]}</span>
-                <p className="text-xs text-brown-mid">{ft.name}</p>
-              </button>
-            ))}
+          <div className="space-y-2">
+            <p className="text-lg font-heading font-bold text-brown-dark">
+              새 꽃을 시작하세요
+            </p>
+            <p className="text-sm text-brown-mid">
+              묘비명을 쓰고 물뿌리개를 받아 꽃을 키워보세요
+            </p>
           </div>
+
+          <button
+            onClick={handleNewFlower}
+            disabled={acting}
+            className="w-full rounded-3xl bg-olive py-4 text-sm text-ivory shadow-sm transition-colors hover:bg-sage disabled:opacity-50"
+          >
+            {acting ? "준비 중..." : "씨앗 심기"}
+          </button>
         </div>
 
         {completedFlowers.length > 0 && (
@@ -71,20 +76,10 @@ export default function MyFlower({
     );
   }
 
-  const ft = getFlowerType(flower.type);
-  const emoji = getFlowerEmoji(flower.type, flower.stage);
   const isComplete = flower.stage >= FLOWER_STAGES.BLOOM;
-  const nextThreshold =
-    flower.stage < FLOWER_STAGES.BLOOM
-      ? WATER_THRESHOLDS[
-          (flower.stage + 1) as keyof typeof WATER_THRESHOLDS
-        ]
-      : flower.waterCount;
-
-  const stageLabels = ["", "새싹", "봉우리", "활짝 핀 꽃"];
-  const progress = nextThreshold > 0
-    ? Math.min(100, (flower.waterCount / nextThreshold) * 100)
-    : 100;
+  const visualStage = Math.min(flower.waterCount, 3);
+  const totalNeeded = WATER_THRESHOLDS[FLOWER_STAGES.BLOOM]; // 3
+  const progress = Math.min(100, (flower.waterCount / totalNeeded) * 100);
 
   return (
     <div className="space-y-4">
@@ -106,28 +101,32 @@ export default function MyFlower({
           </div>
         </div>
 
-        {/* 꽃 비주얼 */}
-        <div className="mt-6 flex flex-col items-center">
-          <div className="text-7xl py-4">{emoji}</div>
-          <div className="mt-3 text-sm text-brown-mid">
-            {ft.name} · {isComplete ? "완성!" : stageLabels[flower.stage]}
-          </div>
-
-          {/* 성장 바 */}
-          {!isComplete && (
-            <div className="mt-4 w-full">
-              <div className="w-full rounded-full bg-sand h-3 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-sage transition-all duration-500"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-              <p className="mt-1 text-xs text-brown-light text-center">
-                {flower.waterCount} / {nextThreshold} 물주기
-              </p>
-            </div>
-          )}
+        {/* 꽃 일러스트 */}
+        <div className="mt-2">
+          <FlowerIllustration waterCount={flower.waterCount} />
         </div>
+
+        {/* 단계 라벨 */}
+        <div className="text-center mt-2">
+          <p className="text-sm text-brown-mid">
+            {isComplete ? "만개 — 완성!" : STAGE_LABELS[visualStage]}
+          </p>
+        </div>
+
+        {/* 성장 바 */}
+        {!isComplete && (
+          <div className="mt-4">
+            <div className="w-full rounded-full bg-sand h-3 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-sage transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="mt-1 text-xs text-brown-light text-center">
+              {flower.waterCount} / {totalNeeded} 물주기
+            </p>
+          </div>
+        )}
       </div>
 
       {/* 정보 카드 */}
@@ -176,11 +175,9 @@ function CompletedList({ flowers }: { flowers: FlowerData[] }) {
         {flowers.map((f) => (
           <div
             key={f.id}
-            className="rounded-[18px] border border-stone bg-[#F7F2E8] px-3 py-2 text-center shadow-sm"
+            className="w-16 h-16 rounded-[18px] border border-stone bg-[#F7F2E8] shadow-sm"
           >
-            <span className="text-2xl">
-              {getFlowerEmoji(f.type, f.stage)}
-            </span>
+            <FlowerIllustration waterCount={3} size="sm" animate={false} />
           </div>
         ))}
       </div>

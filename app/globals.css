@@ -59,3 +59,37 @@ body {
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+/* ━━━ 꽃 애니메이션 ━━━ */
+
+/* 전체 식물 흔들림 */
+@keyframes flower-sway {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(1.8deg); }
+  75% { transform: rotate(-1.8deg); }
+}
+
+/* 잎 미세 흔들림 */
+@keyframes leaf-sway {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  40% { transform: rotate(1.5deg) translateX(0.5px); }
+  60% { transform: rotate(-1deg) translateX(-0.3px); }
+}
+
+/* 꽃잎 숨쉬기 */
+@keyframes petal-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+.flower-leaves {
+  animation: leaf-sway 6s ease-in-out infinite;
+  transform-origin: center bottom;
+  transform-box: fill-box;
+}
+
+.flower-petals {
+  animation: petal-breathe 4s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}

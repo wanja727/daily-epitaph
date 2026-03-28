@@ -2,9 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { getFlowerEmoji } from "@/lib/utils/flower-types";
 import { GARDEN_SIZE } from "@/lib/utils/constants";
 import { placeFlowerInGarden } from "./actions";
+import FlowerIllustration from "@/app/components/FlowerIllustration";
 
 interface PlotData {
   x: number;
@@ -55,6 +55,7 @@ export default function CellGarden({
   }
 
   const placeable = completedFlowers.filter((f) => f.stage >= 3);
+  const plantedCount = plots.filter((p) => p.flowerId).length;
 
   async function handlePlace(x: number, y: number) {
     if (!placing || acting) return;
@@ -79,7 +80,7 @@ export default function CellGarden({
             </div>
           </div>
           <span className="inline-flex rounded-full px-3 py-1 text-xs bg-[#DCE5D6] text-[#516047]">
-            {plots.filter((p) => p.flowerId).length}송이
+            {plantedCount}송이
           </span>
         </div>
 
@@ -88,18 +89,19 @@ export default function CellGarden({
             row.map((plot, x) => {
               const hasFlower = plot?.flowerId;
               const isEmpty = !hasFlower;
+              const idx = y * GARDEN_SIZE + x;
 
               return (
                 <button
                   key={`${x}-${y}`}
                   disabled={!isEmpty || !placing || acting}
                   onClick={() => handlePlace(x, y)}
-                  className={`aspect-square rounded-[18px] border border-stone flex items-center justify-center text-xl shadow-sm transition-all ${
+                  className={`aspect-square rounded-[18px] border flex items-center justify-center transition-all overflow-hidden ${
                     hasFlower
-                      ? "bg-[#F7F2E8]"
+                      ? "bg-[#F7F2E8] border-stone"
                       : placing
                       ? "bg-sage-light border-sage hover:bg-[#DCE5D6] cursor-pointer"
-                      : "bg-[#F7F2E8]"
+                      : "bg-[#F7F2E8] border-stone"
                   }`}
                   title={
                     plot?.placedByNickname
@@ -107,11 +109,18 @@ export default function CellGarden({
                       : undefined
                   }
                 >
-                  {hasFlower && plot?.flowerType
-                    ? getFlowerEmoji(plot.flowerType, 3)
-                    : isEmpty && placing
-                    ? "+"
-                    : ""}
+                  {hasFlower ? (
+                    <div className="w-full h-full p-0.5">
+                      <FlowerIllustration
+                        waterCount={3}
+                        size="sm"
+                        animate={true}
+                        delay={idx * 0.4}
+                      />
+                    </div>
+                  ) : isEmpty && placing ? (
+                    <span className="text-sage text-lg">+</span>
+                  ) : null}
                 </button>
               );
             })
@@ -139,15 +148,13 @@ export default function CellGarden({
                 onClick={() =>
                   setPlacing(placing === f.id ? null : f.id)
                 }
-                className={`rounded-[18px] border shadow-sm px-3 py-2 text-center transition-colors ${
+                className={`w-16 h-16 rounded-[18px] border shadow-sm transition-colors overflow-hidden ${
                   placing === f.id
                     ? "bg-[#DCE5D6] border-sage"
                     : "bg-[#F7F2E8] border-stone hover:bg-sand"
                 }`}
               >
-                <span className="text-2xl">
-                  {getFlowerEmoji(f.type, 3)}
-                </span>
+                <FlowerIllustration waterCount={3} size="sm" animate={false} />
               </button>
             ))}
           </div>

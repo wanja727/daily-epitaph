@@ -65,13 +65,13 @@ export async function waterFlower(flowerId: string) {
     .where(eq(flowers.id, flowerId));
 }
 
-export async function startNewFlower(typeId: string) {
+export async function startNewFlower() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
   await db.insert(flowers).values({
     userId: session.user.id,
-    type: typeId,
+    type: "flower",
     stage: 1,
     waterCount: 0,
   });

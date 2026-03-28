@@ -14,21 +14,20 @@ export default function OnboardingForm({
 }) {
   const [nickname, setNickname] = useState(suggestedNickname);
   const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const { withLoading } = useLoading();
+  const { isPending, startTransition } = useLoading();
 
   function reroll() {
     setNickname(generateFlowerNickname());
   }
 
-  async function handleSubmit(formData: FormData) {
+  function handleSubmit(formData: FormData) {
     setError("");
-    setSubmitting(true);
-    const result = await withLoading(() => completeOnboarding(formData));
-    if (result?.error) {
-      setError(result.error);
-      setSubmitting(false);
-    }
+    startTransition(async () => {
+      const result = await completeOnboarding(formData);
+      if (result?.error) {
+        setError(result.error);
+      }
+    });
   }
 
   return (
@@ -88,7 +87,7 @@ export default function OnboardingForm({
 
       <button
         type="submit"
-        disabled={submitting}
+        disabled={isPending}
         className="w-full py-3.5 rounded-[20px] bg-olive hover:bg-sage text-ivory font-semibold transition-colors disabled:opacity-50 shadow-sm"
       >
         시작하기

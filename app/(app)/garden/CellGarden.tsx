@@ -107,8 +107,7 @@ export default function CellGarden({
 }) {
   const router = useRouter();
   const [placing, setPlacing] = useState<string | null>(null);
-  const [acting, setActing] = useState(false);
-  const { withLoading } = useLoading();
+  const { isPending, startTransition } = useLoading();
 
   if (!cellId) {
     return (
@@ -132,13 +131,13 @@ export default function CellGarden({
   const placeable = completedFlowers.filter((f) => f.stage >= 3);
   const plantedCount = plots.filter((p) => p.flowerId).length;
 
-  async function handlePlace(x: number, y: number) {
-    if (!placing || acting) return;
-    setActing(true);
-    await withLoading(() => placeFlowerInGarden(placing, cellId!, x, y));
-    setPlacing(null);
-    router.refresh();
-    setActing(false);
+  function handlePlace(x: number, y: number) {
+    if (!placing || isPending) return;
+    startTransition(async () => {
+      await placeFlowerInGarden(placing, cellId!, x, y);
+      setPlacing(null);
+      router.refresh();
+    });
   }
 
   return (

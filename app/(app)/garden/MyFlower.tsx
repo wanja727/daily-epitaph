@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { WATER_THRESHOLDS, FLOWER_STAGES } from "@/lib/utils/constants";
 import { waterFlower, startNewFlower } from "./actions";
-import { useState } from "react";
 import FlowerIllustration from "@/app/components/FlowerIllustration";
 import { useLoading } from "@/app/components/LoadingProvider";
 
@@ -27,22 +26,21 @@ export default function MyFlower({
   completedFlowers: FlowerData[];
 }) {
   const router = useRouter();
-  const [acting, setActing] = useState(false);
-  const { withLoading } = useLoading();
+  const { isPending, startTransition } = useLoading();
 
-  async function handleWater() {
-    if (!flower || acting) return;
-    setActing(true);
-    await withLoading(() => waterFlower(flower.id));
-    router.refresh();
-    setActing(false);
+  function handleWater() {
+    if (!flower) return;
+    startTransition(async () => {
+      await waterFlower(flower.id);
+      router.refresh();
+    });
   }
 
-  async function handleNewFlower() {
-    setActing(true);
-    await withLoading(() => startNewFlower());
-    router.refresh();
-    setActing(false);
+  function handleNewFlower() {
+    startTransition(async () => {
+      await startNewFlower();
+      router.refresh();
+    });
   }
 
   // 완성되었지만 아직 심지 않은 꽃이 있으면 축하 화면 표시
@@ -66,7 +64,7 @@ export default function MyFlower({
 
           <button
             onClick={handleNewFlower}
-            disabled={acting}
+            disabled={isPending}
             className="w-full rounded-3xl bg-olive py-4 text-sm text-ivory shadow-sm transition-colors hover:bg-sage disabled:opacity-50"
           >
             씨앗 심기
@@ -114,7 +112,7 @@ export default function MyFlower({
 
         <button
           onClick={handleNewFlower}
-          disabled={acting}
+          disabled={isPending}
           className="w-full rounded-3xl border border-stone bg-white/70 py-4 text-sm text-brown-mid transition-colors hover:bg-sand disabled:opacity-50"
         >
           새 꽃 시작하기
@@ -171,7 +169,7 @@ export default function MyFlower({
         {/* 새 꽃 시작 */}
         <button
           onClick={handleNewFlower}
-          disabled={acting}
+          disabled={isPending}
           className="w-full rounded-3xl border border-stone bg-white/70 py-4 text-sm text-brown-mid transition-colors hover:bg-sand disabled:opacity-50"
         >
           새 꽃 시작하기
@@ -233,7 +231,7 @@ export default function MyFlower({
       {/* 물 주기 버튼 */}
       <button
         onClick={handleWater}
-        disabled={waterCount <= 0 || acting}
+        disabled={waterCount <= 0 || isPending}
         className="w-full rounded-3xl bg-sage py-4 text-sm text-ivory shadow-sm transition-colors hover:bg-olive disabled:opacity-40"
       >
         물 주기

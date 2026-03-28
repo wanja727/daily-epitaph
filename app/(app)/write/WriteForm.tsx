@@ -15,12 +15,12 @@ export default function WriteForm({
 }) {
   const [yesterday, setYesterday] = useState(defaultYesterday);
   const [today, setToday] = useState(defaultToday);
-  const [submitting, setSubmitting] = useState(false);
-  const { withLoading } = useLoading();
+  const { isPending, startTransition } = useLoading();
 
-  async function handleSubmit(formData: FormData) {
-    setSubmitting(true);
-    await withLoading(() => upsertEpitaph(formData));
+  function handleSubmit(formData: FormData) {
+    startTransition(async () => {
+      await upsertEpitaph(formData);
+    });
   }
 
   return (
@@ -79,7 +79,7 @@ export default function WriteForm({
 
       <button
         type="submit"
-        disabled={submitting}
+        disabled={isPending}
         className="w-full rounded-3xl bg-olive py-4 text-sm text-ivory shadow-sm transition-colors hover:bg-sage disabled:opacity-50"
       >
         {isEdit ? "수정하기" : "오늘의 고백 새기기"}

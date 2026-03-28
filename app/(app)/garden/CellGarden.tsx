@@ -20,7 +20,7 @@ interface FlowerData {
   stage: number;
 }
 
-/** 개별 밭 칸 — SVG 흙/잔디 배경 */
+/** 개별 밭 칸 — SVG 잔디 배경 */
 function PlotCell({
   hasFlower,
   placing,
@@ -40,37 +40,42 @@ function PlotCell({
     <button
       disabled={!(!hasFlower && placing) || acting}
       onClick={onClick}
-      className={`aspect-square rounded-[18px] relative overflow-hidden transition-all ${
+      className={`aspect-square rounded-[14px] relative overflow-hidden transition-all border-2 ${
         !hasFlower && placing
-          ? "ring-2 ring-olive/40 cursor-pointer"
-          : ""
+          ? "ring-2 ring-olive/40 cursor-pointer border-[#5A9A3C]"
+          : "border-[#6AAA4A]/40"
       }`}
       title={nickname ? `${nickname}` : undefined}
     >
-      {/* 배경 SVG: 흙 + 잔디 */}
+      {/* 배경 SVG: 잔디 */}
       <svg
         viewBox="0 0 60 60"
         className="absolute inset-0 w-full h-full"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* 흙 배경 */}
-        <rect width="60" height="60" rx="12" fill="#EDE6D8" />
-        {/* 흙 질감 */}
-        <circle cx="15" cy="48" r="1.5" fill="#D6CCBB" opacity="0.5" />
-        <circle cx="35" cy="52" r="1" fill="#D6CCBB" opacity="0.4" />
-        <circle cx="48" cy="46" r="1.2" fill="#D6CCBB" opacity="0.3" />
-        {/* 잔디 하단 */}
-        <ellipse cx="30" cy="54" rx="26" ry="5" fill="#C5D4B3" opacity="0.3" />
-        {/* 잔디 블레이드 */}
-        <path d="M12,54 Q13,48 14,54" stroke="#8FB070" strokeWidth="1" fill="none" opacity="0.4" />
-        <path d="M22,53 Q23,46 24,53" stroke="#7DA65E" strokeWidth="1" fill="none" opacity="0.35" />
-        <path d="M38,54 Q39,47 40,54" stroke="#8FB070" strokeWidth="1" fill="none" opacity="0.4" />
-        <path d="M48,53 Q49,48 50,53" stroke="#7DA65E" strokeWidth="1" fill="none" opacity="0.3" />
+        {/* 잔디 배경 */}
+        <rect width="60" height="60" rx="10" fill="#B8D89E" />
+        {/* 잔디 텍스처 */}
+        <rect width="60" height="60" rx="10" fill="#A8CE8A" opacity="0.4" />
+        {/* 잔디 패턴 */}
+        <path d="M8,52 Q10,44 12,52" stroke="#7EBF5C" strokeWidth="1.2" fill="none" opacity="0.5" />
+        <path d="M20,50 Q22,42 24,50" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.45" />
+        <path d="M36,53 Q38,45 40,53" stroke="#7EBF5C" strokeWidth="1.1" fill="none" opacity="0.5" />
+        <path d="M48,51 Q50,44 52,51" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.4" />
+        <path d="M14,20 Q15,14 16,20" stroke="#8FC878" strokeWidth="0.8" fill="none" opacity="0.3" />
+        <path d="M42,18 Q43,12 44,18" stroke="#8FC878" strokeWidth="0.8" fill="none" opacity="0.25" />
+        {/* 밝은 잔디 하이라이트 */}
+        <ellipse cx="20" cy="25" rx="8" ry="6" fill="#C4E4A8" opacity="0.25" />
+        <ellipse cx="42" cy="40" rx="7" ry="5" fill="#C4E4A8" opacity="0.2" />
+        {/* 흙 패치 — 중앙 심기 영역 */}
+        {!hasFlower && (
+          <ellipse cx="30" cy="42" rx="12" ry="6" fill="#C9B89A" opacity="0.3" />
+        )}
         {/* 빈 자리 플러스 표시 */}
         {!hasFlower && placing && (
-          <g opacity="0.5">
-            <line x1="30" y1="22" x2="30" y2="38" stroke="#6D7A5F" strokeWidth="2" strokeLinecap="round" />
-            <line x1="22" y1="30" x2="38" y2="30" stroke="#6D7A5F" strokeWidth="2" strokeLinecap="round" />
+          <g opacity="0.6">
+            <line x1="30" y1="22" x2="30" y2="38" stroke="#4A7A35" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="22" y1="30" x2="38" y2="30" stroke="#4A7A35" strokeWidth="2.5" strokeLinecap="round" />
           </g>
         )}
       </svg>
@@ -139,9 +144,9 @@ export default function CellGarden({
   return (
     <div className="space-y-4">
       {/* 꽃밭 카드 */}
-      <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4 relative overflow-hidden">
+      <div className="rounded-[28px] border border-[#8BBF6A]/30 bg-[#E8F0DE]/80 backdrop-blur-sm shadow-sm p-4 relative overflow-hidden">
         {/* 배경 글로우 */}
-        <div className="absolute -top-8 -left-8 h-32 w-32 rounded-full bg-sage/15 blur-3xl" />
+        <div className="absolute -top-8 -left-8 h-32 w-32 rounded-full bg-[#8BBF6A]/15 blur-3xl" />
         <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-gold/10 blur-2xl" />
 
         <div className="relative">

@@ -43,8 +43,11 @@ export default function MyFlower({
     setActing(false);
   }
 
+  // 완성되었지만 아직 심지 않은 꽃이 있으면 축하 화면 표시
+  const unplacedCompleted = completedFlowers.length > 0 ? completedFlowers[0] : null;
+
   // 꽃을 아직 시작하지 않은 상태
-  if (!flower) {
+  if (!flower && !unplacedCompleted) {
     return (
       <div className="space-y-4">
         <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-6 text-center space-y-6">
@@ -67,13 +70,58 @@ export default function MyFlower({
             {acting ? "준비 중..." : "씨앗 심기"}
           </button>
         </div>
-
-        {completedFlowers.length > 0 && (
-          <CompletedList flowers={completedFlowers} />
-        )}
       </div>
     );
   }
+
+  // 활성 꽃 없고 완성된 꽃이 있으면 → 축하 화면
+  if (!flower && unplacedCompleted) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-6 relative overflow-visible">
+          {/* 축하 글로우 */}
+          <div className="absolute -top-10 left-1/2 -translate-x-1/2 h-40 w-40 rounded-full bg-gold/30 blur-3xl" />
+          <div className="absolute -top-6 right-6 h-20 w-20 rounded-full bg-rose/20 blur-2xl" />
+
+          <div className="relative text-center space-y-4">
+            <div className="text-xs uppercase tracking-[0.2em] text-brown-light">
+              Fully Bloomed
+            </div>
+
+            <div className="w-64 h-72 mx-auto">
+              <FlowerIllustration waterCount={3} />
+            </div>
+
+            <div>
+              <p className="text-xl font-heading font-bold text-brown-dark">
+                만개했습니다!
+              </p>
+              <p className="mt-1 text-sm text-brown-mid">
+                당신의 기도와 결단이 아름다운 꽃으로 피었어요
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={() => router.push("/garden?tab=cell")}
+          className="w-full rounded-3xl bg-olive py-4 text-sm text-ivory shadow-sm transition-colors hover:bg-sage"
+        >
+          셀 꽃밭에 심으러 가기
+        </button>
+
+        <button
+          onClick={handleNewFlower}
+          disabled={acting}
+          className="w-full rounded-3xl border border-stone bg-white/70 py-4 text-sm text-brown-mid transition-colors hover:bg-sand disabled:opacity-50"
+        >
+          {acting ? "준비 중..." : "새 꽃 시작하기"}
+        </button>
+      </div>
+    );
+  }
+
+  if (!flower) return null;
 
   const isComplete = flower.stage >= FLOWER_STAGES.BLOOM;
   const visualStage = Math.min(flower.waterCount, 3);

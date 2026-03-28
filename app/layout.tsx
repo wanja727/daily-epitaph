@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { Noto_Serif_KR } from "next/font/google";
 import "./globals.css";
+import LoadingProvider from "@/app/components/LoadingProvider";
 
 const geist = Geist({
   variable: "--font-geist",
@@ -33,7 +34,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${geist.variable} ${notoSerif.variable} antialiased`}>{children}</body>
+      <body className={`${geist.variable} ${notoSerif.variable} antialiased`}>
+        <LoadingProvider>{children}</LoadingProvider>
+      </body>
     </html>
   );
 }

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { GARDEN_SIZE } from "@/lib/utils/constants";
 import { placeFlowerInGarden } from "./actions";
 import FlowerIllustration from "@/app/components/FlowerIllustration";
-import Spinner from "@/app/components/Spinner";
+import { useLoading } from "@/app/components/LoadingProvider";
 
 interface PlotData {
   x: number;
@@ -25,21 +25,19 @@ interface FlowerData {
 function PlotCell({
   hasFlower,
   placing,
-  acting,
   nickname,
   index,
   onClick,
 }: {
   hasFlower: boolean;
   placing: boolean;
-  acting: boolean;
   nickname?: string | null;
   index: number;
   onClick: () => void;
 }) {
   return (
     <button
-      disabled={!(!hasFlower && placing) || acting}
+      disabled={!(!hasFlower && placing)}
       onClick={onClick}
       className={`aspect-square rounded-[14px] relative overflow-hidden transition-all border-2 ${
         !hasFlower && placing
@@ -73,20 +71,13 @@ function PlotCell({
           <ellipse cx="30" cy="42" rx="12" ry="6" fill="#C9B89A" opacity="0.3" />
         )}
         {/* 빈 자리 플러스 표시 */}
-        {!hasFlower && placing && !acting && (
+        {!hasFlower && placing && (
           <g opacity="0.6">
             <line x1="30" y1="22" x2="30" y2="38" stroke="#4A7A35" strokeWidth="2.5" strokeLinecap="round" />
             <line x1="22" y1="30" x2="38" y2="30" stroke="#4A7A35" strokeWidth="2.5" strokeLinecap="round" />
           </g>
         )}
       </svg>
-
-      {/* 심는 중 스피너 */}
-      {!hasFlower && placing && acting && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Spinner size={18} className="text-[#4A7A35]" />
-        </div>
-      )}
 
       {/* 꽃 */}
       {hasFlower && (
@@ -117,6 +108,7 @@ export default function CellGarden({
   const router = useRouter();
   const [placing, setPlacing] = useState<string | null>(null);
   const [acting, setActing] = useState(false);
+  const { withLoading } = useLoading();
 
   if (!cellId) {
     return (
@@ -143,7 +135,7 @@ export default function CellGarden({
   async function handlePlace(x: number, y: number) {
     if (!placing || acting) return;
     setActing(true);
-    await placeFlowerInGarden(placing, cellId!, x, y);
+    await withLoading(() => placeFlowerInGarden(placing, cellId!, x, y));
     setPlacing(null);
     router.refresh();
     setActing(false);
@@ -182,7 +174,6 @@ export default function CellGarden({
                     key={`${x}-${y}`}
                     hasFlower={hasFlower}
                     placing={!!placing}
-                    acting={acting}
                     nickname={plot?.placedByNickname}
                     index={idx}
                     onClick={() => handlePlace(x, y)}

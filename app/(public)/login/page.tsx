@@ -1,6 +1,5 @@
 import { signIn, auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import SubmitButton from "@/app/components/SubmitButton";
 
 export default async function LoginPage() {
   const session = await auth();
@@ -41,13 +40,13 @@ export default async function LoginPage() {
             }}
             className="mt-4"
           >
-            <SubmitButton
-              pendingText="로그인 중..."
+            <button
+              type="submit"
               className="w-full flex items-center justify-center gap-3 bg-[#FEE500] hover:bg-[#F0D800] text-stone-900 font-semibold py-3.5 px-6 rounded-[20px] transition-colors"
             >
               <KakaoIcon />
               카카오로 시작하기
-            </SubmitButton>
+            </button>
           </form>
         </div>
       </div>

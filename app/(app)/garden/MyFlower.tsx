@@ -5,7 +5,7 @@ import { WATER_THRESHOLDS, FLOWER_STAGES } from "@/lib/utils/constants";
 import { waterFlower, startNewFlower } from "./actions";
 import { useState } from "react";
 import FlowerIllustration from "@/app/components/FlowerIllustration";
-import Spinner from "@/app/components/Spinner";
+import { useLoading } from "@/app/components/LoadingProvider";
 
 interface FlowerData {
   id: string;
@@ -28,18 +28,19 @@ export default function MyFlower({
 }) {
   const router = useRouter();
   const [acting, setActing] = useState(false);
+  const { withLoading } = useLoading();
 
   async function handleWater() {
     if (!flower || acting) return;
     setActing(true);
-    await waterFlower(flower.id);
+    await withLoading(() => waterFlower(flower.id));
     router.refresh();
     setActing(false);
   }
 
   async function handleNewFlower() {
     setActing(true);
-    await startNewFlower();
+    await withLoading(() => startNewFlower());
     router.refresh();
     setActing(false);
   }
@@ -68,12 +69,7 @@ export default function MyFlower({
             disabled={acting}
             className="w-full rounded-3xl bg-olive py-4 text-sm text-ivory shadow-sm transition-colors hover:bg-sage disabled:opacity-50"
           >
-            {acting ? (
-              <span className="inline-flex items-center justify-center gap-2">
-                <Spinner size={14} />
-                준비 중...
-              </span>
-            ) : "씨앗 심기"}
+            씨앗 심기
           </button>
         </div>
       </div>
@@ -121,12 +117,7 @@ export default function MyFlower({
           disabled={acting}
           className="w-full rounded-3xl border border-stone bg-white/70 py-4 text-sm text-brown-mid transition-colors hover:bg-sand disabled:opacity-50"
         >
-          {acting ? (
-            <span className="inline-flex items-center justify-center gap-2">
-              <Spinner size={14} />
-              준비 중...
-            </span>
-          ) : "새 꽃 시작하기"}
+          새 꽃 시작하기
         </button>
       </div>
     );
@@ -183,12 +174,7 @@ export default function MyFlower({
           disabled={acting}
           className="w-full rounded-3xl border border-stone bg-white/70 py-4 text-sm text-brown-mid transition-colors hover:bg-sand disabled:opacity-50"
         >
-          {acting ? (
-            <span className="inline-flex items-center justify-center gap-2">
-              <Spinner size={14} />
-              준비 중...
-            </span>
-          ) : "새 꽃 시작하기"}
+          새 꽃 시작하기
         </button>
 
         {completedFlowers.length > 0 && (
@@ -250,12 +236,7 @@ export default function MyFlower({
         disabled={waterCount <= 0 || acting}
         className="w-full rounded-3xl bg-sage py-4 text-sm text-ivory shadow-sm transition-colors hover:bg-olive disabled:opacity-40"
       >
-        {acting ? (
-          <span className="inline-flex items-center justify-center gap-2">
-            <Spinner size={14} />
-            물 주는 중...
-          </span>
-        ) : "물 주기"}
+        물 주기
       </button>
 
       {completedFlowers.length > 0 && (

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { completeOnboarding } from "./actions";
 import { generateFlowerNickname } from "@/lib/utils/flower-names";
-import Spinner from "@/app/components/Spinner";
+import { useLoading } from "@/app/components/LoadingProvider";
 
 export default function OnboardingForm({
   suggestedNickname,
@@ -15,6 +15,7 @@ export default function OnboardingForm({
   const [nickname, setNickname] = useState(suggestedNickname);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const { withLoading } = useLoading();
 
   function reroll() {
     setNickname(generateFlowerNickname());
@@ -23,7 +24,7 @@ export default function OnboardingForm({
   async function handleSubmit(formData: FormData) {
     setError("");
     setSubmitting(true);
-    const result = await completeOnboarding(formData);
+    const result = await withLoading(() => completeOnboarding(formData));
     if (result?.error) {
       setError(result.error);
       setSubmitting(false);
@@ -90,12 +91,7 @@ export default function OnboardingForm({
         disabled={submitting}
         className="w-full py-3.5 rounded-[20px] bg-olive hover:bg-sage text-ivory font-semibold transition-colors disabled:opacity-50 shadow-sm"
       >
-        {submitting ? (
-          <span className="inline-flex items-center justify-center gap-2">
-            <Spinner size={14} />
-            설정 중...
-          </span>
-        ) : "시작하기"}
+        시작하기
       </button>
     </form>
   );

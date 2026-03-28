@@ -5,7 +5,6 @@ import { eq, desc } from "drizzle-orm";
 import { PROJECT_START_DATE, PROJECT_DAYS } from "@/lib/utils/constants";
 import { formatDateKR } from "@/lib/utils/date";
 import AttendanceGrid from "./AttendanceGrid";
-import SubmitButton from "@/app/components/SubmitButton";
 
 export default async function MyPage() {
   const session = await auth();
@@ -65,12 +64,12 @@ export default async function MyPage() {
             await signOut({ redirectTo: "/login" });
           }}
         >
-          <SubmitButton
-            pendingText="로그아웃..."
+          <button
+            type="submit"
             className="text-xs text-brown-light hover:text-brown px-3 py-1.5 rounded-full border border-stone hover:bg-sand transition-colors"
           >
             로그아웃
-          </SubmitButton>
+          </button>
         </form>
       </div>
 

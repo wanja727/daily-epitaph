@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { upsertEpitaph } from "./actions";
-import Spinner from "@/app/components/Spinner";
+import { useLoading } from "@/app/components/LoadingProvider";
 
 export default function WriteForm({
   defaultYesterday,
@@ -16,10 +16,11 @@ export default function WriteForm({
   const [yesterday, setYesterday] = useState(defaultYesterday);
   const [today, setToday] = useState(defaultToday);
   const [submitting, setSubmitting] = useState(false);
+  const { withLoading } = useLoading();
 
   async function handleSubmit(formData: FormData) {
     setSubmitting(true);
-    await upsertEpitaph(formData);
+    await withLoading(() => upsertEpitaph(formData));
   }
 
   return (
@@ -81,16 +82,7 @@ export default function WriteForm({
         disabled={submitting}
         className="w-full rounded-3xl bg-olive py-4 text-sm text-ivory shadow-sm transition-colors hover:bg-sage disabled:opacity-50"
       >
-        {submitting ? (
-          <span className="inline-flex items-center justify-center gap-2">
-            <Spinner size={14} />
-            저장 중...
-          </span>
-        ) : isEdit ? (
-          "수정하기"
-        ) : (
-          "오늘의 고백 새기기"
-        )}
+        {isEdit ? "수정하기" : "오늘의 고백 새기기"}
       </button>
 
       {!isEdit && (

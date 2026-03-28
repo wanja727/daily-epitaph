@@ -6,15 +6,19 @@ export default async function LoginPage() {
   if (session) redirect("/");
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen bg-ivory flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm space-y-10 text-center">
         {/* Header */}
         <div className="space-y-4">
-          <div className="text-5xl">⛪</div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
+          <div className="flex justify-center">
+            <div className="w-20 h-20 rounded-full bg-linear-to-b from-gold/30 to-sage/20 flex items-center justify-center">
+              <span className="text-4xl">🪨</span>
+            </div>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-brown">
             빈 무덤 프로젝트
           </h1>
-          <p className="text-sm text-slate-400 leading-relaxed">
+          <p className="text-sm text-brown-light leading-relaxed">
             40일, 매일 죽고 예수로 사는
             <br />
             삶의 실전편
@@ -37,7 +41,7 @@ export default async function LoginPage() {
           </button>
         </form>
 
-        <p className="text-xs text-slate-500">셀 리더 커뮤니티 전용</p>
+        <p className="text-xs text-warm-gray">셀 리더 커뮤니티 전용</p>
       </div>
     </div>
   );

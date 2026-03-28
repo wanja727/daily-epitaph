@@ -28,19 +28,19 @@ export default function AttendanceGrid({
   });
 
   return (
-    <div className="rounded-2xl bg-white/[0.04] border border-white/[0.06] p-4">
+    <div className="rounded-2xl bg-white border border-warm-gray/30 p-4">
       <div className="grid grid-cols-8 gap-1.5">
         {days.map((d) => (
           <div
             key={d.dayNum}
             className={`aspect-square rounded-lg flex items-center justify-center text-xs font-medium transition-colors ${
               d.attended
-                ? "bg-accent/30 text-accent-bright border border-accent/40"
+                ? "bg-olive/20 text-olive border border-olive/30"
                 : d.isToday
-                ? "bg-white/10 text-white border border-white/20 ring-1 ring-accent/50"
+                ? "bg-gold/10 text-brown border border-gold/40 ring-1 ring-gold/30"
                 : d.isPast
-                ? "bg-white/[0.02] text-slate-600 border border-white/[0.04]"
-                : "bg-white/[0.02] text-slate-600 border border-white/[0.04]"
+                ? "bg-warm-gray/10 text-warm-gray border border-warm-gray/15"
+                : "bg-warm-gray/5 text-warm-gray/60 border border-warm-gray/10"
             }`}
             title={d.dateStr}
           >

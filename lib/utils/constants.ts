@@ -9,8 +9,8 @@ export const FLOWER_STAGES = {
 
 /** 각 단계로 성장하기 위해 필요한 누적 물 횟수 */
 export const WATER_THRESHOLDS = {
-  [FLOWER_STAGES.BUD]: 3, // 1→2: 물 3회
-  [FLOWER_STAGES.BLOOM]: 7, // 2→3: 물 7회 (누적)
+  [FLOWER_STAGES.BUD]: 1, // 1→2: 물 1회
+  [FLOWER_STAGES.BLOOM]: 3, // 2→3: 물 3회 (누적)
 } as const;
 
 export const GARDEN_SIZE = 5; // 5×5 그리드

@@ -52,10 +52,10 @@ export default async function MainPage() {
     <div className="px-4 py-6 space-y-5">
       {/* 날짜 + 인사 */}
       <div className="space-y-1">
-        <p className="text-xs text-slate-500 uppercase tracking-widest">
+        <p className="text-xs text-warm-gray uppercase tracking-widest">
           TODAY
         </p>
-        <p className="text-sm text-slate-400">{todayFormatted}</p>
+        <p className="text-sm text-brown-light">{todayFormatted}</p>
       </div>
 
       {/* 피드 (클라이언트 컴포넌트에서 필터링) */}
@@ -70,7 +70,7 @@ export default async function MainPage() {
       {/* 플로팅 작성 버튼 */}
       <Link
         href="/write"
-        className="fixed bottom-24 right-6 z-40 w-14 h-14 rounded-full bg-accent hover:bg-accent-bright shadow-lg shadow-accent/30 flex items-center justify-center transition-colors"
+        className="fixed bottom-24 right-6 z-40 w-14 h-14 rounded-full bg-olive hover:bg-sage shadow-lg shadow-olive/20 flex items-center justify-center transition-colors"
       >
         <svg
           width="24"

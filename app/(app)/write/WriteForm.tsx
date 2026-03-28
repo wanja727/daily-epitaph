@@ -25,10 +25,10 @@ export default function WriteForm({
     <form action={handleSubmit} className="space-y-6">
       {/* 어제 돌아보기 */}
       <div className="space-y-2">
-        <p className="text-sm text-slate-300 leading-relaxed">
+        <p className="text-sm text-brown-light leading-relaxed">
           어제의 내 모습을 돌아보며
           <br />
-          <span className="text-accent-bright">
+          <span className="text-rose font-medium">
             나의 죄와 연약함을 십자가에 못 박아 보세요.
           </span>
         </p>
@@ -39,16 +39,16 @@ export default function WriteForm({
           placeholder="어제를 돌아보며..."
           rows={4}
           required
-          className="w-full resize-none rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-accent/50 text-sm leading-relaxed"
+          className="w-full resize-none rounded-xl bg-white border border-warm-gray/40 px-4 py-3 text-brown placeholder:text-warm-gray focus:outline-none focus:ring-2 focus:ring-olive/30 text-sm leading-relaxed"
         />
       </div>
 
       {/* 오늘 기대함 */}
       <div className="space-y-2">
-        <p className="text-sm text-slate-300 leading-relaxed">
+        <p className="text-sm text-brown-light leading-relaxed">
           오늘도 내 삶에 새 생명을 주신 예수님께 감사하며,
           <br />
-          <span className="text-accent-bright">
+          <span className="text-olive font-medium">
             하루를 기대하는 마음을 적어 보세요.
           </span>
         </p>
@@ -59,25 +59,25 @@ export default function WriteForm({
           placeholder="오늘을 기대하며..."
           rows={4}
           required
-          className="w-full resize-none rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-accent/50 text-sm leading-relaxed"
+          className="w-full resize-none rounded-xl bg-white border border-warm-gray/40 px-4 py-3 text-brown placeholder:text-warm-gray focus:outline-none focus:ring-2 focus:ring-olive/30 text-sm leading-relaxed"
         />
       </div>
 
       <button
         type="submit"
         disabled={submitting}
-        className="w-full py-3.5 rounded-2xl bg-accent hover:bg-accent-bright text-white font-semibold transition-colors disabled:opacity-50"
+        className="w-full py-3.5 rounded-2xl bg-olive hover:bg-sage text-white font-semibold transition-colors disabled:opacity-50"
       >
         {submitting
           ? "저장 중..."
           : isEdit
           ? "수정하기"
-          : "묘비명 새기기 ✍️"}
+          : "묘비명 새기기"}
       </button>
 
       {!isEdit && (
-        <p className="text-center text-xs text-slate-500">
-          작성 완료 시 물뿌리개 1개를 받아요 🚿
+        <p className="text-center text-xs text-warm-gray">
+          작성 완료 시 물뿌리개 1개를 받아요
         </p>
       )}
     </form>

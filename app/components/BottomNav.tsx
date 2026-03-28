@@ -13,7 +13,7 @@ const NAV_ITEMS = [
         height="24"
         viewBox="0 0 24 24"
         fill="none"
-        stroke={active ? "#8ba4ff" : "#64748b"}
+        stroke={active ? "#5E4633" : "#D9D2C7"}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -32,7 +32,7 @@ const NAV_ITEMS = [
         height="24"
         viewBox="0 0 24 24"
         fill="none"
-        stroke={active ? "#8ba4ff" : "#64748b"}
+        stroke={active ? "#5E4633" : "#D9D2C7"}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -52,7 +52,7 @@ const NAV_ITEMS = [
         height="24"
         viewBox="0 0 24 24"
         fill="none"
-        stroke={active ? "#8ba4ff" : "#64748b"}
+        stroke={active ? "#5E4633" : "#D9D2C7"}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -68,7 +68,7 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-navy-950/95 backdrop-blur-md border-t border-white/10 safe-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-ivory/95 backdrop-blur-md border-t border-warm-gray/30 safe-bottom">
       <div className="max-w-lg mx-auto flex items-center justify-around h-16">
         {NAV_ITEMS.map((item) => {
           const active = pathname.startsWith(item.href);
@@ -81,7 +81,7 @@ export default function BottomNav() {
               {item.icon(active)}
               <span
                 className={`text-[10px] font-medium ${
-                  active ? "text-accent-bright" : "text-slate-500"
+                  active ? "text-brown" : "text-warm-gray"
                 }`}
               >
                 {item.label}

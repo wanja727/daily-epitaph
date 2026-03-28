@@ -26,16 +26,23 @@ export default function CoverContent() {
   return (
     <div
       onClick={handleEnter}
-      className="min-h-screen bg-navy-950 flex items-center justify-center px-6 py-12 cursor-pointer select-none"
+      className="min-h-screen bg-ivory flex items-center justify-center px-6 py-12 cursor-pointer select-none"
     >
       <div className="max-w-md space-y-8 text-center animate-[fadeIn_0.8s_ease-out]">
-        <h1 className="text-2xl font-bold text-white tracking-tight">
+        {/* 새벽빛 심볼 */}
+        <div className="flex justify-center">
+          <div className="w-20 h-20 rounded-full bg-linear-to-b from-gold/30 to-sage/20 flex items-center justify-center">
+            <span className="text-4xl">🪨</span>
+          </div>
+        </div>
+
+        <h1 className="text-2xl font-bold text-brown tracking-tight">
           40일 &lsquo;빈 무덤 프로젝트&rsquo;를 시작하며
         </h1>
 
-        <div className="space-y-6 text-sm leading-7 text-slate-300">
+        <div className="space-y-6 text-sm leading-7 text-brown-light">
           <div>
-            <p className="font-semibold text-accent-bright mb-2">
+            <p className="font-semibold text-olive mb-2">
               오늘도 이어지는 부활의 능력
             </p>
             <p>
@@ -62,7 +69,7 @@ export default function CoverContent() {
           </p>
 
           <div>
-            <p className="font-semibold text-accent-bright mb-2">
+            <p className="font-semibold text-olive mb-2">
               죽음에서 생명으로의 전환
             </p>
             <p>
@@ -90,7 +97,7 @@ export default function CoverContent() {
             내 대신 주님이 사시는 거룩한 변화가 있기를 사모합니다.
           </p>
 
-          <p className="text-xs text-slate-400 italic">
+          <p className="text-xs text-warm-gray italic">
             &ldquo;만일 우리가 그리스도와 함께 죽었으면
             <br />
             또한 그와 함께 살 줄을 믿노니&rdquo;
@@ -100,7 +107,7 @@ export default function CoverContent() {
         </div>
 
         <div className="pt-4">
-          <span className="text-xs text-slate-500 animate-pulse">
+          <span className="text-xs text-warm-gray animate-pulse">
             화면을 터치하여 시작하기
           </span>
         </div>

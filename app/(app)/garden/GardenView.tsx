@@ -45,21 +45,21 @@ export default function GardenView({
           onClick={() => setTab("my")}
           className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
             tab === "my"
-              ? "bg-accent text-white"
-              : "bg-white/5 text-slate-400 hover:bg-white/10"
+              ? "bg-olive text-white"
+              : "bg-brown/5 text-brown-light hover:bg-brown/10"
           }`}
         >
-          내 꽃 🌱
+          내 꽃
         </button>
         <button
           onClick={() => setTab("cell")}
           className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
             tab === "cell"
-              ? "bg-accent text-white"
-              : "bg-white/5 text-slate-400 hover:bg-white/10"
+              ? "bg-olive text-white"
+              : "bg-brown/5 text-brown-light hover:bg-brown/10"
           }`}
         >
-          {cellName ? `${cellName} 꽃밭` : "셀 꽃밭"} 🌻
+          {cellName ? `${cellName} 꽃밭` : "셀 꽃밭"}
         </button>
       </div>
 

@@ -82,7 +82,21 @@ export default async function GardenPage() {
   }
 
   return (
-    <div className="px-4 py-6">
+    <div className="px-5 py-5 space-y-4">
+      {/* 헤더 */}
+      <div className="text-xs tracking-[0.25em] uppercase text-brown-light">
+        Empty Tomb Project
+      </div>
+
+      <div>
+        <h2 className="text-[28px] leading-[1.1] font-heading font-bold text-brown-dark">
+          물 주기
+        </h2>
+        <p className="mt-2 text-sm text-brown-mid leading-6">
+          하나님이 내어놓은 땅에서 자라게 하시는 것을 기도하며 물을 주세요.
+        </p>
+      </div>
+
       <GardenView
         activeFlower={activeFlower ?? null}
         completedFlowers={completedFlowers}

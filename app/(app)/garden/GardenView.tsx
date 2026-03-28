@@ -38,25 +38,25 @@ export default function GardenView({
   const [tab, setTab] = useState<"my" | "cell">("my");
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* 탭 */}
       <div className="flex gap-2">
         <button
           onClick={() => setTab("my")}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+          className={`inline-flex rounded-full px-3 py-1 text-xs transition-colors ${
             tab === "my"
-              ? "bg-olive text-white"
-              : "bg-brown/5 text-brown-light hover:bg-brown/10"
+              ? "bg-[#DCE5D6] text-[#516047]"
+              : "bg-sand/60 text-brown-mid"
           }`}
         >
           내 꽃
         </button>
         <button
           onClick={() => setTab("cell")}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+          className={`inline-flex rounded-full px-3 py-1 text-xs transition-colors ${
             tab === "cell"
-              ? "bg-olive text-white"
-              : "bg-brown/5 text-brown-light hover:bg-brown/10"
+              ? "bg-[#DCE5D6] text-[#516047]"
+              : "bg-sand/60 text-brown-mid"
           }`}
         >
           {cellName ? `${cellName} 꽃밭` : "셀 꽃밭"}

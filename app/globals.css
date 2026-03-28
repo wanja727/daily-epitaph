@@ -1,28 +1,50 @@
 @import "tailwindcss";
 
 :root {
-  --ivory: #F7F3EC;
-  --warm-gray: #D9D2C7;
-  --brown: #5E4633;
-  --brown-light: #7A6352;
-  --sage: #A8B99A;
-  --olive: #7C8A63;
-  --rose: #C67C6A;
-  --gold: #D8B65C;
-  --card-bg: rgba(94, 70, 51, 0.06);
-  --card-border: rgba(94, 70, 51, 0.12);
+  /* 배경 */
+  --ivory: #F8F3EA;
+  --sand: #ECE4D8;
+  --stone: #E5E1D2;
+
+  /* 텍스트 */
+  --brown-dark: #4A372A;
+  --brown: #5A4636;
+  --brown-mid: #6B5A4E;
+  --brown-light: #8A786A;
+
+  /* 카드/보더 */
+  --card-bg: rgba(255, 255, 255, 0.70);
+  --card-border: #E7E0D3;
+
+  /* 포인트 컬러 */
+  --olive: #6D7A5F;
+  --sage: #8B9A7C;
+  --sage-light: #EDF2E8;
+  --rose: #D7A3A7;
+  --rose-deep: #C88990;
+  --rose-light: #E9D7D7;
+  --gold: #F0E1A9;
+  --gold-light: #EFE3BD;
 }
 
 @theme inline {
   --color-ivory: var(--ivory);
-  --color-warm-gray: var(--warm-gray);
+  --color-sand: var(--sand);
+  --color-stone: var(--stone);
+  --color-brown-dark: var(--brown-dark);
   --color-brown: var(--brown);
+  --color-brown-mid: var(--brown-mid);
   --color-brown-light: var(--brown-light);
-  --color-sage: var(--sage);
   --color-olive: var(--olive);
+  --color-sage: var(--sage);
+  --color-sage-light: var(--sage-light);
   --color-rose: var(--rose);
+  --color-rose-deep: var(--rose-deep);
+  --color-rose-light: var(--rose-light);
   --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
   --font-sans: var(--font-geist);
+  --font-heading: var(--font-serif);
 }
 
 body {

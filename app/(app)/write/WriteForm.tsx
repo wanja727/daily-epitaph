@@ -22,61 +22,73 @@ export default function WriteForm({
   }
 
   return (
-    <form action={handleSubmit} className="space-y-6">
-      {/* 어제 돌아보기 */}
-      <div className="space-y-2">
-        <p className="text-sm text-brown-light leading-relaxed">
-          어제의 내 모습을 돌아보며
-          <br />
-          <span className="text-rose font-medium">
-            나의 죄와 연약함을 십자가에 못 박아 보세요.
+    <form action={handleSubmit} className="space-y-4">
+      {/* 어제 돌아보기 — warm 카드 */}
+      <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
+              어제를 돌아보며
+            </div>
+            <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
+              무엇을 묻어야 하나요?
+            </div>
+          </div>
+          <span className="inline-flex rounded-full px-3 py-1 text-xs bg-sand text-brown-mid">
+            회개
           </span>
-        </p>
+        </div>
         <textarea
           name="yesterday"
           value={yesterday}
           onChange={(e) => setYesterday(e.target.value)}
-          placeholder="어제를 돌아보며..."
-          rows={4}
+          placeholder="내려놓고 싶은 욕망, 두려움, 교만, 상처, 불순종을 그리스도와 함께 솔직히 적어보세요."
+          rows={6}
           required
-          className="w-full resize-none rounded-xl bg-white border border-warm-gray/40 px-4 py-3 text-brown placeholder:text-warm-gray focus:outline-none focus:ring-2 focus:ring-olive/30 text-sm leading-relaxed"
+          className="mt-4 w-full resize-none rounded-3xl border border-stone bg-[#FCFAF6] px-4 py-4 text-sm text-brown leading-7 placeholder:text-brown-light/70 focus:outline-none focus:ring-2 focus:ring-olive/30"
         />
       </div>
 
-      {/* 오늘 기대함 */}
-      <div className="space-y-2">
-        <p className="text-sm text-brown-light leading-relaxed">
-          오늘도 내 삶에 새 생명을 주신 예수님께 감사하며,
-          <br />
-          <span className="text-olive font-medium">
-            하루를 기대하는 마음을 적어 보세요.
+      {/* 오늘 기대함 — green 카드 */}
+      <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-xs uppercase tracking-[0.18em] text-[#6B7B61]">
+              오늘을 기대하며
+            </div>
+            <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
+              예수로 어떻게 살까요?
+            </div>
+          </div>
+          <span className="inline-flex rounded-full px-3 py-1 text-xs bg-[#DCE5D6] text-[#516047]">
+            새 순종
           </span>
-        </p>
+        </div>
         <textarea
           name="today"
           value={today}
           onChange={(e) => setToday(e.target.value)}
-          placeholder="오늘을 기대하며..."
-          rows={4}
+          placeholder="오늘의 구체적인 결단: 기도, 절제, 화해의 행동, 숨겨진 섬김, 혹은 신뢰의 한 걸음을 적어보세요."
+          rows={6}
           required
-          className="w-full resize-none rounded-xl bg-white border border-warm-gray/40 px-4 py-3 text-brown placeholder:text-warm-gray focus:outline-none focus:ring-2 focus:ring-olive/30 text-sm leading-relaxed"
+          className="mt-4 w-full resize-none rounded-3xl border border-stone bg-[#F6FAF2] px-4 py-4 text-sm text-brown leading-7 placeholder:text-brown-light/70 focus:outline-none focus:ring-2 focus:ring-olive/30"
         />
       </div>
 
       <button
         type="submit"
         disabled={submitting}
-        className="w-full py-3.5 rounded-2xl bg-olive hover:bg-sage text-white font-semibold transition-colors disabled:opacity-50"
+        className="w-full rounded-3xl bg-olive py-4 text-sm text-ivory shadow-sm transition-colors hover:bg-sage disabled:opacity-50"
       >
         {submitting
           ? "저장 중..."
           : isEdit
           ? "수정하기"
-          : "묘비명 새기기"}
+          : "오늘의 고백 새기기"}
       </button>
 
       {!isEdit && (
-        <p className="text-center text-xs text-warm-gray">
+        <p className="text-center text-xs text-brown-light">
           작성 완료 시 물뿌리개 1개를 받아요
         </p>
       )}

@@ -33,22 +33,22 @@ export default function OnboardingForm({
     <form action={handleSubmit} className="space-y-5">
       {/* 카카오 닉네임 표시 */}
       {kakaoName && (
-        <div className="text-xs text-warm-gray text-center">
+        <div className="text-xs text-brown-light text-center">
           카카오 계정: {kakaoName}
         </div>
       )}
 
       {/* 실명 */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-brown">
-          실명 <span className="text-rose">*</span>
+      <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4 space-y-3">
+        <label className="text-sm font-medium text-brown-dark">
+          실명 <span className="text-rose-deep">*</span>
         </label>
         <input
           name="realName"
           type="text"
           placeholder="셀 명단에 등록된 이름을 입력하세요"
           required
-          className="w-full rounded-xl bg-white border border-warm-gray/50 px-4 py-3 text-brown placeholder:text-warm-gray focus:outline-none focus:ring-2 focus:ring-olive/40"
+          className="w-full rounded-3xl bg-[#FCFAF6] border border-stone px-4 py-3 text-brown placeholder:text-brown-light/60 focus:outline-none focus:ring-2 focus:ring-olive/30 text-sm"
         />
         <p className="text-xs text-brown-light">
           입력한 이름으로 셀이 자동 배정됩니다
@@ -56,20 +56,20 @@ export default function OnboardingForm({
       </div>
 
       {/* 닉네임 */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-brown">닉네임</label>
+      <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4 space-y-3">
+        <label className="text-sm font-medium text-brown-dark">닉네임</label>
         <div className="flex gap-2">
           <input
             name="nickname"
             type="text"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
-            className="flex-1 rounded-xl bg-white border border-warm-gray/50 px-4 py-3 text-brown placeholder:text-warm-gray focus:outline-none focus:ring-2 focus:ring-olive/40"
+            className="flex-1 rounded-3xl bg-[#FCFAF6] border border-stone px-4 py-3 text-brown placeholder:text-brown-light/60 focus:outline-none focus:ring-2 focus:ring-olive/30 text-sm"
           />
           <button
             type="button"
             onClick={reroll}
-            className="px-3 rounded-xl bg-white border border-warm-gray/50 text-brown-light hover:text-brown hover:bg-sage/10 transition-colors text-lg"
+            className="px-4 rounded-3xl bg-sand border border-stone text-brown-mid hover:text-brown-dark hover:bg-[#E5DDD0] transition-colors text-lg"
             title="다시 생성"
           >
             🎲
@@ -81,13 +81,13 @@ export default function OnboardingForm({
       </div>
 
       {error && (
-        <p className="text-sm text-rose text-center">{error}</p>
+        <p className="text-sm text-rose-deep text-center">{error}</p>
       )}
 
       <button
         type="submit"
         disabled={submitting}
-        className="w-full py-3.5 rounded-2xl bg-olive hover:bg-sage text-white font-semibold transition-colors disabled:opacity-50"
+        className="w-full py-3.5 rounded-[20px] bg-olive hover:bg-sage text-ivory font-semibold transition-colors disabled:opacity-50 shadow-sm"
       >
         {submitting ? "설정 중..." : "시작하기"}
       </button>

@@ -12,6 +12,34 @@ interface Epitaph {
   updatedAt: Date;
 }
 
+function Pill({
+  children,
+  tone = "default",
+  active = false,
+  onClick,
+}: {
+  children: React.ReactNode;
+  tone?: "default" | "green" | "rose" | "gold";
+  active?: boolean;
+  onClick?: () => void;
+}) {
+  const tones = {
+    default: active ? "bg-sand text-brown" : "bg-sand/60 text-brown-mid",
+    green: active ? "bg-[#DCE5D6] text-[#516047]" : "bg-[#DCE5D6]/60 text-[#516047]",
+    rose: "bg-rose-light text-[#7A5858]",
+    gold: "bg-gold-light text-[#7A6841]",
+  };
+  const Component = onClick ? "button" : "span";
+  return (
+    <Component
+      onClick={onClick}
+      className={`inline-flex rounded-full px-3 py-1 text-xs ${tones[tone]} transition-colors`}
+    >
+      {children}
+    </Component>
+  );
+}
+
 export default function FeedTabs({
   epitaphs,
   myCellId,
@@ -34,36 +62,29 @@ export default function FeedTabs({
 
   return (
     <div className="space-y-4">
-      {/* 탭 */}
-      <div className="flex gap-2">
-        <button
+      {/* 필터 탭 */}
+      <div className="flex gap-2 overflow-auto pb-1">
+        <Pill
+          tone="green"
+          active={filter === "all"}
           onClick={() => setFilter("all")}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-            filter === "all"
-              ? "bg-olive text-white"
-              : "bg-brown/5 text-brown-light hover:bg-brown/10"
-          }`}
         >
           전체 {epitaphs.length > 0 && `(${epitaphs.length})`}
-        </button>
+        </Pill>
         {myCellId && (
-          <button
+          <Pill
+            active={filter === "cell"}
             onClick={() => setFilter("cell")}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              filter === "cell"
-                ? "bg-olive text-white"
-                : "bg-brown/5 text-brown-light hover:bg-brown/10"
-            }`}
           >
             {cellName ?? "우리 셀"}
-          </button>
+          </Pill>
         )}
       </div>
 
       {/* 오늘 미작성 안내 */}
       {!wroteToday && (
-        <div className="rounded-2xl border border-rose/30 bg-rose/5 p-4 text-center space-y-1">
-          <p className="text-sm text-rose font-medium">
+        <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm p-5 text-center space-y-2">
+          <p className="text-sm text-brown-dark font-medium">
             오늘의 묘비명을 아직 작성하지 않았어요
           </p>
           <p className="text-xs text-brown-light">
@@ -74,48 +95,53 @@ export default function FeedTabs({
 
       {/* 리스트 */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16 text-warm-gray text-sm">
+        <div className="text-center py-16 text-brown-light text-sm">
           아직 오늘의 묘비명을 작성한 분이 없어요
         </div>
       ) : (
-        <ul className="space-y-3">
+        <div className="space-y-4">
           {filtered.map((e) => (
-            <li
+            <div
               key={e.id}
-              className="rounded-2xl bg-white border border-warm-gray/30 p-4 space-y-3"
+              className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4"
             >
-              {/* 닉네임 */}
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-brown">
-                  {e.nickname ?? "익명"}
-                </span>
+              {/* 닉네임 + 뱃지 */}
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-sm font-medium text-brown-dark">
+                    {e.nickname ?? "익명"}
+                  </div>
+                </div>
                 {e.userId === myUserId && (
-                  <span className="text-[10px] bg-sage/20 text-olive px-1.5 py-0.5 rounded">
-                    나
-                  </span>
+                  <Pill tone="gold">나</Pill>
                 )}
               </div>
-              {/* 어제 */}
-              <div className="space-y-1">
-                <p className="text-[10px] text-warm-gray uppercase tracking-wider">
-                  어제를 돌아보며
-                </p>
-                <p className="text-sm text-brown-light leading-relaxed whitespace-pre-line">
-                  {e.yesterday}
-                </p>
+
+              {/* 두 섹션 */}
+              <div className="mt-4 grid gap-3">
+                {/* 어제 — warm 톤 */}
+                <div className="rounded-2xl bg-[#F7F1E7] p-3">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-brown-light">
+                    어제를 돌아보며
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-brown-mid whitespace-pre-line">
+                    {e.yesterday}
+                  </p>
+                </div>
+
+                {/* 오늘 — green 톤 */}
+                <div className="rounded-2xl bg-sage-light p-3">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-[#6C7A62]">
+                    오늘을 기대하며
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-[#4D5B46] whitespace-pre-line">
+                    {e.today}
+                  </p>
+                </div>
               </div>
-              {/* 오늘 */}
-              <div className="space-y-1">
-                <p className="text-[10px] text-warm-gray uppercase tracking-wider">
-                  오늘을 기대하며
-                </p>
-                <p className="text-sm text-brown-light leading-relaxed whitespace-pre-line">
-                  {e.today}
-                </p>
-              </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

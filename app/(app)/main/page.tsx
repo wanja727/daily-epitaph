@@ -49,16 +49,24 @@ export default async function MainPage() {
   );
 
   return (
-    <div className="px-4 py-6 space-y-5">
-      {/* 날짜 + 인사 */}
-      <div className="space-y-1">
-        <p className="text-xs text-warm-gray uppercase tracking-widest">
-          TODAY
-        </p>
-        <p className="text-sm text-brown-light">{todayFormatted}</p>
+    <div className="px-5 py-5 space-y-4">
+      {/* 헤더 */}
+      <div className="flex items-center justify-between">
+        <div className="text-xs tracking-[0.25em] uppercase text-brown-light">
+          Empty Tomb Project
+        </div>
       </div>
 
-      {/* 피드 (클라이언트 컴포넌트에서 필터링) */}
+      <div>
+        <h2 className="text-[28px] leading-[1.1] font-heading font-bold text-brown-dark">
+          오늘의 묘비명
+        </h2>
+        <p className="mt-2 text-sm text-brown-mid leading-6">
+          {todayFormatted}
+        </p>
+      </div>
+
+      {/* 피드 */}
       <FeedTabs
         epitaphs={todayEpitaphs}
         myCellId={session?.user?.cellId ?? null}
@@ -77,7 +85,7 @@ export default async function MainPage() {
           height="24"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="white"
+          stroke="#F8F3EA"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"

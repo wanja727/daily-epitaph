@@ -1,10 +1,17 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
+import { Noto_Serif_KR } from "next/font/google";
 import "./globals.css";
 
 const geist = Geist({
   variable: "--font-geist",
   subsets: ["latin"],
+});
+
+const notoSerif = Noto_Serif_KR({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -16,7 +23,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#F7F3EC",
+  themeColor: "#F8F3EA",
 };
 
 export default function RootLayout({
@@ -26,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${geist.variable} antialiased`}>{children}</body>
+      <body className={`${geist.variable} ${notoSerif.variable} antialiased`}>{children}</body>
     </html>
   );
 }

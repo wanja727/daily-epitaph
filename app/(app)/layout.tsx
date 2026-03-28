@@ -12,8 +12,8 @@ export default async function AppLayout({
   if (!session.user.onboardingCompleted) redirect("/onboarding");
 
   return (
-    <div className="min-h-screen max-w-lg mx-auto relative">
-      <main className="pb-20">{children}</main>
+    <div className="min-h-screen max-w-lg mx-auto relative bg-ivory">
+      <main className="pb-24">{children}</main>
       <BottomNav />
     </div>
   );

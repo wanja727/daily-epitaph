@@ -8,7 +8,6 @@ export default function CoverContent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // 이미 커버를 본 경우 바로 메인으로
     if (sessionStorage.getItem("coverSeen")) {
       router.replace("/main");
       return;
@@ -26,90 +25,63 @@ export default function CoverContent() {
   return (
     <div
       onClick={handleEnter}
-      className="min-h-screen bg-ivory flex items-center justify-center px-6 py-12 cursor-pointer select-none"
+      className="min-h-screen bg-ivory relative overflow-hidden cursor-pointer select-none"
     >
-      <div className="max-w-md space-y-8 text-center animate-[fadeIn_0.8s_ease-out]">
-        {/* 새벽빛 심볼 */}
-        <div className="flex justify-center">
-          <div className="w-20 h-20 rounded-full bg-linear-to-b from-gold/30 to-sage/20 flex items-center justify-center">
-            <span className="text-4xl">🪨</span>
-          </div>
+      {/* 새벽빛 그라데이션 */}
+      <div className="absolute inset-0 bg-linear-to-b from-[#F7ECCE] via-[#F6F1E7] to-[#E5E1D2]" />
+
+      {/* 새벽빛 글로우 */}
+      <div className="absolute top-20 left-1/2 -translate-x-1/2 h-48 w-48 rounded-full bg-gold/40 blur-3xl" />
+
+      {/* 돌과 흙 — 하단 지형 */}
+      <div className="absolute bottom-0 left-0 right-0 h-[46%] bg-stone rounded-t-[42px]" />
+
+      {/* 무덤 아치 */}
+      <div className="absolute bottom-[26%] left-1/2 -translate-x-1/2 w-56 h-32 bg-[#8C7A69] rounded-t-[140px]" />
+
+      {/* 빈 무덤 입구 (빛) */}
+      <div className="absolute bottom-[26%] left-1/2 -translate-x-1/2 translate-y-8 w-20 h-20 bg-ivory rounded-full shadow-inner" />
+
+      {/* 콘텐츠 */}
+      <div className="relative z-10 h-screen flex flex-col justify-between p-7 text-brown-dark max-w-lg mx-auto">
+        {/* 상단 라벨 */}
+        <div className="flex items-center justify-between text-xs tracking-[0.28em] uppercase opacity-70 pt-2">
+          <span>Lent Journey</span>
+          <span>Day 01</span>
         </div>
 
-        <h1 className="text-2xl font-bold text-brown tracking-tight">
-          40일 &lsquo;빈 무덤 프로젝트&rsquo;를 시작하며
-        </h1>
-
-        <div className="space-y-6 text-sm leading-7 text-brown-light">
-          <div>
-            <p className="font-semibold text-olive mb-2">
-              오늘도 이어지는 부활의 능력
-            </p>
-            <p>
-              2천여 년 전 예수님의 부활은
-              <br />
-              예수 그리스도를 믿음으로 구원받은 사람들에게
-              <br />
-              오늘도 동일한 능력으로 역사합니다.
-            </p>
-          </div>
-
-          <p>
-            우리의 죄와 연약함이
-            <br />
-            그리스도와 함께 십자가에 못 박히고
-            <br />
-            그분의 부활과 연합하는 과정을 통해
-          </p>
-
-          <p>
-            우리의 옛사람은 어느새 자취를 감추고
-            <br />
-            새사람의 모습이 갈수록 뚜렷하게 나타날 줄로 믿습니다.
-          </p>
-
-          <div>
-            <p className="font-semibold text-olive mb-2">
-              죽음에서 생명으로의 전환
-            </p>
-            <p>
-              부활의 상징인 &lsquo;빈 무덤&rsquo;이라는 공간에서
-              <br />
-              나의 죽음이 예수님의 생명으로 전환되기를
-              <br />
-              기대하는 마음으로
-              <br />
-              이번 &lsquo;빈 무덤 프로젝트&rsquo;를 시작합니다.
-            </p>
-          </div>
-
-          <p>
-            매일매일 나는 죽고, 예수로 사는 삶의 실전편이
-            <br />
-            이번 프로젝트를 통해 실제적으로 일어나기를 소원합니다.
-          </p>
-
-          <p>
-            이번 40일의 여정을 통해
-            <br />
-            예수님의 생명이 우리 안에 충만히 거하시고
-            <br />
-            내 대신 주님이 사시는 거룩한 변화가 있기를 사모합니다.
-          </p>
-
-          <p className="text-xs text-warm-gray italic">
-            &ldquo;만일 우리가 그리스도와 함께 죽었으면
-            <br />
-            또한 그와 함께 살 줄을 믿노니&rdquo;
-            <br />
-            (로마서 6:8)
-          </p>
-        </div>
-
-        <div className="pt-4">
-          <span className="text-xs text-warm-gray animate-pulse">
-            화면을 터치하여 시작하기
+        {/* 타이틀 영역 */}
+        <div className="pt-20">
+          <span className="inline-flex rounded-full px-3 py-1 text-xs bg-gold-light text-[#7A6841]">
+            quiet resurrection
           </span>
+          <h1 className="mt-5 text-[42px] leading-[0.95] font-heading font-bold text-brown-dark">
+            빈 무덤
+            <br />
+            프로젝트
+          </h1>
+          <p className="mt-5 text-[15px] leading-7 max-w-[280px] text-brown-mid">
+            매일 그리스도와 함께 죽고,
+            <br />
+            예수로 사는 40일의 여정
+          </p>
+        </div>
+
+        {/* 하단 카드 */}
+        <div>
+          <div className="rounded-[28px] border border-stone bg-white/60 backdrop-blur-sm shadow-sm p-5">
+            <div className="text-xs uppercase tracking-[0.22em] text-brown-light">
+              40-day spiritual journey
+            </div>
+            <p className="mt-3 text-sm leading-6 text-brown-mid">
+              회개에서 새 생명으로, 매일의 묵상과 결단,
+              <br />
+              그리고 고요한 공동체의 성장을 함께 걸어갑니다.
+            </p>
+            <button className="mt-5 w-full rounded-[20px] bg-olive py-3 text-sm text-ivory shadow-sm">
+              오늘을 시작하기
+            </button>
+          </div>
         </div>
       </div>
     </div>

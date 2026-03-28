@@ -32,12 +32,12 @@ export default function CellGarden({
   completedFlowers: FlowerData[];
 }) {
   const router = useRouter();
-  const [placing, setPlacing] = useState<string | null>(null); // flowerId being placed
+  const [placing, setPlacing] = useState<string | null>(null);
   const [acting, setActing] = useState(false);
 
   if (!cellId) {
     return (
-      <div className="text-center py-16 text-warm-gray text-sm">
+      <div className="text-center py-16 text-brown-light text-sm">
         소속 셀이 없어 꽃밭을 사용할 수 없어요
       </div>
     );
@@ -54,9 +54,7 @@ export default function CellGarden({
     }
   }
 
-  const placeable = completedFlowers.filter(
-    (f) => f.stage >= 3
-  );
+  const placeable = completedFlowers.filter((f) => f.stage >= 3);
 
   async function handlePlace(x: number, y: number) {
     if (!placing || acting) return;
@@ -68,19 +66,24 @@ export default function CellGarden({
   }
 
   return (
-    <div className="space-y-5">
-      <div className="text-center">
-        <h2 className="text-lg font-bold text-brown">
-          {cellName} 공동 꽃밭
-        </h2>
-        <p className="text-xs text-warm-gray mt-1">
-          완성한 꽃을 빈 곳에 심어보세요
-        </p>
-      </div>
+    <div className="space-y-4">
+      {/* 꽃밭 카드 */}
+      <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
+              Cell garden
+            </div>
+            <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
+              {cellName} 꽃밭
+            </div>
+          </div>
+          <span className="inline-flex rounded-full px-3 py-1 text-xs bg-[#DCE5D6] text-[#516047]">
+            {plots.filter((p) => p.flowerId).length}송이
+          </span>
+        </div>
 
-      {/* 그리드 */}
-      <div className="rounded-2xl bg-white border border-warm-gray/30 p-4">
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-5 gap-3">
           {grid.map((row, y) =>
             row.map((plot, x) => {
               const hasFlower = plot?.flowerId;
@@ -91,12 +94,12 @@ export default function CellGarden({
                   key={`${x}-${y}`}
                   disabled={!isEmpty || !placing || acting}
                   onClick={() => handlePlace(x, y)}
-                  className={`aspect-square rounded-xl flex items-center justify-center text-2xl transition-all ${
+                  className={`aspect-square rounded-[18px] border border-stone flex items-center justify-center text-xl shadow-sm transition-all ${
                     hasFlower
-                      ? "bg-sage/15 border border-sage/30"
+                      ? "bg-[#F7F2E8]"
                       : placing
-                      ? "bg-olive/10 border border-olive/30 hover:bg-olive/20 cursor-pointer"
-                      : "bg-warm-gray/10 border border-warm-gray/20"
+                      ? "bg-sage-light border-sage hover:bg-[#DCE5D6] cursor-pointer"
+                      : "bg-[#F7F2E8]"
                   }`}
                   title={
                     plot?.placedByNickname
@@ -114,12 +117,19 @@ export default function CellGarden({
             })
           )}
         </div>
+
+        {/* 범례 */}
+        <div className="mt-4 flex gap-2 flex-wrap text-xs text-brown-mid">
+          <span className="inline-flex rounded-full px-3 py-1 bg-sand/60">빈 자리</span>
+          <span className="inline-flex rounded-full px-3 py-1 bg-[#DCE5D6] text-[#516047]">자라는 믿음</span>
+          <span className="inline-flex rounded-full px-3 py-1 bg-rose-light text-[#7A5858]">피어난 증인</span>
+        </div>
       </div>
 
       {/* 심을 꽃 선택 */}
       {placeable.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-brown-light">
+          <h3 className="text-xs uppercase tracking-[0.18em] text-brown-light">
             심을 꽃 선택
           </h3>
           <div className="flex gap-2 flex-wrap">
@@ -129,10 +139,10 @@ export default function CellGarden({
                 onClick={() =>
                   setPlacing(placing === f.id ? null : f.id)
                 }
-                className={`px-3 py-2 rounded-xl border text-center transition-colors ${
+                className={`rounded-[18px] border shadow-sm px-3 py-2 text-center transition-colors ${
                   placing === f.id
-                    ? "bg-olive/15 border-olive/40"
-                    : "bg-sage/10 border-sage/20 hover:bg-sage/20"
+                    ? "bg-[#DCE5D6] border-sage"
+                    : "bg-[#F7F2E8] border-stone hover:bg-sand"
                 }`}
               >
                 <span className="text-2xl">
@@ -150,7 +160,7 @@ export default function CellGarden({
       )}
 
       {placeable.length === 0 && (
-        <p className="text-xs text-warm-gray text-center">
+        <p className="text-xs text-brown-light text-center">
           꽃을 완성하면 여기에 심을 수 있어요
         </p>
       )}

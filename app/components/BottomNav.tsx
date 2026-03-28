@@ -9,11 +9,11 @@ const NAV_ITEMS = [
     label: "메인",
     icon: (active: boolean) => (
       <svg
-        width="24"
-        height="24"
+        width="20"
+        height="20"
         viewBox="0 0 24 24"
         fill="none"
-        stroke={active ? "#5E4633" : "#D9D2C7"}
+        stroke={active ? "#4A372A" : "#8A786A"}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -28,11 +28,11 @@ const NAV_ITEMS = [
     label: "꽃밭",
     icon: (active: boolean) => (
       <svg
-        width="24"
-        height="24"
+        width="20"
+        height="20"
         viewBox="0 0 24 24"
         fill="none"
-        stroke={active ? "#5E4633" : "#D9D2C7"}
+        stroke={active ? "#4A372A" : "#8A786A"}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -48,11 +48,11 @@ const NAV_ITEMS = [
     label: "마이",
     icon: (active: boolean) => (
       <svg
-        width="24"
-        height="24"
+        width="20"
+        height="20"
         viewBox="0 0 24 24"
         fill="none"
-        stroke={active ? "#5E4633" : "#D9D2C7"}
+        stroke={active ? "#4A372A" : "#8A786A"}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -68,27 +68,31 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-ivory/95 backdrop-blur-md border-t border-warm-gray/30 safe-bottom">
-      <div className="max-w-lg mx-auto flex items-center justify-around h-16">
-        {NAV_ITEMS.map((item) => {
-          const active = pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex flex-col items-center gap-1 py-1 px-4"
-            >
-              {item.icon(active)}
-              <span
-                className={`text-[10px] font-medium ${
-                  active ? "text-brown" : "text-warm-gray"
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-stone bg-[#F6F0E5]/95 backdrop-blur-md safe-bottom">
+      <div className="max-w-lg mx-auto px-4 py-3">
+        <div className="grid grid-cols-3 gap-2 text-center">
+          {NAV_ITEMS.map((item) => {
+            const active = pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex flex-col items-center gap-1 rounded-2xl py-2 transition-colors ${
+                  active ? "bg-white/70" : ""
                 }`}
               >
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
+                {item.icon(active)}
+                <span
+                  className={`text-[11px] ${
+                    active ? "text-brown-dark font-medium" : "text-brown-light"
+                  }`}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );

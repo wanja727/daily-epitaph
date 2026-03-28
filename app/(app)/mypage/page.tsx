@@ -37,22 +37,24 @@ export default async function MyPage() {
   const attendedDates = new Set(myEpitaphs.map((e) => e.date));
 
   return (
-    <div className="px-4 py-6 space-y-6">
-      {/* 프로필 */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-lg font-bold text-brown">
+    <div className="px-5 py-5 space-y-4">
+      {/* 헤더 */}
+      <div className="text-xs tracking-[0.25em] uppercase text-brown-light">
+        Empty Tomb Project
+      </div>
+
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-[28px] leading-[1.1] font-heading font-bold text-brown-dark">
+            나의 여정
+          </h2>
+          <div className="mt-2 flex items-center gap-2 text-sm text-brown-mid">
             {session!.user.nickname ?? session!.user.name ?? "익명"}
-          </h1>
-          <div className="flex items-center gap-2 text-xs text-warm-gray">
             {session!.user.realName && (
-              <span>{session!.user.realName}</span>
+              <span className="text-brown-light">· {session!.user.realName}</span>
             )}
             {cellName && (
-              <>
-                <span>·</span>
-                <span>{cellName}</span>
-              </>
+              <span className="text-brown-light">· {cellName}</span>
             )}
           </div>
         </div>
@@ -64,7 +66,7 @@ export default async function MyPage() {
         >
           <button
             type="submit"
-            className="text-xs text-warm-gray hover:text-brown px-3 py-1.5 rounded-lg border border-warm-gray/30 hover:bg-brown/5 transition-colors"
+            className="text-xs text-brown-light hover:text-brown px-3 py-1.5 rounded-full border border-stone hover:bg-sand transition-colors"
           >
             로그아웃
           </button>
@@ -72,61 +74,59 @@ export default async function MyPage() {
       </div>
 
       {/* 40일 출석 */}
-      <div className="space-y-3">
-        <h2 className="text-sm font-semibold text-brown-light">
-          40일 참여 현황
-          <span className="ml-2 text-olive">
-            {attendedDates.size}/{PROJECT_DAYS}일
+      <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
+              Participation tracker
+            </div>
+            <div className="mt-1 text-2xl font-heading font-bold text-brown-dark">
+              {attendedDates.size}일 참여
+            </div>
+          </div>
+          <span className="inline-flex rounded-full px-3 py-1 text-xs bg-gold-light text-[#7A6841]">
+            {attendedDates.size}/{PROJECT_DAYS} complete
           </span>
-        </h2>
-        <AttendanceGrid
-          startDate={PROJECT_START_DATE}
-          totalDays={PROJECT_DAYS}
-          attendedDates={attendedDates}
-        />
+        </div>
+        <div className="mt-4">
+          <AttendanceGrid
+            startDate={PROJECT_START_DATE}
+            totalDays={PROJECT_DAYS}
+            attendedDates={attendedDates}
+          />
+        </div>
       </div>
 
       {/* 내 묘비명 히스토리 */}
-      <div className="space-y-3">
-        <h2 className="text-sm font-semibold text-brown-light">
-          나의 묘비명 기록
-          {myEpitaphs.length > 0 && ` (${myEpitaphs.length})`}
-        </h2>
+      <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
+        <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
+          Recent archive
+        </div>
         {myEpitaphs.length === 0 ? (
-          <div className="text-center py-12 text-warm-gray text-sm">
+          <div className="text-center py-8 text-brown-light text-sm">
             아직 작성한 묘비명이 없어요
           </div>
         ) : (
-          <ul className="space-y-3">
+          <div className="mt-3 space-y-3">
             {myEpitaphs.map((e) => (
-              <li
+              <div
                 key={e.id}
-                className="rounded-2xl bg-white border border-warm-gray/30 p-4 space-y-3"
+                className="rounded-2xl bg-[#F8F4EC] p-3"
               >
-                <span className="text-xs text-warm-gray">
+                <div className="text-sm text-brown-dark">
                   {formatDateKR(e.date)}
-                </span>
-                <div className="space-y-2">
-                  <div>
-                    <p className="text-[10px] text-warm-gray uppercase tracking-wider mb-0.5">
-                      어제를 돌아보며
-                    </p>
-                    <p className="text-sm text-brown-light leading-relaxed whitespace-pre-line">
-                      {e.yesterday}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-warm-gray uppercase tracking-wider mb-0.5">
-                      오늘을 기대하며
-                    </p>
-                    <p className="text-sm text-brown-light leading-relaxed whitespace-pre-line">
-                      {e.today}
-                    </p>
-                  </div>
                 </div>
-              </li>
+                <div className="mt-2 space-y-1.5">
+                  <p className="text-xs text-brown-mid leading-5 whitespace-pre-line">
+                    {e.yesterday}
+                  </p>
+                  <p className="text-xs text-[#4D5B46] leading-5 whitespace-pre-line">
+                    {e.today}
+                  </p>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>

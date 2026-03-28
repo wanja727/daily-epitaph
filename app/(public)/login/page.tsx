@@ -6,42 +6,49 @@ export default async function LoginPage() {
   if (session) redirect("/");
 
   return (
-    <div className="min-h-screen bg-ivory flex flex-col items-center justify-center px-6">
-      <div className="w-full max-w-sm space-y-10 text-center">
+    <div className="min-h-screen bg-ivory relative overflow-hidden flex flex-col items-center justify-center px-6">
+      {/* 배경 글로우 */}
+      <div className="absolute top-20 left-1/2 -translate-x-1/2 h-48 w-48 rounded-full bg-gold/30 blur-3xl" />
+
+      <div className="relative z-10 w-full max-w-sm space-y-10 text-center">
         {/* Header */}
         <div className="space-y-4">
-          <div className="flex justify-center">
-            <div className="w-20 h-20 rounded-full bg-linear-to-b from-gold/30 to-sage/20 flex items-center justify-center">
-              <span className="text-4xl">🪨</span>
-            </div>
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-brown">
-            빈 무덤 프로젝트
+          <span className="inline-flex rounded-full px-3 py-1 text-xs bg-gold-light text-[#7A6841]">
+            quiet resurrection
+          </span>
+          <h1 className="text-[36px] leading-[0.95] font-heading font-bold text-brown-dark">
+            빈 무덤
+            <br />
+            프로젝트
           </h1>
-          <p className="text-sm text-brown-light leading-relaxed">
+          <p className="text-sm text-brown-mid leading-relaxed">
             40일, 매일 죽고 예수로 사는
             <br />
             삶의 실전편
           </p>
         </div>
 
-        {/* Login button */}
-        <form
-          action={async () => {
-            "use server";
-            await signIn("kakao", { redirectTo: "/" });
-          }}
-        >
-          <button
-            type="submit"
-            className="w-full flex items-center justify-center gap-3 bg-[#FEE500] hover:bg-[#F0D800] text-stone-900 font-semibold py-3.5 px-6 rounded-2xl transition-colors"
+        {/* Login card */}
+        <div className="rounded-[28px] border border-stone bg-white/60 backdrop-blur-sm shadow-sm p-5">
+          <div className="text-xs uppercase tracking-[0.22em] text-brown-light">
+            셀 리더 커뮤니티 전용
+          </div>
+          <form
+            action={async () => {
+              "use server";
+              await signIn("kakao", { redirectTo: "/" });
+            }}
+            className="mt-4"
           >
-            <KakaoIcon />
-            카카오로 시작하기
-          </button>
-        </form>
-
-        <p className="text-xs text-warm-gray">셀 리더 커뮤니티 전용</p>
+            <button
+              type="submit"
+              className="w-full flex items-center justify-center gap-3 bg-[#FEE500] hover:bg-[#F0D800] text-stone-900 font-semibold py-3.5 px-6 rounded-[20px] transition-colors"
+            >
+              <KakaoIcon />
+              카카오로 시작하기
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -31,16 +31,18 @@ export default function CoverContent() {
       <div className="absolute inset-0 bg-linear-to-b from-[#F7ECCE] via-[#F6F1E7] to-[#E5E1D2]" />
 
       {/* 새벽빛 글로우 */}
-      <div className="absolute top-20 left-1/2 -translate-x-1/2 h-48 w-48 rounded-full bg-gold/40 blur-3xl" />
+      <div className="absolute top-16 left-1/2 -translate-x-1/2 h-48 w-48 rounded-full bg-gold/40 blur-3xl" />
 
-      {/* 돌과 흙 — 하단 지형 */}
-      <div className="absolute bottom-0 left-0 right-0 h-[46%] bg-stone rounded-t-[42px]" />
+      {/* 돌과 흙 — 하단 지형 (높이 줄임) */}
+      <div className="absolute bottom-0 left-0 right-0 h-[38%] bg-stone rounded-t-[42px]" />
 
-      {/* 무덤 아치 */}
-      <div className="absolute bottom-[26%] left-1/2 -translate-x-1/2 w-56 h-32 bg-[#8C7A69] rounded-t-[140px]" />
+      {/* 무덤 아치 — 지형 위로 올림 */}
+      <div className="absolute bottom-[34%] left-1/2 -translate-x-1/2 w-56 h-36 bg-[#8C7A69] rounded-t-[140px]" />
 
       {/* 빈 무덤 입구 (빛) */}
-      <div className="absolute bottom-[26%] left-1/2 -translate-x-1/2 translate-y-8 w-20 h-20 bg-ivory rounded-full shadow-inner" />
+      <div className="absolute bottom-[34%] left-1/2 -translate-x-1/2 translate-y-10 w-20 h-20 bg-ivory rounded-full shadow-inner" />
+      {/* 무덤 빛 글로우 */}
+      <div className="absolute bottom-[34%] left-1/2 -translate-x-1/2 translate-y-10 w-28 h-28 bg-gold/15 rounded-full blur-xl" />
 
       {/* 콘텐츠 */}
       <div className="relative z-10 h-screen flex flex-col justify-between p-7 text-brown-dark max-w-lg mx-auto">
@@ -51,7 +53,7 @@ export default function CoverContent() {
         </div>
 
         {/* 타이틀 영역 */}
-        <div className="pt-20">
+        <div className="pt-12">
           <span className="inline-flex rounded-full px-3 py-1 text-xs bg-gold-light text-[#7A6841]">
             quiet resurrection
           </span>
@@ -68,7 +70,7 @@ export default function CoverContent() {
         </div>
 
         {/* 하단 카드 */}
-        <div>
+        <div className="pb-2">
           <div className="rounded-[28px] border border-stone bg-white/60 backdrop-blur-sm shadow-sm p-5">
             <div className="text-xs uppercase tracking-[0.22em] text-brown-light">
               40-day spiritual journey

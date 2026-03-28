@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import MyFlower from "./MyFlower";
 import CellGarden from "./CellGarden";
 
@@ -35,7 +36,15 @@ export default function GardenView({
   cellName: string | null;
   cellId: string | null;
 }) {
-  const [tab, setTab] = useState<"my" | "cell">("my");
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") === "cell" ? "cell" : "my";
+  const [tab, setTab] = useState<"my" | "cell">(initialTab);
+
+  useEffect(() => {
+    if (searchParams.get("tab") === "cell") {
+      setTab("cell");
+    }
+  }, [searchParams]);
 
   return (
     <div className="space-y-4">

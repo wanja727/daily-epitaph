@@ -5,6 +5,7 @@ import { useState } from "react";
 import { GARDEN_SIZE } from "@/lib/utils/constants";
 import { placeFlowerInGarden } from "./actions";
 import FlowerIllustration from "@/app/components/FlowerIllustration";
+import Spinner from "@/app/components/Spinner";
 
 interface PlotData {
   x: number;
@@ -72,13 +73,20 @@ function PlotCell({
           <ellipse cx="30" cy="42" rx="12" ry="6" fill="#C9B89A" opacity="0.3" />
         )}
         {/* 빈 자리 플러스 표시 */}
-        {!hasFlower && placing && (
+        {!hasFlower && placing && !acting && (
           <g opacity="0.6">
             <line x1="30" y1="22" x2="30" y2="38" stroke="#4A7A35" strokeWidth="2.5" strokeLinecap="round" />
             <line x1="22" y1="30" x2="38" y2="30" stroke="#4A7A35" strokeWidth="2.5" strokeLinecap="round" />
           </g>
         )}
       </svg>
+
+      {/* 심는 중 스피너 */}
+      {!hasFlower && placing && acting && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Spinner size={18} className="text-[#4A7A35]" />
+        </div>
+      )}
 
       {/* 꽃 */}
       {hasFlower && (

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { completeOnboarding } from "./actions";
 import { generateFlowerNickname } from "@/lib/utils/flower-names";
+import Spinner from "@/app/components/Spinner";
 
 export default function OnboardingForm({
   suggestedNickname,
@@ -89,7 +90,12 @@ export default function OnboardingForm({
         disabled={submitting}
         className="w-full py-3.5 rounded-[20px] bg-olive hover:bg-sage text-ivory font-semibold transition-colors disabled:opacity-50 shadow-sm"
       >
-        {submitting ? "설정 중..." : "시작하기"}
+        {submitting ? (
+          <span className="inline-flex items-center justify-center gap-2">
+            <Spinner size={14} />
+            설정 중...
+          </span>
+        ) : "시작하기"}
       </button>
     </form>
   );

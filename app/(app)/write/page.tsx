@@ -15,9 +15,7 @@ export default async function WritePage() {
       today: epitaphs.today,
     })
     .from(epitaphs)
-    .where(
-      and(eq(epitaphs.userId, session!.user.id), eq(epitaphs.date, today))
-    )
+    .where(and(eq(epitaphs.userId, session!.user.id), eq(epitaphs.date, today)))
     .limit(1);
 
   const current = existing[0] ?? null;
@@ -34,7 +32,7 @@ export default async function WritePage() {
           오늘의 기록
         </h2>
         <p className="mt-2 text-sm text-brown-mid leading-6">
-          어제를 묻고, 오늘을 부활의 순종으로 걸어가는 두 부분의 고백
+          부활은 과거의 한 사건이 아니라, 오늘 내 삶에 계속되는 이야기여야 한다
         </p>
       </div>
 

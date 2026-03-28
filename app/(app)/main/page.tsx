@@ -2,13 +2,14 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { epitaphs, users, cells } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
-import { getTodayKST } from "@/lib/utils/date";
+import { getTodayKST, getProjectDay } from "@/lib/utils/date";
 import Link from "next/link";
 import FeedTabs from "./FeedTabs";
 
 export default async function MainPage() {
   const session = await auth();
   const today = getTodayKST();
+  const projectDay = getProjectDay();
 
   const todayFormatted = new Date().toLocaleDateString("ko-KR", {
     timeZone: "Asia/Seoul",
@@ -44,9 +45,7 @@ export default async function MainPage() {
     cellName = cell?.name ?? null;
   }
 
-  const myEpitaph = todayEpitaphs.find(
-    (e) => e.userId === session?.user?.id
-  );
+  const myEpitaph = todayEpitaphs.find((e) => e.userId === session?.user?.id);
 
   return (
     <div className="px-5 py-5 space-y-4">
@@ -58,9 +57,16 @@ export default async function MainPage() {
       </div>
 
       <div>
-        <h2 className="text-[28px] leading-[1.1] font-heading font-bold text-brown-dark">
-          오늘의 묘비명
-        </h2>
+        <div className="flex items-baseline gap-3">
+          <h2 className="text-[28px] leading-[1.1] font-heading font-bold text-brown-dark">
+            오늘의 기록
+          </h2>
+          {projectDay !== null && (
+            <span className="text-[28px] leading-[1.1] font-heading font-bold text-olive">
+              Day {projectDay}
+            </span>
+          )}
+        </div>
         <p className="mt-2 text-sm text-brown-mid leading-6">
           {todayFormatted}
         </p>

@@ -33,7 +33,7 @@ export default function WriteForm({
               어제를 돌아보며
             </div>
             <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
-              무엇을 묻어야 하나요?
+              무엇을 십자가에 못 박을까요?
             </div>
           </div>
           <span className="inline-flex rounded-full px-3 py-1 text-xs bg-sand text-brown-mid">
@@ -44,7 +44,7 @@ export default function WriteForm({
           name="yesterday"
           value={yesterday}
           onChange={(e) => setYesterday(e.target.value)}
-          placeholder="내려놓고 싶은 욕망, 두려움, 교만, 상처, 불순종을 그리스도와 함께 솔직히 적어보세요."
+          placeholder="내려놓고 싶은 욕망, 두려움, 교만, 상처, 연약함, 불순종을 그리스도와 함께 솔직히 적어보세요."
           rows={6}
           required
           className="mt-4 w-full resize-none rounded-3xl border border-stone bg-[#FCFAF6] px-4 py-4 text-sm text-brown leading-7 placeholder:text-brown-light/70 focus:outline-none focus:ring-2 focus:ring-olive/30"
@@ -59,18 +59,18 @@ export default function WriteForm({
               오늘을 기대하며
             </div>
             <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
-              예수로 어떻게 살까요?
+              어떻게 예수님과 함께 살까요?
             </div>
           </div>
           <span className="inline-flex rounded-full px-3 py-1 text-xs bg-[#DCE5D6] text-[#516047]">
-            새 순종
+            결단
           </span>
         </div>
         <textarea
           name="today"
           value={today}
           onChange={(e) => setToday(e.target.value)}
-          placeholder="오늘의 구체적인 결단: 기도, 절제, 화해의 행동, 숨겨진 섬김, 혹은 신뢰의 한 걸음을 적어보세요."
+          placeholder="오늘의 구체적인 결단: 믿음, 용서, 인내, 절제, 섬김, 나눔, 화해 등의 다짐을 예수님께 적어보세요."
           rows={6}
           required
           className="mt-4 w-full resize-none rounded-3xl border border-stone bg-[#F6FAF2] px-4 py-4 text-sm text-brown leading-7 placeholder:text-brown-light/70 focus:outline-none focus:ring-2 focus:ring-olive/30"

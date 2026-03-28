@@ -47,15 +47,15 @@ export default function CoverContent() {
       {/* 콘텐츠 */}
       <div className="relative z-10 h-screen flex flex-col justify-between p-7 text-brown-dark max-w-lg mx-auto">
         {/* 상단 라벨 */}
-        <div className="flex items-center justify-between text-xs tracking-[0.28em] uppercase opacity-70 pt-2">
+        {/* <div className="flex items-center justify-between text-xs tracking-[0.28em] uppercase opacity-70 pt-2">
           <span>Lent Journey</span>
           <span>Day 01</span>
-        </div>
+        </div> */}
 
         {/* 타이틀 영역 */}
         <div className="pt-12">
           <span className="inline-flex rounded-full px-3 py-1 text-xs bg-gold-light text-[#7A6841]">
-            quiet resurrection
+            Daily Resurrection
           </span>
           <h1 className="mt-5 text-[42px] leading-[0.95] font-heading font-bold text-brown-dark">
             빈 무덤
@@ -63,9 +63,9 @@ export default function CoverContent() {
             프로젝트
           </h1>
           <p className="mt-5 text-[15px] leading-7 max-w-[280px] text-brown-mid">
-            매일 그리스도와 함께 죽고,
+            매일 나는 죽고,
             <br />
-            예수로 사는 40일의 여정
+            예수로 사는 삶의 실전편
           </p>
         </div>
 
@@ -76,9 +76,9 @@ export default function CoverContent() {
               40-day spiritual journey
             </div>
             <p className="mt-3 text-sm leading-6 text-brown-mid">
-              회개에서 새 생명으로, 매일의 묵상과 결단,
+              예수님께 더 가까이,
               <br />
-              그리고 고요한 공동체의 성장을 함께 걸어갑니다.
+              공동체가 40일간 함께 걸어갑니다.
             </p>
             <button className="mt-5 w-full rounded-[20px] bg-olive py-3 text-sm text-ivory shadow-sm">
               오늘을 시작하기

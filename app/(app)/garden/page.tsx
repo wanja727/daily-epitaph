@@ -27,24 +27,14 @@ export default async function GardenPage() {
   const [activeFlower] = await db
     .select()
     .from(flowers)
-    .where(
-      and(
-        eq(flowers.userId, userId),
-        isNull(flowers.completedAt)
-      )
-    )
+    .where(and(eq(flowers.userId, userId), isNull(flowers.completedAt)))
     .limit(1);
 
   // 완성되었지만 아직 꽃밭에 심지 않은 꽃들
   const completedFlowers = await db
     .select()
     .from(flowers)
-    .where(
-      and(
-        eq(flowers.userId, userId),
-        eq(flowers.placedInGarden, false)
-      )
-    )
+    .where(and(eq(flowers.userId, userId), eq(flowers.placedInGarden, false)))
     .then((rows) => rows.filter((r) => r.completedAt !== null));
 
   // 셀 꽃밭 데이터
@@ -93,7 +83,7 @@ export default async function GardenPage() {
           물 주기
         </h2>
         <p className="mt-2 text-sm text-brown-mid leading-6">
-          하나님이 내어놓은 땅에서 자라게 하시는 것을 기도하며 물을 주세요.
+          하나님의 땅에서 풍성히 자라나도록 기도하며 물을 주세요.
         </p>
       </div>
 

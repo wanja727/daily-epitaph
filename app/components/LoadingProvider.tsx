@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useTransition,
-} from "react";
+import { createContext, useContext, useTransition } from "react";
 import Spinner from "./Spinner";
 
 interface LoadingCtx {
@@ -34,7 +30,7 @@ export default function LoadingProvider({
 
       {/* 글로벌 로딩 오버레이 */}
       {isPending && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-ivory/60 backdrop-blur-[2px]">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
           <Spinner size={32} className="text-olive" />
         </div>
       )}

@@ -46,12 +46,18 @@ export default function GardenView({
     }
   }, [searchParams]);
 
+  function switchTab(newTab: "my" | "cell") {
+    setTab(newTab);
+    const url = newTab === "cell" ? "/garden?tab=cell" : "/garden";
+    window.history.replaceState(null, "", url);
+  }
+
   return (
     <div className="space-y-4">
       {/* 탭 */}
       <div className="flex gap-2">
         <button
-          onClick={() => setTab("my")}
+          onClick={() => switchTab("my")}
           className={`inline-flex rounded-full px-3 py-1 text-xs transition-colors ${
             tab === "my"
               ? "bg-[#DCE5D6] text-[#516047]"
@@ -61,7 +67,7 @@ export default function GardenView({
           내 꽃
         </button>
         <button
-          onClick={() => setTab("cell")}
+          onClick={() => switchTab("cell")}
           className={`inline-flex rounded-full px-3 py-1 text-xs transition-colors ${
             tab === "cell"
               ? "bg-[#DCE5D6] text-[#516047]"

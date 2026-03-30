@@ -1,4 +1,4 @@
-export const PROJECT_START_DATE = "2026-04-06";
+export const PROJECT_START_DATE = "2026-03-28";
 export const PROJECT_DAYS = 40;
 
 export const FLOWER_STAGES = {

@@ -33,7 +33,7 @@ export default function WriteForm({
               어제를 돌아보며
             </div>
             <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
-              무엇을 십자가에 못 박을까요?
+              십자가에 못 박을 것은 무엇인가요?
             </div>
           </div>
           <span className="inline-flex rounded-full px-3 py-1 text-xs bg-sand text-brown-mid">
@@ -44,7 +44,7 @@ export default function WriteForm({
           name="yesterday"
           value={yesterday}
           onChange={(e) => setYesterday(e.target.value)}
-          placeholder="내려놓고 싶은 욕망, 두려움, 교만, 상처, 연약함, 불순종을 그리스도와 함께 솔직히 적어보세요."
+          placeholder="내 안의 두려움, 시기, 교만, 거짓, 연약함, 불신, 불순종 등을 솔직히 고백해 보세요."
           rows={6}
           required
           className="mt-4 w-full resize-none rounded-3xl border border-stone bg-[#FCFAF6] px-4 py-4 text-sm text-brown leading-7 placeholder:text-brown-light/70 focus:outline-none focus:ring-2 focus:ring-olive/30"
@@ -70,7 +70,7 @@ export default function WriteForm({
           name="today"
           value={today}
           onChange={(e) => setToday(e.target.value)}
-          placeholder="오늘의 구체적인 결단: 믿음, 용서, 인내, 절제, 섬김, 나눔, 화해 등의 다짐을 예수님께 적어보세요."
+          placeholder="믿음, 용서, 인내, 절제, 섬김, 나눔, 성결 등을 결단하며 기도로 짧게 적어보세요."
           rows={6}
           required
           className="mt-4 w-full resize-none rounded-3xl border border-stone bg-[#F6FAF2] px-4 py-4 text-sm text-brown leading-7 placeholder:text-brown-light/70 focus:outline-none focus:ring-2 focus:ring-olive/30"
@@ -82,7 +82,7 @@ export default function WriteForm({
         disabled={isPending}
         className="w-full rounded-3xl bg-olive py-4 text-sm text-ivory shadow-sm transition-colors hover:bg-sage disabled:opacity-50"
       >
-        {isEdit ? "수정하기" : "오늘의 고백 새기기"}
+        {isEdit ? "수정하기" : "오늘의 기록 새기기"}
       </button>
 
       {!isEdit && (

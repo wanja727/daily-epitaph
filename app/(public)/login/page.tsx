@@ -31,7 +31,7 @@ export default async function LoginPage() {
         {/* Login card */}
         <div className="rounded-[28px] border border-stone bg-white/60 backdrop-blur-sm shadow-sm p-5">
           <div className="text-xs uppercase tracking-[0.22em] text-brown-light">
-            청년캠프1 전용
+            포드처치 청년캠프1 전용
           </div>
           <form
             action={async () => {

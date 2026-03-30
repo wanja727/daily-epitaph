@@ -51,11 +51,11 @@ export default async function MyPage() {
           <div className="mt-2 flex items-center gap-2 text-sm text-brown-mid">
             {session!.user.nickname ?? session!.user.name ?? "익명"}
             {session!.user.realName && (
-              <span className="text-brown-light">· {session!.user.realName}</span>
+              <span className="text-brown-light">
+                · {session!.user.realName}
+              </span>
             )}
-            {cellName && (
-              <span className="text-brown-light">· {cellName}</span>
-            )}
+            {cellName && <span className="text-brown-light">· {cellName}</span>}
           </div>
         </div>
         <form
@@ -104,15 +104,12 @@ export default async function MyPage() {
         </div>
         {myEpitaphs.length === 0 ? (
           <div className="text-center py-8 text-brown-light text-sm">
-            아직 작성한 묘비명이 없어요
+            아직 작성한 기록이 없어요
           </div>
         ) : (
           <div className="mt-3 space-y-3">
             {myEpitaphs.map((e) => (
-              <div
-                key={e.id}
-                className="rounded-2xl bg-[#F8F4EC] p-3"
-              >
+              <div key={e.id} className="rounded-2xl bg-[#F8F4EC] p-3">
                 <div className="text-sm text-brown-dark">
                   {formatDateKR(e.date)}
                 </div>

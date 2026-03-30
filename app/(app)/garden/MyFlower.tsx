@@ -44,7 +44,8 @@ export default function MyFlower({
   }
 
   // 완성되었지만 아직 심지 않은 꽃이 있으면 축하 화면 표시
-  const unplacedCompleted = completedFlowers.length > 0 ? completedFlowers[0] : null;
+  const unplacedCompleted =
+    completedFlowers.length > 0 ? completedFlowers[0] : null;
 
   // 꽃을 아직 시작하지 않은 상태
   if (!flower && !unplacedCompleted) {
@@ -58,7 +59,7 @@ export default function MyFlower({
               새 꽃을 시작하세요
             </p>
             <p className="text-sm text-brown-mid">
-              묘비명을 쓰고 물뿌리개를 받아 꽃을 키워보세요
+              오늘의 기록을 쓰고 물뿌리개를 받아 꽃을 키워보세요
             </p>
           </div>
 
@@ -192,7 +193,9 @@ export default function MyFlower({
         {/* 물뿌리개 표시 */}
         <div className="flex items-center justify-between relative">
           <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-brown-light">Daily grace</div>
+            <div className="text-xs uppercase tracking-[0.2em] text-brown-light">
+              Daily grace
+            </div>
             <div className="mt-1 text-2xl font-heading font-bold text-brown-dark">
               {waterCount}개
             </div>
@@ -209,9 +212,7 @@ export default function MyFlower({
 
         {/* 단계 라벨 */}
         <div className="text-center mt-2">
-          <p className="text-sm text-brown-mid">
-            {STAGE_LABELS[visualStage]}
-          </p>
+          <p className="text-sm text-brown-mid">{STAGE_LABELS[visualStage]}</p>
         </div>
 
         {/* 성장 바 */}

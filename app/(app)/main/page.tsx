@@ -62,7 +62,7 @@ export default async function MainPage() {
             오늘의 기록
           </h2>
           {projectDay !== null && (
-            <span className="text-[28px] leading-[1.1] font-heading font-bold text-olive">
+            <span className="ml-auto text-[28px] leading-[1.1] font-heading font-bold text-olive">
               Day {projectDay}
             </span>
           )}

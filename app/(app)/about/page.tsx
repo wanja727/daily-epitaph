@@ -17,8 +17,8 @@ export default function AboutPage() {
         {/* 무덤 아치 — 지형 위로 올림 */}
         <div className="absolute bottom-[20%] left-1/2 -translate-x-1/2 w-48 h-28 bg-[#8C7A69] rounded-t-[120px]" />
         {/* 빈 무덤 입구 (빛) */}
-        <div className="absolute bottom-[20%] left-1/2 -translate-x-1/2 translate-y-4 w-16 h-16 bg-ivory rounded-full shadow-inner" />
-        <div className="absolute bottom-[20%] left-1/2 -translate-x-1/2 translate-y-4 w-24 h-24 bg-gold/15 rounded-full blur-xl" />
+        <div className="absolute bottom-[22%] left-1/2 -translate-x-1/2 translate-y-4 w-16 h-16 bg-ivory rounded-full shadow-inner" />
+        <div className="absolute bottom-[22%] left-1/2 -translate-x-1/2 translate-y-4 w-24 h-24 bg-gold/15 rounded-full blur-xl" />
 
         {/* 텍스트 */}
         <div className="relative z-10 px-6 pt-12">

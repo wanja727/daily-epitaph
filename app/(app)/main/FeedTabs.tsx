@@ -25,7 +25,9 @@ function Pill({
 }) {
   const tones = {
     default: active ? "bg-sand text-brown" : "bg-sand/60 text-brown-mid",
-    green: active ? "bg-[#DCE5D6] text-[#516047]" : "bg-[#DCE5D6]/60 text-[#516047]",
+    green: active
+      ? "bg-[#DCE5D6] text-[#516047]"
+      : "bg-[#DCE5D6]/60 text-[#516047]",
     rose: "bg-rose-light text-[#7A5858]",
     gold: "bg-gold-light text-[#7A6841]",
   };
@@ -72,10 +74,7 @@ export default function FeedTabs({
           전체 {epitaphs.length > 0 && `(${epitaphs.length})`}
         </Pill>
         {myCellId && (
-          <Pill
-            active={filter === "cell"}
-            onClick={() => setFilter("cell")}
-          >
+          <Pill active={filter === "cell"} onClick={() => setFilter("cell")}>
             {cellName ?? "우리 셀"}
           </Pill>
         )}
@@ -85,7 +84,7 @@ export default function FeedTabs({
       {!wroteToday && (
         <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm p-5 text-center space-y-2">
           <p className="text-sm text-brown-dark font-medium">
-            오늘의 묘비명을 아직 작성하지 않았어요
+            오늘의 기록을 아직 작성하지 않았어요
           </p>
           <p className="text-xs text-brown-light">
             + 버튼을 눌러 오늘을 기록해보세요
@@ -96,7 +95,7 @@ export default function FeedTabs({
       {/* 리스트 */}
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-brown-light text-sm">
-          아직 오늘의 묘비명을 작성한 분이 없어요
+          아직 오늘의 기록을 작성한 분이 없어요
         </div>
       ) : (
         <div className="space-y-4">
@@ -112,9 +111,7 @@ export default function FeedTabs({
                     {e.nickname ?? "익명"}
                   </div>
                 </div>
-                {e.userId === myUserId && (
-                  <Pill tone="gold">나</Pill>
-                )}
+                {e.userId === myUserId && <Pill tone="gold">나</Pill>}
               </div>
 
               {/* 두 섹션 */}

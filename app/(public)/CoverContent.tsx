@@ -34,15 +34,15 @@ export default function CoverContent() {
       <div className="absolute top-16 left-1/2 -translate-x-1/2 h-48 w-48 rounded-full bg-gold/40 blur-3xl" />
 
       {/* 돌과 흙 — 하단 지형 (높이 줄임) */}
-      <div className="absolute bottom-0 left-0 right-0 h-[38%] bg-stone rounded-t-[42px]" />
+      <div className="absolute bottom-0 left-0 right-0 h-[44%] bg-stone rounded-t-[42px]" />
 
       {/* 무덤 아치 — 지형 위로 올림 */}
-      <div className="absolute bottom-[34%] left-1/2 -translate-x-1/2 w-56 h-36 bg-[#8C7A69] rounded-t-[140px]" />
+      <div className="absolute bottom-[35%] left-1/2 -translate-x-1/2 w-56 h-36 bg-[#8C7A69] rounded-t-[140px]" />
 
       {/* 빈 무덤 입구 (빛) */}
-      <div className="absolute bottom-[34%] left-1/2 -translate-x-1/2 translate-y-10 w-20 h-20 bg-ivory rounded-full shadow-inner" />
+      <div className="absolute bottom-[38%] left-1/2 -translate-x-1/2 translate-y-10 w-20 h-20 bg-ivory rounded-full shadow-inner" />
       {/* 무덤 빛 글로우 */}
-      <div className="absolute bottom-[34%] left-1/2 -translate-x-1/2 translate-y-10 w-28 h-28 bg-gold/15 rounded-full blur-xl" />
+      <div className="absolute bottom-[38%] left-1/2 -translate-x-1/2 translate-y-10 w-28 h-28 bg-gold/15 rounded-full blur-xl" />
 
       {/* 콘텐츠 */}
       <div className="relative z-10 h-screen flex flex-col justify-between p-7 text-brown-dark max-w-lg mx-auto">

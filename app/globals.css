@@ -2,29 +2,29 @@
 
 :root {
   /* 배경 */
-  --ivory: #F8F3EA;
-  --sand: #ECE4D8;
-  --stone: #E5E1D2;
+  --ivory: #f8f3ea;
+  --sand: #ece4d8;
+  --stone: #e5e1d2;
 
   /* 텍스트 */
-  --brown-dark: #4A372A;
-  --brown: #5A4636;
-  --brown-mid: #6B5A4E;
-  --brown-light: #8A786A;
+  --brown-dark: #4a372a;
+  --brown: #5a4636;
+  --brown-mid: #6b5a4e;
+  --brown-light: #8a786a;
 
   /* 카드/보더 */
-  --card-bg: rgba(255, 255, 255, 0.70);
-  --card-border: #E7E0D3;
+  --card-bg: rgba(255, 255, 255, 0.7);
+  --card-border: #e7e0d3;
 
   /* 포인트 컬러 */
-  --olive: #6D7A5F;
-  --sage: #8B9A7C;
-  --sage-light: #EDF2E8;
-  --rose: #D7A3A7;
-  --rose-deep: #C88990;
-  --rose-light: #E9D7D7;
-  --gold: #F0E1A9;
-  --gold-light: #EFE3BD;
+  --olive: #6d7a5f;
+  --sage: #8b9a7c;
+  --sage-light: #edf2e8;
+  --rose: #d7a3a7;
+  --rose-deep: #c88990;
+  --rose-light: #e9d7d7;
+  --gold: #f0e1a9;
+  --gold-light: #efe3bd;
 }
 
 @theme inline {
@@ -50,7 +50,11 @@
 body {
   background: var(--ivory);
   color: var(--brown);
-  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI",
+  font-family:
+    var(--font-sans),
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
     sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -60,36 +64,215 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* ━━━ stage 1: 새싹 ━━━ */
+
+@keyframes sprout-sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(0.9deg);
+  }
+  75% {
+    transform: rotate(-0.9deg);
+  }
+}
+
+@keyframes sprout-leaf-left {
+  0%,
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: rotate(1.2deg) translateX(-0.4px);
+  }
+  75% {
+    transform: rotate(-0.8deg) translateX(0.2px);
+  }
+}
+
+@keyframes sprout-leaf-right {
+  0%,
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: rotate(-1.2deg) translateX(0.4px);
+  }
+  75% {
+    transform: rotate(0.8deg) translateX(-0.2px);
+  }
+}
+
+.sprout-plant {
+  transform-origin: 50px 118px;
+  animation: sprout-sway 5.8s ease-in-out infinite;
+}
+
+.sprout-leaf-left {
+  transform-origin: 48px 50px;
+  animation: sprout-leaf-left 5s ease-in-out infinite;
+}
+
+.sprout-leaf-right {
+  transform-origin: 52px 50px;
+  animation: sprout-leaf-right 5s ease-in-out infinite;
+}
+
+/* ━━━ stage 2: 봉우리 ━━━ */
+
+@keyframes bud-sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(0.8deg);
+  }
+  75% {
+    transform: rotate(-0.8deg);
+  }
+}
+
+@keyframes bud-leaf-left {
+  0%,
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: rotate(1deg) translateX(-0.35px);
+  }
+  75% {
+    transform: rotate(-0.7deg) translateX(0.15px);
+  }
+}
+
+@keyframes bud-leaf-right {
+  0%,
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: rotate(-1deg) translateX(0.35px);
+  }
+  75% {
+    transform: rotate(0.7deg) translateX(-0.15px);
+  }
+}
+
+@keyframes bud-bloom {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-0.8px) rotate(0.35deg);
+  }
+}
+
+.bud-plant {
+  transform-origin: 50px 118px;
+  animation: bud-sway 6s ease-in-out infinite;
+}
+
+.bud-leaf-left {
+  transform-origin: 49px 78px;
+  animation: bud-leaf-left 5.2s ease-in-out infinite;
+}
+
+.bud-leaf-right {
+  transform-origin: 51px 78px;
+  animation: bud-leaf-right 5.2s ease-in-out infinite;
+}
+
+.bud-top {
+  transform-origin: 50px 32px;
+  animation: bud-bloom 4.8s ease-in-out infinite;
+}
+
 /* ━━━ 꽃 애니메이션 ━━━ */
 
-/* 전체 식물 흔들림 */
-@keyframes flower-sway {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(1.8deg); }
-  75% { transform: rotate(-1.8deg); }
+@keyframes flower-sway-soft {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(0.9deg);
+  }
+  50% {
+    transform: rotate(0.2deg);
+  }
+  75% {
+    transform: rotate(-0.9deg);
+  }
 }
 
-/* 잎 미세 흔들림 */
-@keyframes leaf-sway {
-  0%, 100% { transform: rotate(0deg) translateX(0); }
-  40% { transform: rotate(1.5deg) translateX(0.5px); }
-  60% { transform: rotate(-1deg) translateX(-0.3px); }
+@keyframes leaf-sway-left-soft {
+  0%,
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: rotate(1.2deg) translateX(-0.4px);
+  }
+  50% {
+    transform: rotate(0.2deg) translateX(-0.1px);
+  }
+  75% {
+    transform: rotate(-0.8deg) translateX(0.2px);
+  }
 }
 
-/* 꽃잎 숨쉬기 */
-@keyframes petal-breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.04); }
+@keyframes leaf-sway-right-soft {
+  0%,
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: rotate(-1.2deg) translateX(0.4px);
+  }
+  50% {
+    transform: rotate(-0.2deg) translateX(0.1px);
+  }
+  75% {
+    transform: rotate(0.8deg) translateX(-0.2px);
+  }
 }
 
-.flower-leaves {
-  animation: leaf-sway 6s ease-in-out infinite;
-  transform-origin: center bottom;
-  transform-box: fill-box;
+@keyframes flower-gentle-soft {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-0.4px) rotate(-0.5deg);
+  }
+  50% {
+    transform: translateY(-1px) rotate(0.35deg);
+  }
+  75% {
+    transform: translateY(-0.3px) rotate(-0.2deg);
+  }
+}
+
+.flower-plant {
+  transform-origin: 50px 124px;
+  animation: flower-sway-soft 5.8s ease-in-out infinite;
+}
+
+.flower-leaf-left {
+  transform-origin: 49px 90px;
+  animation: leaf-sway-left-soft 5.2s ease-in-out infinite;
+}
+
+.flower-leaf-right {
+  transform-origin: 51px 90px;
+  animation: leaf-sway-right-soft 5.2s ease-in-out infinite;
 }
 
 .flower-petals {
-  animation: petal-breathe 4s ease-in-out infinite;
-  transform-origin: center;
-  transform-box: fill-box;
+  transform-origin: 50px 36px;
+  animation: flower-gentle-soft 4.4s ease-in-out infinite;
 }

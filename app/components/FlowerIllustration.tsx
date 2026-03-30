@@ -1,18 +1,5 @@
 "use client";
 
-/**
- * SVG로 그린 꽃 일러스트레이션
- *
- * 4가지 시각 단계 (waterCount 기반):
- *   0: 씨앗 — 흙에 묻힌 작은 씨앗
- *   1: 새싹 — 짧은 줄기 + 두 장의 떡잎
- *   2: 봉우리 — 중간 줄기 + 잎 + 뾰족한 봉우리
- *   3: 만개 — 긴 줄기 + 잎 + 화사한 꽃잎 + 금빛 중심
- *
- * size="lg": 상세 보기 (맨땅)
- * size="sm": 꽃밭 그리드용
- */
-
 interface Props {
   waterCount: number;
   size?: "lg" | "sm";
@@ -29,299 +16,399 @@ export default function FlowerIllustration({
   const stage = Math.min(Math.max(waterCount, 0), 3);
   const isLarge = size === "lg";
 
+  const wrapperClass = isLarge ? "w-52 h-64 mx-auto" : "w-full h-full";
+
+  const swayStyle =
+    animate && stage > 0
+      ? {
+          animation: "flower-sway 5s ease-in-out infinite",
+          transformOrigin: "center bottom",
+          animationDelay: `${delay}s`,
+        }
+      : undefined;
+
   return (
-    <div
-      className={isLarge ? "w-52 h-64 mx-auto" : "w-full h-full"}
-      style={
-        animate && stage > 0
-          ? {
-              animation: "flower-sway 5s ease-in-out infinite",
-              transformOrigin: "center bottom",
-              animationDelay: `${delay}s`,
-            }
-          : undefined
-      }
-    >
+    <div className={wrapperClass} style={swayStyle}>
       <svg
-        viewBox={isLarge ? "0 0 100 130" : "15 10 70 82"}
+        viewBox="0 0 100 130"
         className="w-full h-full overflow-visible"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* ═══ 맨땅 (lg) ═══ */}
-        {isLarge && (
-          <g>
-            {/* 흙 그림자 */}
-            <ellipse cx="50" cy="118" rx="32" ry="6" fill="#C9B39A" opacity="0.3" />
-            {/* 풀잔디 */}
-            <ellipse cx="50" cy="115" rx="28" ry="4" fill="#8FB070" opacity="0.35" />
-            {/* 흙 */}
-            <ellipse cx="50" cy="116" rx="22" ry="3" fill="#B5A48F" opacity="0.5" />
-            {/* 잔디 블레이드 */}
-            <path d="M25,116 Q27,108 29,116" stroke="#6DB04A" strokeWidth="1.2" fill="none" opacity="0.4" />
-            <path d="M68,115 Q70,107 72,115" stroke="#7EBF5C" strokeWidth="1" fill="none" opacity="0.35" />
-            <path d="M35,117 Q36,111 37,117" stroke="#5EA33B" strokeWidth="0.8" fill="none" opacity="0.3" />
-            <path d="M62,117 Q63,110 64,117" stroke="#6DB04A" strokeWidth="0.8" fill="none" opacity="0.3" />
-          </g>
-        )}
+        <defs>
+          <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="1.2" result="blur" />
+            <feOffset dx="1.2" dy="1.6" result="offset" />
+            <feFlood floodColor="#cfc9bf" floodOpacity="0.45" result="color" />
+            <feComposite
+              in="color"
+              in2="offset"
+              operator="in"
+              result="shadow"
+            />
+            <feMerge>
+              <feMergeNode in="shadow" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
 
-        {/* ═══ 작은 흙 (sm) ═══ */}
-        {!isLarge && (
-          <g>
-            <ellipse cx="50" cy="88" rx="18" ry="4" fill="#8FB070" opacity="0.35" />
-            <ellipse cx="50" cy="89" rx="14" ry="2.5" fill="#B5A48F" opacity="0.4" />
-          </g>
-        )}
+          <filter id="petalShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="0.8" result="blur" />
+            <feOffset dx="0.8" dy="1.1" result="offset" />
+            <feFlood floodColor="#d79077" floodOpacity="0.18" result="color" />
+            <feComposite
+              in="color"
+              in2="offset"
+              operator="in"
+              result="shadow"
+            />
+            <feMerge>
+              <feMergeNode in="shadow" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
 
-        {/* ═══ 씨앗 (stage 0) ═══ */}
-        {stage === 0 && (
-          <g>
-            <ellipse cx="50" cy={isLarge ? 112 : 84} rx="5" ry="3.5" fill="#8C7A69" />
-            <ellipse cx="48" cy={isLarge ? 111 : 83} rx="2" ry="1.5" fill="#A09080" opacity="0.5" />
-          </g>
-        )}
+        {/* 배경은 원본 만개 SVG처럼 연한 베이지 톤 */}
+        {/* {stage >= 3 && isLarge && (
+          <rect x="0" y="0" width="100" height="130" fill="#F5E9D7" />
+        )} */}
 
-        {/* ═══ 새싹 (stage 1) ═══ */}
-        {stage === 1 && (
-          <g className={animate ? "flower-leaves" : ""}>
-            <path
-              d={isLarge ? "M50,114 Q49,100 50,86" : "M50,88 Q49,78 50,66"}
-              stroke="#5C8A3E"
-              strokeWidth="2.5"
-              fill="none"
-              strokeLinecap="round"
-            />
-            {/* 왼쪽 떡잎 */}
+        {/* 하단 바닥 */}
+        {/* {isLarge && (
+          <>
             <ellipse
-              cx={43} cy={isLarge ? 88 : 68}
-              rx="8" ry="4.5"
-              fill="#6DB04A"
-              transform={`rotate(-25, 43, ${isLarge ? 88 : 68})`}
-            />
-            {/* 오른쪽 떡잎 */}
-            <ellipse
-              cx={57} cy={isLarge ? 88 : 68}
-              rx="8" ry="4.5"
-              fill="#7EBF5C"
-              transform={`rotate(25, 57, ${isLarge ? 88 : 68})`}
-            />
-            {/* 잎맥 */}
-            <path
-              d={isLarge ? "M43,88 L38,86" : "M43,68 L38,66"}
-              stroke="#4A8030"
-              strokeWidth="0.5"
-              opacity="0.4"
-              fill="none"
+              cx="50"
+              cy="126.5"
+              rx="18"
+              ry="2.6"
+              fill="#E9D8C5"
+              opacity="0.75"
             />
             <path
-              d={isLarge ? "M57,88 L62,86" : "M57,68 L62,66"}
-              stroke="#4A8030"
-              strokeWidth="0.5"
-              opacity="0.4"
-              fill="none"
-            />
-          </g>
-        )}
-
-        {/* ═══ 봉우리 (stage 2) ═══ */}
-        {stage === 2 && (
-          <g className={animate ? "flower-leaves" : ""}>
-            {/* 줄기 */}
-            <path
-              d={isLarge ? "M50,114 Q47,90 50,58" : "M50,88 Q47,68 50,42"}
-              stroke="#4D8B2F"
-              strokeWidth="3"
-              fill="none"
-              strokeLinecap="round"
-            />
-            {/* 왼쪽 잎 */}
-            <ellipse
-              cx={36} cy={isLarge ? 88 : 66}
-              rx="13" ry="5.5"
-              fill="#5EA33B"
-              transform={`rotate(-28, 36, ${isLarge ? 88 : 66})`}
-            />
-            <path
-              d={isLarge ? "M36,88 L28,85" : "M36,66 L28,63"}
-              stroke="#3E7A25"
-              strokeWidth="0.7"
-              opacity="0.3"
-              fill="none"
-            />
-            {/* 오른쪽 잎 */}
-            <ellipse
-              cx={64} cy={isLarge ? 88 : 66}
-              rx="13" ry="5.5"
-              fill="#6DB04A"
-              transform={`rotate(28, 64, ${isLarge ? 88 : 66})`}
-            />
-            <path
-              d={isLarge ? "M64,88 L72,85" : "M64,66 L72,63"}
-              stroke="#3E7A25"
-              strokeWidth="0.7"
-              opacity="0.3"
-              fill="none"
-            />
-            {/* 봉우리 — 뾰족한 형태 */}
-            <path
-              d={isLarge
-                ? "M42,62 Q44,48 50,38 Q56,48 58,62 Q50,66 42,62Z"
-                : "M42,46 Q44,32 50,22 Q56,32 58,46 Q50,50 42,46Z"
-              }
-              fill="#6DB04A"
-            />
-            {/* 봉우리 내부 핑크 힌트 */}
-            <path
-              d={isLarge
-                ? "M45,60 Q47,50 50,43 Q53,50 55,60 Q50,62 45,60Z"
-                : "M45,44 Q47,34 50,27 Q53,34 55,44 Q50,46 45,44Z"
-              }
-              fill="#D7A3A7"
-              opacity="0.5"
-            />
-            {/* 봉우리 꼭대기 — 뾰족한 잎 */}
-            <path
-              d={isLarge
-                ? "M48,42 Q50,34 52,42 Q50,43 48,42Z"
-                : "M48,26 Q50,18 52,26 Q50,27 48,26Z"
-              }
-              fill="#4D8B2F"
+              d="M0 130 L0 120 Q20 127 50 122 Q78 118 100 125 L100 130 Z"
+              fill="#F0E2D2"
               opacity="0.9"
             />
+          </>
+        )} */}
+
+        {/* stage 0 - 씨앗 */}
+        {stage === 0 && (
+          <g filter="url(#softShadow)">
+            <ellipse cx="50" cy="117" rx="4.4" ry="2.9" fill="#9B8B76" />
+            <ellipse
+              cx="48.6"
+              cy="116.2"
+              rx="1.3"
+              ry="0.8"
+              fill="#B7A694"
+              opacity="0.65"
+            />
+            <path
+              d="M41 121 Q50 118 59 121"
+              stroke="#E6D8C6"
+              strokeWidth="1"
+              fill="none"
+              opacity="0.45"
+            />
           </g>
         )}
 
-        {/* ═══ 만개 (stage 3) ═══ */}
-        {stage >= 3 && (
-          <g className={animate ? "flower-leaves" : ""}>
+        {/* stage 1 - 새싹 */}
+        {stage === 1 && (
+          <g
+            className={animate ? "sprout-plant" : ""}
+            filter="url(#softShadow)"
+          >
             {/* 줄기 */}
             <path
-              d={isLarge ? "M50,114 Q46,82 50,48" : "M50,88 Q46,62 50,35"}
-              stroke="#4D8B2F"
-              strokeWidth="3.5"
-              fill="none"
+              d="M50 118 C50 108, 50 94, 50 76 C50 65, 50.2 58, 49.8 52"
+              stroke="#A7AC9C"
+              strokeWidth="4"
               strokeLinecap="round"
-            />
-            {/* 줄기 하이라이트 */}
-            <path
-              d={isLarge ? "M51,110 Q47,82 51,50" : "M51,84 Q47,62 51,37"}
-              stroke="#6DB04A"
-              strokeWidth="1"
               fill="none"
-              strokeLinecap="round"
-              opacity="0.4"
             />
 
             {/* 왼쪽 잎 */}
-            <ellipse
-              cx={34} cy={isLarge ? 84 : 64}
-              rx="14" ry="6"
-              fill="#5EA33B"
-              transform={`rotate(-28, 34, ${isLarge ? 84 : 64})`}
-            />
-            <ellipse
-              cx={34} cy={isLarge ? 84 : 64}
-              rx="10" ry="3"
-              fill="#6DB04A"
-              opacity="0.4"
-              transform={`rotate(-28, 34, ${isLarge ? 84 : 64})`}
-            />
+            <g className={animate ? "sprout-leaf-left" : ""}>
+              <path
+                d="M48 50
+           C42 40, 31 34, 20 35
+           C17 43, 20 52, 30 60
+           C37 65.5, 44 67, 48.5 67.5
+           C49.2 61.5, 49.1 56, 48 50 Z"
+                fill="#B2B5A7"
+              />
+              <path
+                d="M48.5 65.5 C44 58, 39 53, 32 48"
+                stroke="#969B8C"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                fill="none"
+                opacity="0.95"
+              />
+              <path
+                d="M48 50 C42 40, 31 34, 20 35"
+                stroke="#C4C7BC"
+                strokeWidth="0.8"
+                fill="none"
+                opacity="0.35"
+              />
+            </g>
+
             {/* 오른쪽 잎 */}
-            <ellipse
-              cx={66} cy={isLarge ? 84 : 64}
-              rx="14" ry="6"
-              fill="#6DB04A"
-              transform={`rotate(28, 66, ${isLarge ? 84 : 64})`}
+            <g className={animate ? "sprout-leaf-right" : ""}>
+              <path
+                d="M52 50
+           C58 40, 69 34, 80 35
+           C83 43, 80 52, 70 60
+           C63 65.5, 56 67, 51.5 67.5
+           C50.8 61.5, 50.9 56, 52 50 Z"
+                fill="#B2B5A7"
+              />
+              <path
+                d="M51.5 65.5 C56 58, 61 53, 68 48"
+                stroke="#969B8C"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                fill="none"
+                opacity="0.95"
+              />
+              <path
+                d="M52 50 C58 40, 69 34, 80 35"
+                stroke="#C4C7BC"
+                strokeWidth="0.8"
+                fill="none"
+                opacity="0.35"
+              />
+            </g>
+          </g>
+        )}
+
+        {/* stage 2 - 봉우리 */}
+        {stage === 2 && (
+          <g className={animate ? "bud-plant" : ""} filter="url(#softShadow)">
+            {/* 줄기 */}
+            <path
+              d="M50 118 C50 104, 50 90, 50 76 C50 67, 49.8 56, 50 45"
+              stroke="#A4A998"
+              strokeWidth="4"
+              strokeLinecap="round"
+              fill="none"
             />
-            <ellipse
-              cx={66} cy={isLarge ? 84 : 64}
-              rx="10" ry="3"
-              fill="#7EBF5C"
-              opacity="0.4"
-              transform={`rotate(28, 66, ${isLarge ? 84 : 64})`}
-            />
 
-            {/* 꽃잎 그룹 */}
-            <g className={animate ? "flower-petals" : ""}>
-              {/* 뒤쪽 큰 꽃잎 */}
-              <ellipse
-                cx={37} cy={isLarge ? 42 : 29}
-                rx={isLarge ? 12 : 11} ry={isLarge ? 10 : 9}
-                fill="#F9A8B0"
-                transform={`rotate(-15, 37, ${isLarge ? 42 : 29})`}
+            {/* 왼쪽 잎 */}
+            <g className={animate ? "bud-leaf-left" : ""}>
+              <path
+                d="M49 78
+           C44 70, 33 64, 22 66
+           C21 74, 27 82, 37 87
+           C42 89.5, 46 91, 49.5 91
+           C49.7 86, 49.5 82, 49 78 Z"
+                fill="#ADB1A2"
               />
-              <ellipse
-                cx={63} cy={isLarge ? 42 : 29}
-                rx={isLarge ? 12 : 11} ry={isLarge ? 10 : 9}
-                fill="#F48C96"
-                transform={`rotate(15, 63, ${isLarge ? 42 : 29})`}
+              <path
+                d="M48.8 89.5 C44.8 83.5, 40 79.5, 34 75"
+                stroke="#94998A"
+                strokeWidth="1.1"
+                strokeLinecap="round"
+                fill="none"
               />
+            </g>
 
-              {/* 위쪽 꽃잎 */}
-              <ellipse
-                cx={50} cy={isLarge ? 28 : 15}
-                rx={isLarge ? 11 : 10} ry={isLarge ? 13 : 12}
-                fill="#F06878"
+            {/* 오른쪽 잎 */}
+            <g className={animate ? "bud-leaf-right" : ""}>
+              <path
+                d="M51 78
+           C56 70, 67 64, 78 66
+           C79 74, 73 82, 63 87
+           C58 89.5, 54 91, 50.5 91
+           C50.3 86, 50.5 82, 51 78 Z"
+                fill="#ADB1A2"
               />
-              {/* 위쪽 꽃잎 하이라이트 */}
-              <ellipse
-                cx={48} cy={isLarge ? 25 : 12}
-                rx={isLarge ? 5 : 4} ry={isLarge ? 7 : 6}
-                fill="#F9B0B8"
-                opacity="0.55"
+              <path
+                d="M51.2 89.5 C55.2 83.5, 60 79.5, 66 75"
+                stroke="#94998A"
+                strokeWidth="1.1"
+                strokeLinecap="round"
+                fill="none"
               />
+            </g>
 
-              {/* 옆쪽 꽃잎 */}
-              <ellipse
-                cx={isLarge ? 36 : 36} cy={isLarge ? 47 : 34}
-                rx={isLarge ? 11 : 10} ry={isLarge ? 9 : 8}
-                fill="#F7808C"
-                transform={`rotate(-22, 36, ${isLarge ? 47 : 34})`}
+            {/* 봉우리 */}
+            <g className={animate ? "bud-top" : ""} filter="url(#petalShadow)">
+              <path
+                d="M50 44
+           C44.5 44, 40 39, 40.8 31
+           C41.5 24, 46 18, 50 16
+           C54 18, 58.5 24, 59.2 31
+           C60 39, 55.5 44, 50 44 Z"
+                fill="#EDA187"
               />
-              <ellipse
-                cx={isLarge ? 64 : 64} cy={isLarge ? 47 : 34}
-                rx={isLarge ? 11 : 10} ry={isLarge ? 9 : 8}
-                fill="#E8606E"
-                transform={`rotate(22, 64, ${isLarge ? 47 : 34})`}
+              <path
+                d="M45.5 41
+           C45.5 34, 47.5 26, 50 20
+           C52.5 26, 54.5 34, 54.5 41"
+                fill="#EE9B84"
+                opacity="0.58"
               />
+              <circle cx="50" cy="32" r="4.8" fill="#F1C994" />
+            </g>
+          </g>
+        )}
 
-              {/* 아래쪽 꽃잎 */}
-              <ellipse
-                cx={isLarge ? 42 : 42} cy={isLarge ? 55 : 42}
-                rx={isLarge ? 10 : 9} ry={isLarge ? 8 : 7}
-                fill="#FBABB4"
+        {/* stage 3 - 만개: 업로드 이미지에 맞춤 */}
+        {stage >= 3 && (
+          <g className={animate ? "flower-plant" : ""}>
+            {/* 줄기 */}
+            <g filter="url(#softShadow)">
+              <path
+                d="M50 124 C50 112, 50 100, 50 88 C50 79, 49.8 69, 50 60"
+                stroke="#A3A995"
+                strokeWidth="4"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <path
+                d="M50 88 C49.6 84, 49.2 81, 49.8 78"
+                stroke="#97A08D"
+                strokeWidth="1.3"
+                strokeLinecap="round"
+                fill="none"
                 opacity="0.9"
               />
+
+              {/* 왼쪽 잎 */}
+              <g className={animate ? "flower-leaf-left" : ""}>
+                <path
+                  d="M49 90
+             C44 82, 33 76, 22 78
+             C20.5 86, 26 94, 37 99
+             C42.5 101.5, 46.7 102.5, 49.8 103
+             C49.8 98, 49.6 94, 49 90 Z"
+                  fill="#AEB2A4"
+                />
+                <path
+                  d="M48.9 101.5 C44.7 95, 40 91, 33 86"
+                  stroke="#959B8C"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </g>
+
+              {/* 오른쪽 잎 */}
+              <g className={animate ? "flower-leaf-right" : ""}>
+                <path
+                  d="M51 90
+             C56 82, 67 76, 78 78
+             C79.5 86, 74 94, 63 99
+             C57.5 101.5, 53.3 102.5, 50.2 103
+             C50.2 98, 50.4 94, 51 90 Z"
+                  fill="#AEB2A4"
+                />
+                <path
+                  d="M51.1 101.5 C55.3 95, 60 91, 67 86"
+                  stroke="#959B8C"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </g>
+            </g>
+
+            {/* 꽃 */}
+            <g
+              className={animate ? "flower-petals" : ""}
+              filter="url(#petalShadow)"
+            >
+              {/* 위 */}
+              <ellipse cx="50" cy="18" rx="10.5" ry="15.5" fill="#E89E83" />
+
+              {/* 좌상 */}
               <ellipse
-                cx={isLarge ? 58 : 58} cy={isLarge ? 55 : 42}
-                rx={isLarge ? 10 : 9} ry={isLarge ? 8 : 7}
-                fill="#F28D98"
-                opacity="0.9"
+                cx="28.5"
+                cy="28"
+                rx="12"
+                ry="16.5"
+                transform="rotate(-48 28.5 28)"
+                fill="#EA9475"
+                opacity="0.95"
               />
 
-              {/* 중심 — 금빛 */}
-              <circle
-                cx={50} cy={isLarge ? 42 : 29}
-                r={isLarge ? 9 : 8}
-                fill="#E8B840"
+              {/* 우상 */}
+              <ellipse
+                cx="71.5"
+                cy="28"
+                rx="12"
+                ry="16.5"
+                transform="rotate(48 71.5 28)"
+                fill="#E98E6D"
+                opacity="0.95"
               />
-              <circle
-                cx={50} cy={isLarge ? 42 : 29}
-                r={isLarge ? 6 : 5}
-                fill="#F5D060"
+
+              {/* 좌하 */}
+              <ellipse
+                cx="29"
+                cy="50.5"
+                rx="12"
+                ry="16.5"
+                transform="rotate(38 29 50.5)"
+                fill="#E99579"
+                opacity="0.92"
               />
-              {/* 중심 하이라이트 */}
-              <circle
-                cx={isLarge ? 48 : 48} cy={isLarge ? 40 : 27}
-                r={isLarge ? 2.5 : 2}
-                fill="#FCE88A"
-                opacity="0.7"
+
+              {/* 하 */}
+              <ellipse
+                cx="50"
+                cy="58"
+                rx="10.7"
+                ry="16"
+                fill="#E89A7F"
+                opacity="0.92"
               />
-              {/* 수술 점 */}
-              <circle cx={isLarge ? 46 : 46} cy={isLarge ? 45 : 32} r="1.2" fill="#D4A030" opacity="0.6" />
-              <circle cx={isLarge ? 54 : 54} cy={isLarge ? 45 : 32} r="1.2" fill="#D4A030" opacity="0.6" />
-              <circle cx={isLarge ? 50 : 50} cy={isLarge ? 47 : 34} r="1" fill="#D4A030" opacity="0.5" />
-              <circle cx={isLarge ? 47 : 47} cy={isLarge ? 38 : 25} r="0.8" fill="#D4A030" opacity="0.4" />
-              <circle cx={isLarge ? 53 : 53} cy={isLarge ? 38 : 25} r="0.8" fill="#D4A030" opacity="0.4" />
+
+              {/* 우하 */}
+              <ellipse
+                cx="71"
+                cy="50.5"
+                rx="12"
+                ry="16.5"
+                transform="rotate(-38 71 50.5)"
+                fill="#EAA387"
+                opacity="0.92"
+              />
+
+              {/* 꽃잎 안쪽 은은한 레이어 */}
+              <ellipse
+                cx="50"
+                cy="28"
+                rx="13"
+                ry="11"
+                fill="#EA8F72"
+                opacity="0.22"
+              />
+              <ellipse
+                cx="39"
+                cy="36"
+                rx="10"
+                ry="11"
+                transform="rotate(-25 39 36)"
+                fill="#EA8F72"
+                opacity="0.12"
+              />
+              <ellipse
+                cx="61"
+                cy="36"
+                rx="10"
+                ry="11"
+                transform="rotate(25 61 36)"
+                fill="#EA8F72"
+                opacity="0.12"
+              />
+
+              {/* 중심 */}
+              <circle cx="50" cy="37.8" r="11" fill="#F0C993" />
             </g>
           </g>
         )}

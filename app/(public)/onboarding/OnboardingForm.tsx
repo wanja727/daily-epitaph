@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { completeOnboarding } from "./actions";
-import { generateFlowerNickname } from "@/lib/utils/flower-names";
 import { useLoading } from "@/app/components/LoadingProvider";
+import NicknameField from "@/app/components/NicknameField";
 
 export default function OnboardingForm({
   suggestedNickname,
@@ -15,10 +15,6 @@ export default function OnboardingForm({
   const [nickname, setNickname] = useState(suggestedNickname);
   const [error, setError] = useState("");
   const { isPending, startTransition } = useLoading();
-
-  function reroll() {
-    setNickname(generateFlowerNickname());
-  }
 
   function handleSubmit(formData: FormData) {
     setError("");
@@ -32,7 +28,6 @@ export default function OnboardingForm({
 
   return (
     <form action={handleSubmit} className="space-y-5">
-      {/* 카카오 닉네임 표시 */}
       {kakaoName && (
         <div className="text-xs text-brown-light text-center">
           카카오 계정: {kakaoName}
@@ -56,30 +51,11 @@ export default function OnboardingForm({
         </p>
       </div>
 
-      {/* 닉네임 */}
-      <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4 space-y-3">
-        <label className="text-sm font-medium text-brown-dark">닉네임</label>
-        <div className="flex gap-2">
-          <input
-            name="nickname"
-            type="text"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            className="flex-1 rounded-3xl bg-[#FCFAF6] border border-stone px-4 py-3 text-brown placeholder:text-brown-light/60 focus:outline-none focus:ring-2 focus:ring-olive/30 text-sm"
-          />
-          <button
-            type="button"
-            onClick={reroll}
-            className="px-4 rounded-3xl bg-sand border border-stone text-brown-mid hover:text-brown-dark hover:bg-[#E5DDD0] transition-colors text-lg"
-            title="다시 생성"
-          >
-            🎲
-          </button>
-        </div>
-        <p className="text-xs text-brown-light">
-          묘비명 작성 시 표시되는 이름입니다
-        </p>
-      </div>
+      <NicknameField
+        nickname={nickname}
+        onChange={setNickname}
+        disabled={isPending}
+      />
 
       {error && (
         <p className="text-sm text-rose-deep text-center">{error}</p>

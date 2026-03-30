@@ -5,6 +5,7 @@ import { eq, desc } from "drizzle-orm";
 import { PROJECT_START_DATE, PROJECT_DAYS } from "@/lib/utils/constants";
 import { formatDateKR } from "@/lib/utils/date";
 import AttendanceGrid from "./AttendanceGrid";
+import NicknameSection from "./NicknameSection";
 
 export default async function MyPage() {
   const session = await auth();
@@ -58,19 +59,25 @@ export default async function MyPage() {
             {cellName && <span className="text-brown-light">· {cellName}</span>}
           </div>
         </div>
-        <form
-          action={async () => {
-            "use server";
-            await signOut({ redirectTo: "/login" });
-          }}
-        >
-          <button
-            type="submit"
-            className="text-xs text-brown-light hover:text-brown px-3 py-1.5 rounded-full border border-stone hover:bg-sand transition-colors"
+        <div className="flex flex-col items-end gap-2">
+          <form
+            action={async () => {
+              "use server";
+              await signOut({ redirectTo: "/login" });
+            }}
           >
-            로그아웃
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="text-xs text-brown-light hover:text-brown px-3 py-1.5 rounded-full border border-stone hover:bg-sand transition-colors"
+            >
+              로그아웃
+            </button>
+          </form>
+          <NicknameSection
+            nickname={session!.user.nickname}
+            fallbackName={session!.user.name}
+          />
+        </div>
       </div>
 
       {/* 40일 출석 */}

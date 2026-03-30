@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useOptimistic, useTransition } from "react";
+import { toggleAmen } from "./actions";
 
 interface Epitaph {
   id: string;
@@ -10,6 +11,8 @@ interface Epitaph {
   nickname: string | null;
   cellId: string | null;
   updatedAt: Date;
+  amenCount: number;
+  amened: boolean;
 }
 
 function Pill({
@@ -39,6 +42,52 @@ function Pill({
     >
       {children}
     </Component>
+  );
+}
+
+function AmenButton({
+  epitaphId,
+  amenCount,
+  amened,
+}: {
+  epitaphId: string;
+  amenCount: number;
+  amened: boolean;
+}) {
+  const [optimistic, setOptimistic] = useOptimistic(
+    { amenCount, amened },
+    (state) => ({
+      amened: !state.amened,
+      amenCount: state.amened
+        ? Math.max(state.amenCount - 1, 0)
+        : state.amenCount + 1,
+    })
+  );
+  const [, startTransition] = useTransition();
+
+  function handleClick() {
+    startTransition(async () => {
+      setOptimistic(null);
+      await toggleAmen(epitaphId);
+    });
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs transition-colors ${
+        optimistic.amened
+          ? "bg-[#E8DFD0] text-brown-dark"
+          : "bg-sand/50 text-brown-light hover:bg-sand hover:text-brown-mid"
+      }`}
+    >
+      <span className="text-sm">{optimistic.amened ? "🙏" : "🤲"}</span>
+      <span>아멘</span>
+      {optimistic.amenCount > 0 && (
+        <span className="font-medium">{optimistic.amenCount}</span>
+      )}
+    </button>
   );
 }
 
@@ -116,7 +165,6 @@ export default function FeedTabs({
 
               {/* 두 섹션 */}
               <div className="mt-4 grid gap-3">
-                {/* 어제 — warm 톤 */}
                 <div className="rounded-2xl bg-[#F7F1E7] p-3">
                   <div className="text-[11px] uppercase tracking-[0.18em] text-brown-light">
                     어제를 돌아보며
@@ -126,7 +174,6 @@ export default function FeedTabs({
                   </p>
                 </div>
 
-                {/* 오늘 — green 톤 */}
                 <div className="rounded-2xl bg-sage-light p-3">
                   <div className="text-[11px] uppercase tracking-[0.18em] text-[#6C7A62]">
                     오늘을 기대하며
@@ -135,6 +182,15 @@ export default function FeedTabs({
                     {e.today}
                   </p>
                 </div>
+              </div>
+
+              {/* 아멘 */}
+              <div className="mt-3 flex justify-end">
+                <AmenButton
+                  epitaphId={e.id}
+                  amenCount={e.amenCount}
+                  amened={e.amened}
+                />
               </div>
             </div>
           ))}

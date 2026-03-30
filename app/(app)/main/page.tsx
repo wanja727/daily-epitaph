@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { epitaphs, users, cells } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { epitaphs, users, cells, epitaphAmens } from "@/lib/db/schema";
+import { eq, and, desc, sql } from "drizzle-orm";
 import { getTodayKST, getProjectDay } from "@/lib/utils/date";
 import Link from "next/link";
 import FeedTabs from "./FeedTabs";
@@ -18,7 +18,9 @@ export default async function MainPage() {
     weekday: "long",
   });
 
-  // 오늘의 모든 묘비명 + 사용자 정보
+  const myUserId = session?.user?.id ?? "";
+
+  // 오늘의 모든 묘비명 + 사용자 정보 + 아멘 상태
   const todayEpitaphs = await db
     .select({
       id: epitaphs.id,
@@ -28,6 +30,12 @@ export default async function MainPage() {
       nickname: users.nickname,
       cellId: users.cellId,
       updatedAt: epitaphs.updatedAt,
+      amenCount: epitaphs.amenCount,
+      amened: sql<boolean>`EXISTS (
+        SELECT 1 FROM "epitaph_amen"
+        WHERE "epitaph_amen"."epitaphId" = ${epitaphs.id}
+          AND "epitaph_amen"."userId" = ${myUserId}
+      )`.as("amened"),
     })
     .from(epitaphs)
     .innerJoin(users, eq(epitaphs.userId, users.id))
@@ -45,7 +53,7 @@ export default async function MainPage() {
     cellName = cell?.name ?? null;
   }
 
-  const myEpitaph = todayEpitaphs.find((e) => e.userId === session?.user?.id);
+  const myEpitaph = todayEpitaphs.find((e) => e.userId === myUserId);
 
   return (
     <div className="px-5 py-5 space-y-4">
@@ -76,7 +84,7 @@ export default async function MainPage() {
       <FeedTabs
         epitaphs={todayEpitaphs}
         myCellId={session?.user?.cellId ?? null}
-        myUserId={session?.user?.id ?? ""}
+        myUserId={myUserId}
         cellName={cellName}
         wroteToday={!!myEpitaph}
       />

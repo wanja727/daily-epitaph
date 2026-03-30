@@ -98,13 +98,32 @@ export const epitaphs = pgTable(
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    yesterday: text("yesterday").notNull(), // 어제 돌아보기
-    today: text("today").notNull(), // 오늘 기대함
+    yesterday: text("yesterday").notNull(),
+    today: text("today").notNull(),
     date: date("date").notNull(),
+    amenCount: integer("amenCount").default(0).notNull(),
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
   },
   (epitaph) => [unique().on(epitaph.userId, epitaph.date)]
+);
+
+/** 아멘(공감) 이력 */
+export const epitaphAmens = pgTable(
+  "epitaph_amen",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    epitaphId: text("epitaphId")
+      .notNull()
+      .references(() => epitaphs.id, { onDelete: "cascade" }),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+  },
+  (amen) => [unique().on(amen.epitaphId, amen.userId)]
 );
 
 // ─── 꽃 키우기 ──────────────────────────────────────────────────────────────

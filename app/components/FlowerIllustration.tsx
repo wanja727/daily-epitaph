@@ -120,9 +120,9 @@ export default function FlowerIllustration({
             className={animate ? "sprout-plant" : ""}
             filter="url(#softShadow)"
           >
-            {/* 줄기 */}
+            {/* 줄기 - 더 짧게 */}
             <path
-              d="M50 118 C50 108, 50 94, 50 76 C50 65, 50.2 58, 49.8 52"
+              d="M50 118 C50 111, 50 103, 50 94 C50 88, 50.1 83, 49.9 79"
               stroke="#A7AC9C"
               strokeWidth="4"
               strokeLinecap="round"
@@ -132,25 +132,25 @@ export default function FlowerIllustration({
             {/* 왼쪽 잎 */}
             <g className={animate ? "sprout-leaf-left" : ""}>
               <path
-                d="M48 50
-           C42 40, 31 34, 20 35
-           C17 43, 20 52, 30 60
-           C37 65.5, 44 67, 48.5 67.5
-           C49.2 61.5, 49.1 56, 48 50 Z"
+                d="M48.8 77
+           C45.6 72, 39.4 68.5, 33 69
+           C31.2 73.8, 33.6 79.3, 39.3 83.5
+           C43.2 86.3, 46.2 87.3, 48.9 87.8
+           C49.1 84.5, 49 80.6, 48.8 77 Z"
                 fill="#B2B5A7"
               />
               <path
-                d="M48.5 65.5 C44 58, 39 53, 32 48"
+                d="M48.8 86.4 C46.2 82.4, 43 79.5, 38.5 76.2"
                 stroke="#969B8C"
-                strokeWidth="1.2"
+                strokeWidth="1"
                 strokeLinecap="round"
                 fill="none"
                 opacity="0.95"
               />
               <path
-                d="M48 50 C42 40, 31 34, 20 35"
+                d="M48.8 77 C45.6 72, 39.4 68.5, 33 69"
                 stroke="#C4C7BC"
-                strokeWidth="0.8"
+                strokeWidth="0.68"
                 fill="none"
                 opacity="0.35"
               />
@@ -159,25 +159,25 @@ export default function FlowerIllustration({
             {/* 오른쪽 잎 */}
             <g className={animate ? "sprout-leaf-right" : ""}>
               <path
-                d="M52 50
-           C58 40, 69 34, 80 35
-           C83 43, 80 52, 70 60
-           C63 65.5, 56 67, 51.5 67.5
-           C50.8 61.5, 50.9 56, 52 50 Z"
+                d="M51.2 77
+           C54.4 72, 60.6 68.5, 67 69
+           C68.8 73.8, 66.4 79.3, 60.7 83.5
+           C56.8 86.3, 53.8 87.3, 51.1 87.8
+           C50.9 84.5, 51 80.6, 51.2 77 Z"
                 fill="#B2B5A7"
               />
               <path
-                d="M51.5 65.5 C56 58, 61 53, 68 48"
+                d="M51.2 86.4 C53.8 82.4, 57 79.5, 61.5 76.2"
                 stroke="#969B8C"
-                strokeWidth="1.2"
+                strokeWidth="1"
                 strokeLinecap="round"
                 fill="none"
                 opacity="0.95"
               />
               <path
-                d="M52 50 C58 40, 69 34, 80 35"
+                d="M51.2 77 C54.4 72, 60.6 68.5, 67 69"
                 stroke="#C4C7BC"
-                strokeWidth="0.8"
+                strokeWidth="0.68"
                 fill="none"
                 opacity="0.35"
               />
@@ -187,77 +187,114 @@ export default function FlowerIllustration({
 
         {/* stage 2 - 봉우리 */}
         {stage === 2 && (
-          <g className={animate ? "bud-plant" : ""} filter="url(#softShadow)">
+          <g className={animate ? "bud-plant" : ""}>
             {/* 줄기 */}
-            <path
-              d="M50 118 C50 104, 50 90, 50 76 C50 67, 49.8 56, 50 45"
-              stroke="#A4A998"
-              strokeWidth="4"
-              strokeLinecap="round"
-              fill="none"
-            />
-
-            {/* 왼쪽 잎 */}
-            <g className={animate ? "bud-leaf-left" : ""}>
+            <g filter="url(#softShadow)">
               <path
-                d="M49 78
-           C44 70, 33 64, 22 66
-           C21 74, 27 82, 37 87
-           C42 89.5, 46 91, 49.5 91
-           C49.7 86, 49.5 82, 49 78 Z"
-                fill="#ADB1A2"
-              />
-              <path
-                d="M48.8 89.5 C44.8 83.5, 40 79.5, 34 75"
-                stroke="#94998A"
-                strokeWidth="1.1"
+                d="M50 118 C50 104, 50 92, 50 78 C50 68, 49.8 57, 50 49"
+                stroke="#A4A998"
+                strokeWidth="4"
                 strokeLinecap="round"
                 fill="none"
               />
+
+              {/* 왼쪽 잎 */}
+              <g className={animate ? "bud-leaf-left" : ""}>
+                <path
+                  d="M49 80
+             C44.5 73, 35 67.5, 25.5 69
+             C24 76, 29 83.5, 38 88
+             C42.8 90.6, 46.5 91.6, 49.5 92
+             C49.7 87.4, 49.5 83.5, 49 80 Z"
+                  fill="#ADB1A2"
+                />
+                <path
+                  d="M48.9 90.6 C45.2 85.2, 40.8 81.2, 35.2 77"
+                  stroke="#94998A"
+                  strokeWidth="1.1"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </g>
+
+              {/* 오른쪽 잎 */}
+              <g className={animate ? "bud-leaf-right" : ""}>
+                <path
+                  d="M51 80
+             C55.5 73, 65 67.5, 74.5 69
+             C76 76, 71 83.5, 62 88
+             C57.2 90.6, 53.5 91.6, 50.5 92
+             C50.3 87.4, 50.5 83.5, 51 80 Z"
+                  fill="#ADB1A2"
+                />
+                <path
+                  d="M51.1 90.6 C54.8 85.2, 59.2 81.2, 64.8 77"
+                  stroke="#94998A"
+                  strokeWidth="1.1"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </g>
             </g>
 
-            {/* 오른쪽 잎 */}
-            <g className={animate ? "bud-leaf-right" : ""}>
-              <path
-                d="M51 78
-           C56 70, 67 64, 78 66
-           C79 74, 73 82, 63 87
-           C58 89.5, 54 91, 50.5 91
-           C50.3 86, 50.5 82, 51 78 Z"
-                fill="#ADB1A2"
-              />
-              <path
-                d="M51.2 89.5 C55.2 83.5, 60 79.5, 66 75"
-                stroke="#94998A"
-                strokeWidth="1.1"
-                strokeLinecap="round"
-                fill="none"
-              />
-            </g>
-
-            {/* 봉우리 */}
+            {/* 봉우리 - 튤립 스타일 */}
             <g className={animate ? "bud-top" : ""} filter="url(#petalShadow)">
+              {/* 윗부분 안쪽 틈 */}
               <path
-                d="M50 44
-           C44.5 44, 40 39, 40.8 31
-           C41.5 24, 46 18, 50 16
-           C54 18, 58.5 24, 59.2 31
-           C60 39, 55.5 44, 50 44 Z"
-                fill="#EDA187"
+                d="M50 20
+           C47.8 20, 46.2 21.6, 45.2 23.8
+           C46.2 27.4, 48 30, 50 31.4
+           C52 30, 53.8 27.4, 54.8 23.8
+           C53.8 21.6, 52.2 20, 50 20 Z"
+                fill="#F5F1E8"
+                opacity="0.95"
               />
+
+              {/* 왼쪽 바깥 꽃잎 */}
               <path
-                d="M45.5 41
-           C45.5 34, 47.5 26, 50 20
-           C52.5 26, 54.5 34, 54.5 41"
-                fill="#EE9B84"
-                opacity="0.58"
+                d="M44.8 55
+           C37 49.2, 31.8 38.5, 32.5 25.5
+           C33 17.5, 37.2 11.2, 42.8 8.5
+           C44.7 9, 45.7 12.5, 46 17.5
+           C46.5 28, 46 42, 44.8 55 Z"
+                fill="#EE8F75"
               />
-              <circle cx="50" cy="32" r="4.8" fill="#F1C994" />
+
+              {/* 오른쪽 바깥 꽃잎 */}
+              <path
+                d="M55.2 55
+           C63 49.2, 68.2 38.5, 67.5 25.5
+           C67 17.5, 62.8 11.2, 57.2 8.5
+           C55.3 9, 54.3 12.5, 54 17.5
+           C53.5 28, 54 42, 55.2 55 Z"
+                fill="#EB886E"
+              />
+
+              {/* 가운데 꽃잎 */}
+              <path
+                d="M50 56
+           C43.5 51, 39 41.8, 39 30.2
+           C39 20.8, 42.8 13.2, 50 9.5
+           C57.2 13.2, 61 20.8, 61 30.2
+           C61 41.8, 56.5 51, 50 56 Z"
+                fill="#F0B39D"
+              />
+
+              {/* 안쪽 레이어 */}
+              <path
+                d="M50 52.5
+           C45.7 48.8, 43 41.5, 43 32.5
+           C43 24.8, 45.6 18.7, 50 15.5
+           C54.4 18.7, 57 24.8, 57 32.5
+           C57 41.5, 54.3 48.8, 50 52.5 Z"
+                fill="#F3C1AF"
+                opacity="0.42"
+              />
             </g>
           </g>
         )}
 
-        {/* stage 3 - 만개: 업로드 이미지에 맞춤 */}
+        {/* stage 3 - 만개 */}
         {stage >= 3 && (
           <g className={animate ? "flower-plant" : ""}>
             {/* 줄기 */}
@@ -282,14 +319,14 @@ export default function FlowerIllustration({
               <g className={animate ? "flower-leaf-left" : ""}>
                 <path
                   d="M49 90
-             C44 82, 33 76, 22 78
-             C20.5 86, 26 94, 37 99
-             C42.5 101.5, 46.7 102.5, 49.8 103
-             C49.8 98, 49.6 94, 49 90 Z"
+             C44 82, 34 76.5, 24 78
+             C22.5 85.5, 27.5 93.5, 37 98
+             C42 100.5, 46.2 101.8, 49.6 102.2
+             C49.7 97.8, 49.5 93.8, 49 90 Z"
                   fill="#AEB2A4"
                 />
                 <path
-                  d="M48.9 101.5 C44.7 95, 40 91, 33 86"
+                  d="M48.9 100.8 C45 95, 40.4 90.9, 34.2 86.3"
                   stroke="#959B8C"
                   strokeWidth="1.2"
                   strokeLinecap="round"
@@ -301,14 +338,14 @@ export default function FlowerIllustration({
               <g className={animate ? "flower-leaf-right" : ""}>
                 <path
                   d="M51 90
-             C56 82, 67 76, 78 78
-             C79.5 86, 74 94, 63 99
-             C57.5 101.5, 53.3 102.5, 50.2 103
-             C50.2 98, 50.4 94, 51 90 Z"
+             C56 82, 66 76.5, 76 78
+             C77.5 85.5, 72.5 93.5, 63 98
+             C58 100.5, 53.8 101.8, 50.4 102.2
+             C50.3 97.8, 50.5 93.8, 51 90 Z"
                   fill="#AEB2A4"
                 />
                 <path
-                  d="M51.1 101.5 C55.3 95, 60 91, 67 86"
+                  d="M51.1 100.8 C55 95, 59.6 90.9, 65.8 86.3"
                   stroke="#959B8C"
                   strokeWidth="1.2"
                   strokeLinecap="round"
@@ -323,37 +360,37 @@ export default function FlowerIllustration({
               filter="url(#petalShadow)"
             >
               {/* 위 */}
-              <ellipse cx="50" cy="18" rx="10.5" ry="15.5" fill="#E89E83" />
+              <ellipse cx="50" cy="18.5" rx="10.5" ry="15.5" fill="#E89E83" />
 
               {/* 좌상 */}
               <ellipse
-                cx="28.5"
-                cy="28"
+                cx="30"
+                cy="28.5"
                 rx="12"
                 ry="16.5"
-                transform="rotate(-48 28.5 28)"
+                transform="rotate(-46 30 28.5)"
                 fill="#EA9475"
                 opacity="0.95"
               />
 
               {/* 우상 */}
               <ellipse
-                cx="71.5"
-                cy="28"
+                cx="70"
+                cy="28.5"
                 rx="12"
                 ry="16.5"
-                transform="rotate(48 71.5 28)"
+                transform="rotate(46 70 28.5)"
                 fill="#E98E6D"
                 opacity="0.95"
               />
 
               {/* 좌하 */}
               <ellipse
-                cx="29"
-                cy="50.5"
+                cx="31"
+                cy="49"
                 rx="12"
                 ry="16.5"
-                transform="rotate(38 29 50.5)"
+                transform="rotate(34 31 49)"
                 fill="#E99579"
                 opacity="0.92"
               />
@@ -370,39 +407,39 @@ export default function FlowerIllustration({
 
               {/* 우하 */}
               <ellipse
-                cx="71"
-                cy="50.5"
+                cx="69"
+                cy="49"
                 rx="12"
                 ry="16.5"
-                transform="rotate(-38 71 50.5)"
+                transform="rotate(-34 69 49)"
                 fill="#EAA387"
                 opacity="0.92"
               />
 
-              {/* 꽃잎 안쪽 은은한 레이어 */}
+              {/* 안쪽 레이어 */}
               <ellipse
                 cx="50"
-                cy="28"
-                rx="13"
-                ry="11"
+                cy="30.5"
+                rx="13.5"
+                ry="11.5"
                 fill="#EA8F72"
                 opacity="0.22"
               />
               <ellipse
-                cx="39"
-                cy="36"
+                cx="40"
+                cy="38"
                 rx="10"
                 ry="11"
-                transform="rotate(-25 39 36)"
+                transform="rotate(-22 40 38)"
                 fill="#EA8F72"
                 opacity="0.12"
               />
               <ellipse
-                cx="61"
-                cy="36"
+                cx="60"
+                cy="38"
                 rx="10"
                 ry="11"
-                transform="rotate(25 61 36)"
+                transform="rotate(22 60 38)"
                 fill="#EA8F72"
                 opacity="0.12"
               />

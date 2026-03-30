@@ -44,39 +44,39 @@ export default async function MyPage() {
         Empty Tomb Project
       </div>
 
-      <div className="flex items-start justify-between">
-        <div>
+      <div>
+        <div className="flex items-center justify-between">
           <h2 className="text-[28px] leading-[1.1] font-heading font-bold text-brown-dark">
             나의 여정
           </h2>
-          <div className="mt-2 flex items-center gap-2 text-sm text-brown-mid">
-            {session!.user.nickname ?? session!.user.name ?? "익명"}
-            {session!.user.realName && (
-              <span className="text-brown-light">
-                · {session!.user.realName}
-              </span>
-            )}
-            {cellName && <span className="text-brown-light">· {cellName}</span>}
+          <div className="flex items-center gap-2 shrink-0">
+            <NicknameSection
+              nickname={session!.user.nickname}
+              fallbackName={session!.user.name}
+            />
+            <form
+              action={async () => {
+                "use server";
+                await signOut({ redirectTo: "/login" });
+              }}
+            >
+              <button
+                type="submit"
+                className="text-xs text-brown-light hover:text-brown px-3 py-1.5 rounded-full border border-stone hover:bg-sand transition-colors"
+              >
+                로그아웃
+              </button>
+            </form>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <NicknameSection
-            nickname={session!.user.nickname}
-            fallbackName={session!.user.name}
-          />
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/login" });
-            }}
-          >
-            <button
-              type="submit"
-              className="text-xs text-brown-light hover:text-brown px-3 py-1.5 rounded-full border border-stone hover:bg-sand transition-colors"
-            >
-              로그아웃
-            </button>
-          </form>
+        <div className="mt-2 flex items-center gap-2 text-sm text-brown-mid">
+          {session!.user.nickname ?? session!.user.name ?? "익명"}
+          {session!.user.realName && (
+            <span className="text-brown-light">
+              · {session!.user.realName}
+            </span>
+          )}
+          {cellName && <span className="text-brown-light">· {cellName}</span>}
         </div>
       </div>
 

@@ -13,11 +13,9 @@ interface FlowerData {
   completedAt: Date | null;
 }
 
-interface PlotData {
-  x: number;
-  y: number;
-  flowerId: string | null;
-  flowerType: string | null;
+interface VisiblePlot {
+  slot: number;
+  flowerType: string;
   placedByNickname: string | null;
 }
 
@@ -25,14 +23,16 @@ export default function GardenView({
   activeFlower,
   completedFlowers,
   waterCount,
-  plots,
+  visiblePlots,
+  totalFlowerCount,
   cellName,
   cellId,
 }: {
   activeFlower: FlowerData | null;
   completedFlowers: FlowerData[];
   waterCount: number;
-  plots: PlotData[];
+  visiblePlots: VisiblePlot[];
+  totalFlowerCount: number;
   cellName: string | null;
   cellId: string | null;
 }) {
@@ -86,7 +86,8 @@ export default function GardenView({
         />
       ) : (
         <CellGarden
-          plots={plots}
+          visiblePlots={visiblePlots}
+          totalFlowerCount={totalFlowerCount}
           cellName={cellName}
           cellId={cellId}
           completedFlowers={completedFlowers}

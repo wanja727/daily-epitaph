@@ -143,7 +143,7 @@ export const flowers = pgTable("flower", {
   createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
 });
 
-/** 셀 공동 꽃밭 5×5 그리드 */
+/** 셀 공동 꽃밭 — 슬롯 기반 자동 배치 */
 export const gardenPlots = pgTable(
   "garden_plot",
   {
@@ -153,13 +153,16 @@ export const gardenPlots = pgTable(
     cellId: text("cellId")
       .notNull()
       .references(() => cells.id, { onDelete: "cascade" }),
-    x: integer("x").notNull(),
-    y: integer("y").notNull(),
-    flowerId: text("flowerId").references(() => flowers.id),
-    placedBy: text("placedBy").references(() => users.id),
-    placedAt: timestamp("placedAt", { mode: "date" }),
+    slot: integer("slot").notNull(),
+    flowerId: text("flowerId")
+      .notNull()
+      .references(() => flowers.id),
+    placedBy: text("placedBy")
+      .notNull()
+      .references(() => users.id),
+    placedAt: timestamp("placedAt", { mode: "date" }).defaultNow().notNull(),
   },
-  (plot) => [unique().on(plot.cellId, plot.x, plot.y)]
+  (plot) => [unique().on(plot.cellId, plot.slot)]
 );
 
 /** 물뿌리개 보유량 */

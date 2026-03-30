@@ -77,15 +77,12 @@ export async function startNewFlower() {
   });
 }
 
-export async function placeFlowerInGarden(
-  flowerId: string,
-  cellId: string,
-  x: number,
-  y: number
-) {
+export async function placeFlowerInGarden(flowerId: string) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
   const userId = session.user.id;
+  const cellId = session.user.cellId;
+  if (!cellId) return;
 
   // 꽃이 완성되었고, 아직 심지 않았는지 확인
   const [flower] = await db
@@ -96,26 +93,25 @@ export async function placeFlowerInGarden(
 
   if (!flower || !flower.completedAt || flower.placedInGarden) return;
 
-  // 해당 위치가 비었는지 확인
-  const [plot] = await db
-    .select()
+  // 이미 사용 중인 슬롯 목록 조회
+  const usedSlots = await db
+    .select({ slot: gardenPlots.slot })
     .from(gardenPlots)
-    .where(
-      and(
-        eq(gardenPlots.cellId, cellId),
-        eq(gardenPlots.x, x),
-        eq(gardenPlots.y, y)
-      )
-    )
-    .limit(1);
+    .where(eq(gardenPlots.cellId, cellId));
 
-  if (!plot || plot.flowerId) return;
+  const usedSet = new Set(usedSlots.map((r) => r.slot));
 
-  // 꽃밭에 심기
-  await db
-    .update(gardenPlots)
-    .set({ flowerId, placedBy: userId, placedAt: new Date() })
-    .where(eq(gardenPlots.id, plot.id));
+  // 비어 있는 가장 작은 슬롯 번호 찾기
+  let nextSlot = 0;
+  while (usedSet.has(nextSlot)) nextSlot++;
+
+  // 꽃밭에 심기 (INSERT — 동적 행 생성)
+  await db.insert(gardenPlots).values({
+    cellId,
+    slot: nextSlot,
+    flowerId,
+    placedBy: userId,
+  });
 
   // 꽃에 심김 표시
   await db

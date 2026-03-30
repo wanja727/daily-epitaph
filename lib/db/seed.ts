@@ -3,8 +3,7 @@ config({ path: ".env.local" });
 
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { cells, cellMembers, gardenPlots } from "./schema";
-import { GARDEN_SIZE } from "../utils/constants";
+import { cells, cellMembers } from "./schema";
 
 const client = postgres(process.env.DATABASE_URL!);
 const db = drizzle(client);
@@ -336,15 +335,7 @@ async function seed() {
       console.log(`    멤버 ${cellData.members.length}명 등록`);
     }
 
-    // 5×5 꽃밭 그리드 생성
-    const plots = [];
-    for (let y = 0; y < GARDEN_SIZE; y++) {
-      for (let x = 0; x < GARDEN_SIZE; x++) {
-        plots.push({ cellId: cell.id, x, y });
-      }
-    }
-    await db.insert(gardenPlots).values(plots);
-    console.log(`    꽃밭 ${GARDEN_SIZE}×${GARDEN_SIZE} 생성`);
+    // 꽃밭은 꽃을 심을 때 동적으로 생성됨
   }
 
   console.log("\n✅ Seed 완료!");

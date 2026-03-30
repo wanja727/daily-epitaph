@@ -1,17 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { GARDEN_SIZE } from "@/lib/utils/constants";
+import { GARDEN_SLOTS, GARDEN_MAX_VISIBLE } from "@/lib/utils/constants";
 import { placeFlowerInGarden } from "./actions";
 import FlowerIllustration from "@/app/components/FlowerIllustration";
 import { useLoading } from "@/app/components/LoadingProvider";
 
-interface PlotData {
-  x: number;
-  y: number;
-  flowerId: string | null;
-  flowerType: string | null;
+interface VisiblePlot {
+  slot: number;
+  flowerType: string;
   placedByNickname: string | null;
 }
 
@@ -21,92 +18,20 @@ interface FlowerData {
   stage: number;
 }
 
-/** 개별 밭 칸 — SVG 잔디 배경 */
-function PlotCell({
-  hasFlower,
-  placing,
-  nickname,
-  index,
-  onClick,
-}: {
-  hasFlower: boolean;
-  placing: boolean;
-  nickname?: string | null;
-  index: number;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      disabled={!(!hasFlower && placing)}
-      onClick={onClick}
-      className={`aspect-square rounded-[14px] relative overflow-hidden transition-all border-2 ${
-        !hasFlower && placing
-          ? "ring-2 ring-olive/40 cursor-pointer border-[#5A9A3C]"
-          : "border-[#6AAA4A]/40"
-      }`}
-      title={nickname ? `${nickname}` : undefined}
-    >
-      {/* 배경 SVG: 잔디 */}
-      <svg
-        viewBox="0 0 60 60"
-        className="absolute inset-0 w-full h-full"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* 잔디 배경 */}
-        <rect width="60" height="60" rx="10" fill="#B8D89E" />
-        {/* 잔디 텍스처 */}
-        <rect width="60" height="60" rx="10" fill="#A8CE8A" opacity="0.4" />
-        {/* 잔디 패턴 */}
-        <path d="M8,52 Q10,44 12,52" stroke="#7EBF5C" strokeWidth="1.2" fill="none" opacity="0.5" />
-        <path d="M20,50 Q22,42 24,50" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.45" />
-        <path d="M36,53 Q38,45 40,53" stroke="#7EBF5C" strokeWidth="1.1" fill="none" opacity="0.5" />
-        <path d="M48,51 Q50,44 52,51" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.4" />
-        <path d="M14,20 Q15,14 16,20" stroke="#8FC878" strokeWidth="0.8" fill="none" opacity="0.3" />
-        <path d="M42,18 Q43,12 44,18" stroke="#8FC878" strokeWidth="0.8" fill="none" opacity="0.25" />
-        {/* 밝은 잔디 하이라이트 */}
-        <ellipse cx="20" cy="25" rx="8" ry="6" fill="#C4E4A8" opacity="0.25" />
-        <ellipse cx="42" cy="40" rx="7" ry="5" fill="#C4E4A8" opacity="0.2" />
-        {/* 흙 패치 — 중앙 심기 영역 */}
-        {!hasFlower && (
-          <ellipse cx="30" cy="42" rx="12" ry="6" fill="#C9B89A" opacity="0.3" />
-        )}
-        {/* 빈 자리 플러스 표시 */}
-        {!hasFlower && placing && (
-          <g opacity="0.6">
-            <line x1="30" y1="22" x2="30" y2="38" stroke="#4A7A35" strokeWidth="2.5" strokeLinecap="round" />
-            <line x1="22" y1="30" x2="38" y2="30" stroke="#4A7A35" strokeWidth="2.5" strokeLinecap="round" />
-          </g>
-        )}
-      </svg>
-
-      {/* 꽃 */}
-      {hasFlower && (
-        <div className="absolute inset-0 p-0.5">
-          <FlowerIllustration
-            waterCount={3}
-            size="sm"
-            animate={true}
-            delay={index * 0.4}
-          />
-        </div>
-      )}
-    </button>
-  );
-}
-
 export default function CellGarden({
-  plots,
+  visiblePlots,
+  totalFlowerCount,
   cellName,
   cellId,
   completedFlowers,
 }: {
-  plots: PlotData[];
+  visiblePlots: VisiblePlot[];
+  totalFlowerCount: number;
   cellName: string | null;
   cellId: string | null;
   completedFlowers: FlowerData[];
 }) {
   const router = useRouter();
-  const [placing, setPlacing] = useState<string | null>(null);
   const { isPending, startTransition } = useLoading();
 
   if (!cellId) {
@@ -117,25 +42,14 @@ export default function CellGarden({
     );
   }
 
-  // 5×5 그리드
-  const grid: (PlotData | null)[][] = Array.from(
-    { length: GARDEN_SIZE },
-    () => Array(GARDEN_SIZE).fill(null)
-  );
-  for (const p of plots) {
-    if (p.x < GARDEN_SIZE && p.y < GARDEN_SIZE) {
-      grid[p.y][p.x] = p;
-    }
-  }
-
   const placeable = completedFlowers.filter((f) => f.stage >= 3);
-  const plantedCount = plots.filter((p) => p.flowerId).length;
 
-  function handlePlace(x: number, y: number) {
-    if (!placing || isPending) return;
+  function handlePlant() {
+    if (isPending || placeable.length === 0) return;
+    // 가장 오래된 완성 꽃을 자동 선택
+    const flower = placeable[0];
     startTransition(async () => {
-      await placeFlowerInGarden(placing, cellId!, x, y);
-      setPlacing(null);
+      await placeFlowerInGarden(flower.id);
       router.refresh();
     });
   }
@@ -149,7 +63,7 @@ export default function CellGarden({
         <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-gold/10 blur-2xl" />
 
         <div className="relative">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <div>
               <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
                 Cell garden
@@ -159,63 +73,123 @@ export default function CellGarden({
               </div>
             </div>
             <span className="inline-flex rounded-full px-3 py-1 text-xs bg-[#DCE5D6] text-[#516047]">
-              {plantedCount}송이
+              {totalFlowerCount}송이
             </span>
           </div>
 
-          <div className="grid grid-cols-5 gap-2">
-            {grid.map((row, y) =>
-              row.map((plot, x) => {
-                const hasFlower = !!plot?.flowerId;
-                const idx = y * GARDEN_SIZE + x;
-                return (
-                  <PlotCell
-                    key={`${x}-${y}`}
-                    hasFlower={hasFlower}
-                    placing={!!placing}
-                    nickname={plot?.placedByNickname}
-                    index={idx}
-                    onClick={() => handlePlace(x, y)}
+          {/* 정원 영역 */}
+          <div
+            className="relative w-full rounded-[20px] overflow-hidden"
+            style={{ aspectRatio: "4 / 3" }}
+          >
+            {/* 배경 SVG */}
+            <svg
+              viewBox="0 0 400 300"
+              className="absolute inset-0 w-full h-full"
+              xmlns="http://www.w3.org/2000/svg"
+              preserveAspectRatio="xMidYMid slice"
+            >
+              <defs>
+                <linearGradient id="grassGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#C2DBA8" />
+                  <stop offset="50%" stopColor="#B0D192" />
+                  <stop offset="100%" stopColor="#A0C67E" />
+                </linearGradient>
+              </defs>
+
+              {/* 전체 잔디 배경 */}
+              <rect width="400" height="300" fill="url(#grassGrad)" />
+
+              {/* 잔디 텍스처 */}
+              <path d="M30,60 Q33,50 36,60" stroke="#7EBF5C" strokeWidth="1" fill="none" opacity="0.25" />
+              <path d="M120,100 Q123,90 126,100" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.2" />
+              <path d="M250,70 Q253,60 256,70" stroke="#7EBF5C" strokeWidth="1" fill="none" opacity="0.25" />
+              <path d="M350,110 Q353,100 356,110" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.2" />
+              <path d="M80,180 Q83,170 86,180" stroke="#7EBF5C" strokeWidth="1" fill="none" opacity="0.2" />
+              <path d="M300,200 Q303,190 306,200" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.2" />
+
+              {/* 밝은 하이라이트 */}
+              <ellipse cx="100" cy="120" rx="45" ry="22" fill="#C4E4A8" opacity="0.15" />
+              <ellipse cx="320" cy="160" rx="38" ry="18" fill="#C4E4A8" opacity="0.12" />
+
+              {/* 하단 울타리 */}
+              <g opacity="0.35" stroke="#8B7355" fill="none" strokeWidth="1.8">
+                {/* 세로 기둥 */}
+                <line x1="15" y1="265" x2="15" y2="295" />
+                <line x1="55" y1="268" x2="55" y2="298" />
+                <line x1="95" y1="270" x2="95" y2="300" />
+                <line x1="140" y1="271" x2="140" y2="300" />
+                <line x1="185" y1="272" x2="185" y2="300" />
+                <line x1="230" y1="272" x2="230" y2="300" />
+                <line x1="275" y1="271" x2="275" y2="300" />
+                <line x1="320" y1="270" x2="320" y2="300" />
+                <line x1="360" y1="268" x2="360" y2="298" />
+                <line x1="395" y1="265" x2="395" y2="295" />
+                {/* 가로 바 */}
+                <path d="M15,275 Q205,282 395,275" />
+                <path d="M15,285 Q205,292 395,285" />
+              </g>
+            </svg>
+
+            {/* 꽃 배치 */}
+            {visiblePlots.map((plot) => {
+              const pos =
+                plot.slot < GARDEN_MAX_VISIBLE
+                  ? GARDEN_SLOTS[plot.slot]
+                  : null;
+              if (!pos) return null;
+
+              return (
+                <div
+                  key={plot.slot}
+                  className="absolute"
+                  style={{
+                    left: `${pos.x}%`,
+                    top: `${pos.y}%`,
+                    width: `${10 * pos.scale}%`,
+                    transform: "translate(-50%, -100%)",
+                  }}
+                  title={plot.placedByNickname ?? undefined}
+                >
+                  <FlowerIllustration
+                    waterCount={3}
+                    size="sm"
+                    animate={true}
+                    delay={plot.slot * 0.15}
                   />
-                );
-              })
+                </div>
+              );
+            })}
+
+            {/* 80개 초과 시 추가 표시 */}
+            {totalFlowerCount > GARDEN_MAX_VISIBLE && (
+              <div className="absolute bottom-2 right-2 rounded-full bg-white/70 backdrop-blur-sm px-2.5 py-1 text-xs text-brown-mid shadow-sm">
+                +{totalFlowerCount - GARDEN_MAX_VISIBLE}송이 더
+              </div>
+            )}
+
+            {/* 빈 정원 안내 */}
+            {visiblePlots.length === 0 && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p className="text-sm text-[#7A9B62] bg-white/50 backdrop-blur-sm rounded-full px-4 py-2">
+                  첫 번째 꽃을 심어보세요
+                </p>
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* 심을 꽃 선택 */}
-      {placeable.length > 0 && (
-        <div className="space-y-2">
-          <h3 className="text-xs uppercase tracking-[0.18em] text-brown-light">
-            심을 꽃 선택
-          </h3>
-          <div className="flex gap-2 flex-wrap">
-            {placeable.map((f) => (
-              <button
-                key={f.id}
-                onClick={() =>
-                  setPlacing(placing === f.id ? null : f.id)
-                }
-                className={`w-16 h-16 rounded-[18px] border shadow-sm transition-colors overflow-hidden ${
-                  placing === f.id
-                    ? "bg-[#DCE5D6] border-sage ring-2 ring-olive/30"
-                    : "bg-[#F7F2E8] border-stone hover:bg-sand"
-                }`}
-              >
-                <FlowerIllustration waterCount={3} size="sm" animate={false} />
-              </button>
-            ))}
-          </div>
-          {placing && (
-            <p className="text-xs text-olive animate-pulse">
-              꽃밭에서 심을 위치를 선택하세요
-            </p>
-          )}
-        </div>
-      )}
-
-      {placeable.length === 0 && (
+      {/* 심기 버튼 */}
+      {placeable.length > 0 ? (
+        <button
+          onClick={handlePlant}
+          disabled={isPending}
+          className="w-full py-3 rounded-2xl text-sm font-medium transition-colors bg-[#8BBF6A] text-white hover:bg-[#7AB05A] disabled:opacity-50"
+        >
+          {isPending ? "심는 중..." : `꽃밭에 심기 (${placeable.length}송이 대기)`}
+        </button>
+      ) : (
         <p className="text-xs text-brown-light text-center">
           꽃을 완성하면 여기에 심을 수 있어요
         </p>

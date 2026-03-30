@@ -7,7 +7,7 @@ import {
   users,
   cells,
 } from "@/lib/db/schema";
-import { eq, and, isNull } from "drizzle-orm";
+import { eq, and, isNull, asc, sql } from "drizzle-orm";
 import GardenView from "./GardenView";
 
 export default async function GardenPage() {
@@ -38,13 +38,12 @@ export default async function GardenPage() {
     .then((rows) => rows.filter((r) => r.completedAt !== null));
 
   // 셀 꽃밭 데이터
-  let plots: {
-    x: number;
-    y: number;
-    flowerId: string | null;
-    flowerType: string | null;
+  let visiblePlots: {
+    slot: number;
+    flowerType: string;
     placedByNickname: string | null;
   }[] = [];
+  let totalFlowerCount = 0;
   let cellName: string | null = null;
 
   if (cellId) {
@@ -55,20 +54,26 @@ export default async function GardenPage() {
       .limit(1);
     cellName = cell?.name ?? null;
 
-    const rawPlots = await db
+    // 화면에 표시할 꽃 (최대 80개, 슬롯 순)
+    visiblePlots = await db
       .select({
-        x: gardenPlots.x,
-        y: gardenPlots.y,
-        flowerId: gardenPlots.flowerId,
+        slot: gardenPlots.slot,
         flowerType: flowers.type,
         placedByNickname: users.nickname,
       })
       .from(gardenPlots)
-      .leftJoin(flowers, eq(gardenPlots.flowerId, flowers.id))
+      .innerJoin(flowers, eq(gardenPlots.flowerId, flowers.id))
       .leftJoin(users, eq(gardenPlots.placedBy, users.id))
-      .where(eq(gardenPlots.cellId, cellId));
+      .where(eq(gardenPlots.cellId, cellId))
+      .orderBy(asc(gardenPlots.slot))
+      .limit(80);
 
-    plots = rawPlots;
+    // 전체 꽃 수
+    const [countRow] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(gardenPlots)
+      .where(eq(gardenPlots.cellId, cellId));
+    totalFlowerCount = countRow?.count ?? 0;
   }
 
   return (
@@ -91,7 +96,8 @@ export default async function GardenPage() {
         activeFlower={activeFlower ?? null}
         completedFlowers={completedFlowers}
         waterCount={waterCount}
-        plots={plots}
+        visiblePlots={visiblePlots}
+        totalFlowerCount={totalFlowerCount}
         cellName={cellName}
         cellId={cellId ?? null}
       />

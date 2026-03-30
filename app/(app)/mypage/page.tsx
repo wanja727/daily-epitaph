@@ -59,7 +59,11 @@ export default async function MyPage() {
             {cellName && <span className="text-brown-light">· {cellName}</span>}
           </div>
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex items-center gap-2">
+          <NicknameSection
+            nickname={session!.user.nickname}
+            fallbackName={session!.user.name}
+          />
           <form
             action={async () => {
               "use server";
@@ -73,10 +77,6 @@ export default async function MyPage() {
               로그아웃
             </button>
           </form>
-          <NicknameSection
-            nickname={session!.user.nickname}
-            fallbackName={session!.user.name}
-          />
         </div>
       </div>
 

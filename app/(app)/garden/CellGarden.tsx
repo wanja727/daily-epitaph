@@ -156,6 +156,7 @@ export default function CellGarden({
                     size="sm"
                     animate={true}
                     delay={plot.slot * 0.15}
+                    flowerType={plot.flowerType}
                   />
                 </div>
               );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { WATER_THRESHOLDS, FLOWER_STAGES } from "@/lib/utils/constants";
 import { waterFlower, startNewFlower } from "./actions";
@@ -16,6 +17,12 @@ interface FlowerData {
 
 const STAGE_LABELS = ["씨앗", "새싹", "봉오리", "만개"];
 
+const SELECTABLE_FLOWERS = [
+  { type: "flower", name: "코스모스" },
+  { type: "purple", name: "클레마티스" },
+  { type: "sunflower", name: "해바라기" },
+];
+
 export default function MyFlower({
   flower,
   waterCount,
@@ -27,6 +34,7 @@ export default function MyFlower({
 }) {
   const router = useRouter();
   const { isPending, startTransition } = useLoading();
+  const [selecting, setSelecting] = useState(false);
 
   function handleWater() {
     if (!flower) return;
@@ -36,9 +44,10 @@ export default function MyFlower({
     });
   }
 
-  function handleNewFlower() {
+  function handleSelectFlower(flowerType: string) {
     startTransition(async () => {
-      await startNewFlower();
+      await startNewFlower(flowerType);
+      setSelecting(false);
       router.refresh();
     });
   }
@@ -46,6 +55,45 @@ export default function MyFlower({
   // 완성되었지만 아직 심지 않은 꽃이 있으면 축하 화면 표시
   const unplacedCompleted =
     completedFlowers.length > 0 ? completedFlowers[0] : null;
+
+  // ──── 꽃 선택 화면 ────
+  if (selecting) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-6 text-center space-y-6">
+          <div className="space-y-2">
+            <p className="text-lg font-heading font-bold text-brown-dark">
+              어떤 꽃을 키울까요?
+            </p>
+            <p className="text-sm text-brown-mid">
+              키우고 싶은 꽃을 선택하세요
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            {SELECTABLE_FLOWERS.map((f) => (
+              <button
+                key={f.type}
+                onClick={() => handleSelectFlower(f.type)}
+                disabled={isPending}
+                className="rounded-[20px] border border-stone bg-white/80 p-3 space-y-2 transition-all hover:shadow-md hover:border-sage active:scale-[0.97] disabled:opacity-50"
+              >
+                <div className="w-full aspect-square">
+                  <FlowerIllustration
+                    waterCount={3}
+                    size="sm"
+                    animate={true}
+                    flowerType={f.type}
+                  />
+                </div>
+                <p className="text-sm font-medium text-brown-dark">{f.name}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // 꽃을 아직 시작하지 않은 상태
   if (!flower && !unplacedCompleted) {
@@ -64,7 +112,7 @@ export default function MyFlower({
           </div>
 
           <button
-            onClick={handleNewFlower}
+            onClick={() => setSelecting(true)}
             disabled={isPending}
             className="w-full rounded-3xl bg-olive py-4 text-sm text-ivory shadow-sm transition-colors hover:bg-sage disabled:opacity-50"
           >
@@ -90,7 +138,10 @@ export default function MyFlower({
             </div>
 
             <div className="w-64 h-72 mx-auto">
-              <FlowerIllustration waterCount={3} />
+              <FlowerIllustration
+                waterCount={3}
+                flowerType={unplacedCompleted.type}
+              />
             </div>
 
             <div>
@@ -112,7 +163,7 @@ export default function MyFlower({
         </button>
 
         <button
-          onClick={handleNewFlower}
+          onClick={() => setSelecting(true)}
           disabled={isPending}
           className="w-full rounded-3xl border border-stone bg-white/70 py-4 text-sm text-brown-mid transition-colors hover:bg-sand disabled:opacity-50"
         >
@@ -145,7 +196,7 @@ export default function MyFlower({
 
             {/* 큰 완성 꽃 */}
             <div className="w-64 h-72 mx-auto">
-              <FlowerIllustration waterCount={3} />
+              <FlowerIllustration waterCount={3} flowerType={flower.type} />
             </div>
 
             <div>
@@ -169,7 +220,7 @@ export default function MyFlower({
 
         {/* 새 꽃 시작 */}
         <button
-          onClick={handleNewFlower}
+          onClick={() => setSelecting(true)}
           disabled={isPending}
           className="w-full rounded-3xl border border-stone bg-white/70 py-4 text-sm text-brown-mid transition-colors hover:bg-sand disabled:opacity-50"
         >
@@ -207,7 +258,10 @@ export default function MyFlower({
 
         {/* 꽃 일러스트 */}
         <div className="mt-2">
-          <FlowerIllustration waterCount={flower.waterCount} />
+          <FlowerIllustration
+            waterCount={flower.waterCount}
+            flowerType={flower.type}
+          />
         </div>
 
         {/* 단계 라벨 */}
@@ -257,7 +311,12 @@ function CompletedList({ flowers }: { flowers: FlowerData[] }) {
             key={f.id}
             className="w-16 h-16 rounded-[18px] border border-stone bg-[#F7F2E8] shadow-sm"
           >
-            <FlowerIllustration waterCount={3} size="sm" animate={false} />
+            <FlowerIllustration
+              waterCount={3}
+              size="sm"
+              animate={false}
+              flowerType={f.type}
+            />
           </div>
         ))}
       </div>

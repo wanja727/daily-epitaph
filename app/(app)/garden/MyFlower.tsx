@@ -14,7 +14,7 @@ interface FlowerData {
   completedAt: Date | null;
 }
 
-const STAGE_LABELS = ["씨앗", "새싹", "봉우리", "만개"];
+const STAGE_LABELS = ["씨앗", "새싹", "봉오리", "만개"];
 
 export default function MyFlower({
   flower,

@@ -2,8 +2,14 @@
 
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { flowers, wateringCans, gardenPlots } from "@/lib/db/schema";
-import { eq, and, sql } from "drizzle-orm";
+import {
+  flowers,
+  wateringCans,
+  gardenPlots,
+  cells,
+  users,
+} from "@/lib/db/schema";
+import { eq, and, asc, sql, desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { WATER_THRESHOLDS, FLOWER_STAGES } from "@/lib/utils/constants";
 
@@ -118,4 +124,86 @@ export async function placeFlowerInGarden(flowerId: string) {
     .update(flowers)
     .set({ placedInGarden: true })
     .where(eq(flowers.id, flowerId));
+}
+
+/** 전체 셀의 꽃 수 + 물뿌리개 합산 통계 */
+export async function getCellStats() {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+
+  // 셀별 심겨진 꽃 수
+  const flowerStats = await db
+    .select({
+      cellId: gardenPlots.cellId,
+      flowerCount: sql<number>`count(*)::int`,
+    })
+    .from(gardenPlots)
+    .groupBy(gardenPlots.cellId);
+
+  const flowerMap = new Map(flowerStats.map((r) => [r.cellId, r.flowerCount]));
+
+  // 셀별 물뿌리개 합산
+  const waterStats = await db
+    .select({
+      cellId: users.cellId,
+      waterSum: sql<number>`coalesce(sum(${wateringCans.count}), 0)::int`,
+    })
+    .from(users)
+    .leftJoin(wateringCans, eq(users.id, wateringCans.userId))
+    .where(sql`${users.cellId} is not null`)
+    .groupBy(users.cellId);
+
+  const waterMap = new Map(waterStats.map((r) => [r.cellId!, r.waterSum]));
+
+  // 전체 셀 목록
+  const allCells = await db.select().from(cells);
+
+  const result = allCells
+    .map((c) => ({
+      id: c.id,
+      name: c.name,
+      flowerCount: flowerMap.get(c.id) ?? 0,
+      waterCount: waterMap.get(c.id) ?? 0,
+    }))
+    .sort((a, b) => b.flowerCount + b.waterCount - (a.flowerCount + a.waterCount));
+
+  return result;
+}
+
+/** 특정 셀의 꽃밭 데이터 조회 (구경용) */
+export async function getCellGardenData(cellId: string) {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+
+  const [cell] = await db
+    .select({ name: cells.name })
+    .from(cells)
+    .where(eq(cells.id, cellId))
+    .limit(1);
+
+  if (!cell) return null;
+
+  const visiblePlots = await db
+    .select({
+      slot: gardenPlots.slot,
+      flowerType: flowers.type,
+      placedByNickname: users.nickname,
+    })
+    .from(gardenPlots)
+    .innerJoin(flowers, eq(gardenPlots.flowerId, flowers.id))
+    .leftJoin(users, eq(gardenPlots.placedBy, users.id))
+    .where(eq(gardenPlots.cellId, cellId))
+    .orderBy(asc(gardenPlots.slot))
+    .limit(80);
+
+  const [countRow] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(gardenPlots)
+    .where(eq(gardenPlots.cellId, cellId));
+
+  return {
+    cellName: cell.name,
+    visiblePlots,
+    totalFlowerCount: countRow?.count ?? 0,
+  };
 }

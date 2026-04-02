@@ -67,7 +67,7 @@ export default async function GardenPage() {
       .leftJoin(users, eq(gardenPlots.placedBy, users.id))
       .where(eq(gardenPlots.cellId, cellId))
       .orderBy(asc(gardenPlots.slot))
-      .limit(80);
+      .limit(120);
 
     // 전체 꽃 수
     const [countRow] = await db

@@ -193,7 +193,7 @@ export default function FlowerIllustration({
         {/* stage 3 - 보라 만개 */}
         {stage >= 3 && flowerType === "purple" && (
           <g className={animate ? "flower-plant" : ""}>
-            <g transform="scale(0.25)">
+            <g transform="translate(-8, 0) scale(0.29)">
               {/* 그라디언트 */}
               <defs>
                 <linearGradient id="purpleStemGrad" x1="206.9" y1="189.7" x2="206.9" y2="445.6" gradientUnits="userSpaceOnUse">
@@ -281,7 +281,7 @@ export default function FlowerIllustration({
         {/* stage 3 - 해바라기 만개 */}
         {stage >= 3 && flowerType === "sunflower" && (
           <g className={animate ? "flower-plant" : ""}>
-            <g transform="scale(0.25)">
+            <g transform="translate(-8, 0) scale(0.29)">
               <defs>
                 <linearGradient id="sunStemGrad" x1="211.8" y1="291.8" x2="203.5" y2="412.9" gradientUnits="userSpaceOnUse">
                   <stop offset="0" stopColor="#9bcb80" />

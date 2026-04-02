@@ -194,7 +194,7 @@ export async function getCellGardenData(cellId: string) {
     .leftJoin(users, eq(gardenPlots.placedBy, users.id))
     .where(eq(gardenPlots.cellId, cellId))
     .orderBy(asc(gardenPlots.slot))
-    .limit(80);
+    .limit(120);
 
   const [countRow] = await db
     .select({ count: sql<number>`count(*)::int` })

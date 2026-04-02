@@ -14,11 +14,11 @@ export const WATER_THRESHOLDS = {
 } as const;
 
 /** 화면에 표시할 최대 꽃 수 */
-export const GARDEN_MAX_VISIBLE = 80;
+export const GARDEN_MAX_VISIBLE = 120;
 
 /**
- * 80개 사전 정의 슬롯 좌표 (% 기반).
- * 10열 × 8행 그리드에 자연스러운 지터를 적용해 유기적 배치를 연출한다.
+ * 120개 사전 정의 슬롯 좌표 (% 기반).
+ * 10열 × 12행 그리드에 자연스러운 지터를 적용해 유기적 배치를 연출한다.
  * 각 슬롯: { x: %, y: %, scale: 깊이감용 크기 비율 }
  */
 export const GARDEN_SLOTS: { x: number; y: number; scale: number }[] =
@@ -30,7 +30,7 @@ export const GARDEN_SLOTS: { x: number; y: number; scale: number }[] =
     }
 
     const cols = 10;
-    const rows = 8;
+    const rows = 12;
     const slots: { x: number; y: number; scale: number }[] = [];
 
     for (let row = 0; row < rows; row++) {
@@ -40,7 +40,7 @@ export const GARDEN_SLOTS: { x: number; y: number; scale: number }[] =
         const jitterY = (seededRandom(idx * 2 + 1) - 0.5) * 4; // ±2%
 
         const x = col * 9.5 + 5.5 + jitterX; // 5.5~95.5 범위
-        const y = row * 8.5 + 16 + jitterY; // 16~75.5 범위 (상단 여백 + 하단 울타리 위)
+        const y = row * 6.5 + 10 + jitterY; // 10~81.5 범위
 
         // 위쪽(먼 곳)일수록 작게
         const scale = 0.7 + (row / (rows - 1)) * 0.3;

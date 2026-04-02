@@ -80,11 +80,11 @@ export default function CellGarden({
           {/* 정원 영역 */}
           <div
             className="relative w-full rounded-[20px] overflow-hidden"
-            style={{ aspectRatio: "4 / 3" }}
+            style={{ aspectRatio: "4 / 4.5" }}
           >
             {/* 배경 SVG */}
             <svg
-              viewBox="0 0 400 300"
+              viewBox="0 0 400 450"
               className="absolute inset-0 w-full h-full"
               xmlns="http://www.w3.org/2000/svg"
               preserveAspectRatio="xMidYMid slice"
@@ -98,36 +98,38 @@ export default function CellGarden({
               </defs>
 
               {/* 전체 잔디 배경 */}
-              <rect width="400" height="300" fill="url(#grassGrad)" />
+              <rect width="400" height="450" fill="url(#grassGrad)" />
 
               {/* 잔디 텍스처 */}
               <path d="M30,60 Q33,50 36,60" stroke="#7EBF5C" strokeWidth="1" fill="none" opacity="0.25" />
               <path d="M120,100 Q123,90 126,100" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.2" />
               <path d="M250,70 Q253,60 256,70" stroke="#7EBF5C" strokeWidth="1" fill="none" opacity="0.25" />
-              <path d="M350,110 Q353,100 356,110" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.2" />
-              <path d="M80,180 Q83,170 86,180" stroke="#7EBF5C" strokeWidth="1" fill="none" opacity="0.2" />
-              <path d="M300,200 Q303,190 306,200" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.2" />
+              <path d="M350,150 Q353,140 356,150" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.2" />
+              <path d="M80,250 Q83,240 86,250" stroke="#7EBF5C" strokeWidth="1" fill="none" opacity="0.2" />
+              <path d="M300,300 Q303,290 306,300" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.2" />
+              <path d="M180,350 Q183,340 186,350" stroke="#7EBF5C" strokeWidth="1" fill="none" opacity="0.2" />
 
               {/* 밝은 하이라이트 */}
-              <ellipse cx="100" cy="120" rx="45" ry="22" fill="#C4E4A8" opacity="0.15" />
-              <ellipse cx="320" cy="160" rx="38" ry="18" fill="#C4E4A8" opacity="0.12" />
+              <ellipse cx="100" cy="150" rx="45" ry="22" fill="#C4E4A8" opacity="0.15" />
+              <ellipse cx="320" cy="250" rx="38" ry="18" fill="#C4E4A8" opacity="0.12" />
+              <ellipse cx="200" cy="370" rx="42" ry="20" fill="#C4E4A8" opacity="0.1" />
 
               {/* 하단 울타리 */}
               <g opacity="0.35" stroke="#8B7355" fill="none" strokeWidth="1.8">
                 {/* 세로 기둥 */}
-                <line x1="15" y1="265" x2="15" y2="295" />
-                <line x1="55" y1="268" x2="55" y2="298" />
-                <line x1="95" y1="270" x2="95" y2="300" />
-                <line x1="140" y1="271" x2="140" y2="300" />
-                <line x1="185" y1="272" x2="185" y2="300" />
-                <line x1="230" y1="272" x2="230" y2="300" />
-                <line x1="275" y1="271" x2="275" y2="300" />
-                <line x1="320" y1="270" x2="320" y2="300" />
-                <line x1="360" y1="268" x2="360" y2="298" />
-                <line x1="395" y1="265" x2="395" y2="295" />
+                <line x1="15" y1="415" x2="15" y2="445" />
+                <line x1="55" y1="418" x2="55" y2="448" />
+                <line x1="95" y1="420" x2="95" y2="450" />
+                <line x1="140" y1="421" x2="140" y2="450" />
+                <line x1="185" y1="422" x2="185" y2="450" />
+                <line x1="230" y1="422" x2="230" y2="450" />
+                <line x1="275" y1="421" x2="275" y2="450" />
+                <line x1="320" y1="420" x2="320" y2="450" />
+                <line x1="360" y1="418" x2="360" y2="448" />
+                <line x1="395" y1="415" x2="395" y2="445" />
                 {/* 가로 바 */}
-                <path d="M15,275 Q205,282 395,275" />
-                <path d="M15,285 Q205,292 395,285" />
+                <path d="M15,425 Q205,432 395,425" />
+                <path d="M15,435 Q205,442 395,435" />
               </g>
             </svg>
 

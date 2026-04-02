@@ -25,7 +25,7 @@ export default function AboutPage() {
           <span className="inline-flex rounded-full px-3 py-1 text-xs bg-gold-light text-[#7A6841]">
             40일 여정
           </span>
-          <h1 className="mt-4 text-[32px] leading-[1.05] font-heading font-bold text-brown-dark">
+          <h1 className="mt-4 text-[32px] leading-[1.3] font-heading font-bold text-brown-dark">
             빈 무덤 프로젝트를
             <br />
             시작하며

@@ -57,7 +57,7 @@ export default function CoverContent() {
           <span className="inline-flex rounded-full px-3 py-1 text-xs bg-gold-light text-[#7A6841]">
             Daily Resurrection
           </span>
-          <h1 className="mt-5 text-[42px] leading-[0.95] font-heading font-bold text-brown-dark">
+          <h1 className="mt-5 text-[42px] leading-[1.2] font-heading font-bold text-brown-dark">
             빈 무덤
             <br />
             프로젝트

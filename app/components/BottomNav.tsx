@@ -84,14 +84,37 @@ const NAV_ITEMS = [
   },
 ];
 
-export default function BottomNav() {
+const ADMIN_ITEM = {
+  href: "/admin",
+  label: "관리",
+  icon: (active: boolean) => (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={active ? "#4A372A" : "#8A786A"}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 20V10" />
+      <path d="M18 20V4" />
+      <path d="M6 20v-4" />
+    </svg>
+  ),
+};
+
+export default function BottomNav({ isAdmin = false }: { isAdmin?: boolean }) {
   const pathname = usePathname();
+
+  const items = isAdmin ? [...NAV_ITEMS, ADMIN_ITEM] : NAV_ITEMS;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-stone bg-[#F6F0E5]/95 backdrop-blur-md safe-bottom">
       <div className="max-w-lg mx-auto px-4 py-3">
-        <div className="grid grid-cols-4 gap-2 text-center">
-          {NAV_ITEMS.map((item) => {
+        <div className={`grid gap-2 text-center ${isAdmin ? "grid-cols-5" : "grid-cols-4"}`}>
+          {items.map((item) => {
             const active = pathname.startsWith(item.href);
             return (
               <Link

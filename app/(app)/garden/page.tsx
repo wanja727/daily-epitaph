@@ -7,7 +7,7 @@ import {
   users,
   cells,
 } from "@/lib/db/schema";
-import { eq, and, isNull, asc, sql } from "drizzle-orm";
+import { eq, and, isNull, asc, desc, sql } from "drizzle-orm";
 import GardenView from "./GardenView";
 
 export default async function GardenPage() {
@@ -35,6 +35,7 @@ export default async function GardenPage() {
     .select()
     .from(flowers)
     .where(and(eq(flowers.userId, userId), eq(flowers.placedInGarden, false)))
+    .orderBy(desc(flowers.completedAt))
     .then((rows) => rows.filter((r) => r.completedAt !== null));
 
   // 셀 꽃밭 데이터

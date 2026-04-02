@@ -4,6 +4,7 @@ config({ path: ".env.local" });
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { cells, cellMembers } from "./schema";
+import { eq } from "drizzle-orm";
 
 const client = postgres(process.env.DATABASE_URL!);
 const db = drizzle(client);
@@ -97,6 +98,7 @@ const CELL_DATA: { name: string; members: string[] }[] = [
       "이시현",
       "박예은",
       "박미순",
+      "지다영",
     ],
   },
   {
@@ -111,6 +113,7 @@ const CELL_DATA: { name: string; members: string[] }[] = [
       "김건식",
       "윤지은",
       "이진희",
+      "송마리아",
     ],
   },
   {
@@ -261,6 +264,7 @@ const CELL_DATA: { name: string; members: string[] }[] = [
       "한동희",
       "부민지",
       "김동석",
+      "김소연",
     ],
   },
   {
@@ -310,32 +314,54 @@ const CELL_DATA: { name: string; members: string[] }[] = [
     name: "조혜원셀",
     members: ["조혜원", "한문종", "오예진", "이윤선"],
   },
+  {
+    name: "Pastor",
+    members: ["백향목"],
+  },
 ];
+
+const mode = process.argv[2]; // "sync" or undefined
 
 async function seed() {
   console.log("🌱 Seeding database...");
 
   for (const cellData of CELL_DATA) {
-    // 셀 생성
-    const [cell] = await db
-      .insert(cells)
-      .values({ name: cellData.name })
-      .returning({ id: cells.id });
+    // 셀 조회, 없으면 생성
+    const existing = await db
+      .select({ id: cells.id })
+      .from(cells)
+      .where(eq(cells.name, cellData.name))
+      .limit(1);
 
-    console.log(`  ✓ 셀 생성: ${cellData.name} (${cell.id})`);
+    const cellId =
+      existing[0]?.id ??
+      (
+        await db
+          .insert(cells)
+          .values({ name: cellData.name })
+          .returning({ id: cells.id })
+      )[0].id;
+
+    console.log(`  ✓ 셀: ${cellData.name} (${cellId})`);
+
+    if (mode === "sync") {
+      // sync 모드: 기존 멤버 삭제 후 재등록
+      await db.delete(cellMembers).where(eq(cellMembers.cellId, cellId));
+    }
 
     // 셀 멤버 등록
     if (cellData.members.length > 0) {
-      await db.insert(cellMembers).values(
-        cellData.members.map((name) => ({
-          cellId: cell.id,
-          name,
-        })),
-      );
+      await db
+        .insert(cellMembers)
+        .values(
+          cellData.members.map((name) => ({
+            cellId,
+            name,
+          }))
+        )
+        .onConflictDoNothing();
       console.log(`    멤버 ${cellData.members.length}명 등록`);
     }
-
-    // 꽃밭은 꽃을 심을 때 동적으로 생성됨
   }
 
   console.log("\n✅ Seed 완료!");

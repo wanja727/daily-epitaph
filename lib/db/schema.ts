@@ -25,6 +25,7 @@ export const users = pgTable("user", {
   nickname: text("nickname"),
   cellId: text("cellId").references(() => cells.id),
   onboardingCompleted: boolean("onboardingCompleted").default(false).notNull(),
+  isAdmin: boolean("isAdmin").default(false).notNull(),
 });
 
 export const accounts = pgTable(
@@ -163,6 +164,22 @@ export const gardenPlots = pgTable(
     placedAt: timestamp("placedAt", { mode: "date" }).defaultNow().notNull(),
   },
   (plot) => [unique().on(plot.cellId, plot.slot)]
+);
+
+/** 일별 방문 기록 */
+export const dailyVisits = pgTable(
+  "daily_visit",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    date: date("date").notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+  },
+  (visit) => [unique().on(visit.userId, visit.date)]
 );
 
 /** 물뿌리개 보유량 */

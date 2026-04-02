@@ -22,6 +22,20 @@
       "when": 1775145600000,
       "tag": "0002_garden_auto_placement",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1775146238403,
+      "tag": "0003_wonderful_shiva",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1775146944875,
+      "tag": "0004_nostalgic_the_fallen",
+      "breakpoints": true
     }
   ]
 }

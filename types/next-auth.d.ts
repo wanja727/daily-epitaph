@@ -11,6 +11,7 @@ declare module "next-auth" {
       nickname?: string | null;
       cellId?: string | null;
       onboardingCompleted: boolean;
+      isAdmin: boolean;
     };
   }
 }

@@ -315,7 +315,7 @@ const CELL_DATA: { name: string; members: string[] }[] = [
     members: ["조혜원", "한문종", "오예진", "이윤선"],
   },
   {
-    name: "Pastor",
+    name: "백향목",
     members: ["백향목"],
   },
 ];
@@ -357,7 +357,7 @@ async function seed() {
           cellData.members.map((name) => ({
             cellId,
             name,
-          }))
+          })),
         )
         .onConflictDoNothing();
       console.log(`    멤버 ${cellData.members.length}명 등록`);

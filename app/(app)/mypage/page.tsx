@@ -1,8 +1,8 @@
 import { auth, signOut } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { epitaphs, cells } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
-import { PROJECT_START_DATE, PROJECT_DAYS } from "@/lib/utils/constants";
+import { epitaphs, cells, epitaphReactions } from "@/lib/db/schema";
+import { eq, desc, sql, inArray } from "drizzle-orm";
+import { PROJECT_START_DATE, PROJECT_DAYS, REACTION_TYPES, type ReactionType } from "@/lib/utils/constants";
 import { formatDateKR } from "@/lib/utils/date";
 import AttendanceGrid from "./AttendanceGrid";
 import NicknameSection from "./NicknameSection";
@@ -33,6 +33,26 @@ export default async function MyPage() {
     .from(epitaphs)
     .where(eq(epitaphs.userId, userId))
     .orderBy(desc(epitaphs.date));
+
+  // 내 기록별 공감 집계
+  const epitaphIds = myEpitaphs.map((e) => e.id);
+  let reactionCounts: { epitaphId: string; type: string; count: number }[] = [];
+  if (epitaphIds.length > 0) {
+    reactionCounts = await db
+      .select({
+        epitaphId: epitaphReactions.epitaphId,
+        type: epitaphReactions.type,
+        count: sql<number>`count(*)::int`.as("count"),
+      })
+      .from(epitaphReactions)
+      .where(inArray(epitaphReactions.epitaphId, epitaphIds))
+      .groupBy(epitaphReactions.epitaphId, epitaphReactions.type);
+  }
+  const reactionMap = new Map<string, Record<string, number>>();
+  for (const r of reactionCounts) {
+    if (!reactionMap.has(r.epitaphId)) reactionMap.set(r.epitaphId, {});
+    reactionMap.get(r.epitaphId)![r.type] = r.count;
+  }
 
   // 참석일 Set
   const attendedDates = new Set(myEpitaphs.map((e) => e.date));
@@ -115,21 +135,44 @@ export default async function MyPage() {
           </div>
         ) : (
           <div className="mt-3 space-y-3">
-            {myEpitaphs.map((e) => (
-              <div key={e.id} className="rounded-2xl bg-[#F8F4EC] p-3">
-                <div className="text-sm text-brown-dark">
-                  {formatDateKR(e.date)}
+            {myEpitaphs.map((e) => {
+              const reactions = reactionMap.get(e.id) ?? {};
+              const activeTypes = (
+                Object.keys(REACTION_TYPES) as ReactionType[]
+              ).filter((t) => (reactions[t] ?? 0) > 0);
+              return (
+                <div key={e.id} className="rounded-2xl bg-[#F8F4EC] p-3">
+                  <div className="text-sm text-brown-dark">
+                    {formatDateKR(e.date)}
+                  </div>
+                  <div className="mt-2 space-y-1.5">
+                    <p className="text-xs text-brown-mid leading-5 whitespace-pre-line">
+                      {e.yesterday}
+                    </p>
+                    <p className="text-xs text-[#4D5B46] leading-5 whitespace-pre-line">
+                      {e.today}
+                    </p>
+                  </div>
+                  {activeTypes.length > 0 && (
+                    <div className="mt-2 flex justify-end gap-1.5 flex-wrap">
+                      {activeTypes.map((type) => (
+                        <span
+                          key={type}
+                          className="inline-flex items-center gap-1 rounded-full bg-sand/40 px-2.5 py-1 text-xs text-brown-light"
+                        >
+                          <span className="text-sm">
+                            {REACTION_TYPES[type].emoji}
+                          </span>
+                          <span className="font-medium">
+                            {reactions[type]}
+                          </span>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div className="mt-2 space-y-1.5">
-                  <p className="text-xs text-brown-mid leading-5 whitespace-pre-line">
-                    {e.yesterday}
-                  </p>
-                  <p className="text-xs text-[#4D5B46] leading-5 whitespace-pre-line">
-                    {e.today}
-                  </p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

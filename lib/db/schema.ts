@@ -109,9 +109,9 @@ export const epitaphs = pgTable(
   (epitaph) => [unique().on(epitaph.userId, epitaph.date)]
 );
 
-/** 아멘(공감) 이력 */
-export const epitaphAmens = pgTable(
-  "epitaph_amen",
+/** 공감 반응 이력 */
+export const epitaphReactions = pgTable(
+  "epitaph_reaction",
   {
     id: text("id")
       .primaryKey()
@@ -122,9 +122,10 @@ export const epitaphAmens = pgTable(
     userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").notNull(), // amen, pray, cheer, touch, smile, surprise
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
   },
-  (amen) => [unique().on(amen.epitaphId, amen.userId)]
+  (r) => [unique().on(r.epitaphId, r.userId)]
 );
 
 // ─── 꽃 키우기 ──────────────────────────────────────────────────────────────

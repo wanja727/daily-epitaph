@@ -1,7 +1,11 @@
 "use client";
 
-import { useState, useOptimistic, useTransition } from "react";
-import { toggleAmen } from "./actions";
+import { useState, useOptimistic, useTransition, useRef, useEffect } from "react";
+import { toggleReaction } from "./actions";
+import {
+  REACTION_TYPES,
+  type ReactionType,
+} from "@/lib/utils/constants";
 
 interface Epitaph {
   id: string;
@@ -11,8 +15,8 @@ interface Epitaph {
   nickname: string | null;
   cellId: string | null;
   updatedAt: Date;
-  amenCount: number;
-  amened: boolean;
+  reactions: Record<string, number>;
+  myReaction: string | null;
 }
 
 function Pill({
@@ -45,49 +49,128 @@ function Pill({
   );
 }
 
-function AmenButton({
+const reactionKeys = Object.keys(REACTION_TYPES) as ReactionType[];
+
+function ReactionBar({
   epitaphId,
-  amenCount,
-  amened,
+  reactions,
+  myReaction,
 }: {
   epitaphId: string;
-  amenCount: number;
-  amened: boolean;
+  reactions: Record<string, number>;
+  myReaction: string | null;
 }) {
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const pickerRef = useRef<HTMLDivElement>(null);
+
   const [optimistic, setOptimistic] = useOptimistic(
-    { amenCount, amened },
-    (state) => ({
-      amened: !state.amened,
-      amenCount: state.amened
-        ? Math.max(state.amenCount - 1, 0)
-        : state.amenCount + 1,
-    })
+    { reactions, myReaction },
+    (state, chosen: ReactionType) => {
+      const prev = state.myReaction;
+      const next: Record<string, number> = { ...state.reactions };
+
+      if (prev === chosen) {
+        // 취소
+        next[chosen] = Math.max((next[chosen] ?? 0) - 1, 0);
+        return { reactions: next, myReaction: null };
+      }
+      // 교체 or 새 반응
+      if (prev) {
+        next[prev] = Math.max((next[prev] ?? 0) - 1, 0);
+      }
+      next[chosen] = (next[chosen] ?? 0) + 1;
+      return { reactions: next, myReaction: chosen };
+    },
   );
   const [, startTransition] = useTransition();
 
-  function handleClick() {
+  // 바깥 클릭 시 picker 닫기
+  useEffect(() => {
+    if (!pickerOpen) return;
+    function onDown(e: MouseEvent | TouchEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setPickerOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("touchstart", onDown);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("touchstart", onDown);
+    };
+  }, [pickerOpen]);
+
+  function handleSelect(type: ReactionType) {
+    setPickerOpen(false);
     startTransition(async () => {
-      setOptimistic(null);
-      await toggleAmen(epitaphId);
+      setOptimistic(type);
+      await toggleReaction(epitaphId, type);
     });
   }
 
+  // 카운트가 있는 반응만 모으기
+  const activeReactions = reactionKeys.filter(
+    (t) => (optimistic.reactions[t] ?? 0) > 0,
+  );
+
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs transition-colors ${
-        optimistic.amened
-          ? "bg-[#E8DFD0] text-brown-dark"
-          : "bg-sand/50 text-brown-light hover:bg-sand hover:text-brown-mid"
-      }`}
-    >
-      <span className="text-sm">{optimistic.amened ? "🙏" : "🤲"}</span>
-      <span>아멘</span>
-      {optimistic.amenCount > 0 && (
-        <span className="font-medium">{optimistic.amenCount}</span>
+    <div className="relative" ref={pickerRef}>
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {/* 기존 공감 표시 */}
+        {activeReactions.map((type) => {
+          const { emoji } = REACTION_TYPES[type];
+          const count = optimistic.reactions[type] ?? 0;
+          const isMine = optimistic.myReaction === type;
+          return (
+            <button
+              key={type}
+              type="button"
+              onClick={() => handleSelect(type)}
+              className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs transition-colors ${
+                isMine
+                  ? "bg-[#E8DFD0] text-brown-dark"
+                  : "bg-sand/40 text-brown-light"
+              }`}
+            >
+              <span className="text-sm">{emoji}</span>
+              <span className="font-medium">{count}</span>
+            </button>
+          );
+        })}
+
+        {/* + 공감하기 버튼 */}
+        {!optimistic.myReaction && (
+          <button
+            type="button"
+            onClick={() => setPickerOpen((v) => !v)}
+            className="flex items-center gap-1 rounded-full px-3 py-1 text-xs bg-sand/40 text-brown-light hover:bg-sand/70 hover:text-brown-mid transition-colors"
+          >
+            <span className="text-sm">+</span>
+            <span>공감하기</span>
+          </button>
+        )}
+      </div>
+
+      {/* 반응 선택 피커 */}
+      {pickerOpen && (
+        <div className="absolute bottom-full left-0 mb-2 z-50 rounded-2xl border border-stone bg-white shadow-lg p-2 min-w-[180px]">
+          {reactionKeys.map((type) => {
+            const { emoji, label } = REACTION_TYPES[type];
+            return (
+              <button
+                key={type}
+                type="button"
+                onClick={() => handleSelect(type)}
+                className="flex items-center gap-2.5 w-full rounded-xl px-3 py-2 text-sm text-brown-dark hover:bg-sand/60 transition-colors"
+              >
+                <span className="text-lg">{emoji}</span>
+                <span>{label}</span>
+              </button>
+            );
+          })}
+        </div>
       )}
-    </button>
+    </div>
   );
 }
 
@@ -136,7 +219,7 @@ export default function FeedTabs({
             오늘의 기록을 아직 작성하지 않았어요
           </p>
           <p className="text-xs text-brown-light">
-            + 버튼을 눌러 오늘을 기록해보세요
+            + 버튼을 눌러 작성을 시작해보세요
           </p>
         </div>
       )}
@@ -153,11 +236,18 @@ export default function FeedTabs({
               key={e.id}
               className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4"
             >
-              {/* 닉네임 + 뱃지 */}
+              {/* 닉네임 + 작성시간 + 뱃지 */}
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="text-sm font-medium text-brown-dark">
                     {e.nickname ?? "익명"}
+                  </div>
+                  <div className="text-[11px] text-brown-light mt-0.5">
+                    {new Date(e.updatedAt).toLocaleTimeString("ko-KR", {
+                      timeZone: "Asia/Seoul",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </div>
                 </div>
                 {e.userId === myUserId && <Pill tone="gold">나</Pill>}
@@ -184,12 +274,12 @@ export default function FeedTabs({
                 </div>
               </div>
 
-              {/* 아멘 */}
+              {/* 공감 반응 */}
               <div className="mt-3 flex justify-end">
-                <AmenButton
+                <ReactionBar
                   epitaphId={e.id}
-                  amenCount={e.amenCount}
-                  amened={e.amened}
+                  reactions={e.reactions}
+                  myReaction={e.myReaction}
                 />
               </div>
             </div>

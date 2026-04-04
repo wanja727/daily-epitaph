@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { epitaphs, users, cells, epitaphAmens } from "@/lib/db/schema";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { epitaphs, users, cells, epitaphReactions } from "@/lib/db/schema";
+import { eq, and, desc, sql, inArray } from "drizzle-orm";
 import { getTodayKST, getProjectDay } from "@/lib/utils/date";
 import Link from "next/link";
 import FeedTabs from "./FeedTabs";
@@ -20,7 +20,7 @@ export default async function MainPage() {
 
   const myUserId = session?.user?.id ?? "";
 
-  // 오늘의 모든 묘비명 + 사용자 정보 + 아멘 상태
+  // 오늘의 모든 묘비명 + 사용자 정보
   const todayEpitaphs = await db
     .select({
       id: epitaphs.id,
@@ -30,17 +30,60 @@ export default async function MainPage() {
       nickname: users.nickname,
       cellId: users.cellId,
       updatedAt: epitaphs.updatedAt,
-      amenCount: epitaphs.amenCount,
-      amened: sql<boolean>`EXISTS (
-        SELECT 1 FROM "epitaph_amen"
-        WHERE "epitaph_amen"."epitaphId" = ${epitaphs.id}
-          AND "epitaph_amen"."userId" = ${myUserId}
-      )`.as("amened"),
     })
     .from(epitaphs)
     .innerJoin(users, eq(epitaphs.userId, users.id))
     .where(eq(epitaphs.date, today))
     .orderBy(desc(epitaphs.updatedAt));
+
+  // 반응 집계: epitaphId별 type별 count + 내 반응
+  const epitaphIds = todayEpitaphs.map((e) => e.id);
+  let reactionCounts: { epitaphId: string; type: string; count: number }[] = [];
+  let myReactionRows: { epitaphId: string; type: string }[] = [];
+
+  if (epitaphIds.length > 0) {
+    [reactionCounts, myReactionRows] = await Promise.all([
+      db
+        .select({
+          epitaphId: epitaphReactions.epitaphId,
+          type: epitaphReactions.type,
+          count: sql<number>`count(*)::int`.as("count"),
+        })
+        .from(epitaphReactions)
+        .where(inArray(epitaphReactions.epitaphId, epitaphIds))
+        .groupBy(epitaphReactions.epitaphId, epitaphReactions.type),
+      db
+        .select({
+          epitaphId: epitaphReactions.epitaphId,
+          type: epitaphReactions.type,
+        })
+        .from(epitaphReactions)
+        .where(
+          and(
+            inArray(epitaphReactions.epitaphId, epitaphIds),
+            eq(epitaphReactions.userId, myUserId),
+          ),
+        ),
+    ]);
+  }
+
+  // 병합
+  const reactionMap = new Map<string, Record<string, number>>();
+  for (const r of reactionCounts) {
+    if (!reactionMap.has(r.epitaphId)) reactionMap.set(r.epitaphId, {});
+    reactionMap.get(r.epitaphId)![r.type] = r.count;
+  }
+
+  const myReactionMap = new Map<string, string>();
+  for (const r of myReactionRows) {
+    myReactionMap.set(r.epitaphId, r.type);
+  }
+
+  const enrichedEpitaphs = todayEpitaphs.map((e) => ({
+    ...e,
+    reactions: reactionMap.get(e.id) ?? {},
+    myReaction: myReactionMap.get(e.id) ?? null,
+  }));
 
   // 내 셀 이름 조회
   let cellName: string | null = null;
@@ -82,7 +125,7 @@ export default async function MainPage() {
 
       {/* 피드 */}
       <FeedTabs
-        epitaphs={todayEpitaphs}
+        epitaphs={enrichedEpitaphs}
         myCellId={session?.user?.cellId ?? null}
         myUserId={myUserId}
         cellName={cellName}

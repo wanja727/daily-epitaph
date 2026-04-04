@@ -1,3 +1,15 @@
+// ─── 공감 반응 타입 ─────────────────────────────────────────────────────────
+export const REACTION_TYPES = {
+  amen: { emoji: "🤍", label: "아멘" },
+  pray: { emoji: "🙏", label: "기도해요" },
+  cheer: { emoji: "🔥", label: "응원해요" },
+  touch: { emoji: "💧", label: "마음이 닿았어요" },
+  smile: { emoji: "😊", label: "미소가 났어요" },
+  surprise: { emoji: "👀", label: "놀랐어요" },
+} as const;
+
+export type ReactionType = keyof typeof REACTION_TYPES;
+
 export const PROJECT_START_DATE = "2026-03-28";
 export const PROJECT_DAYS = 40;
 

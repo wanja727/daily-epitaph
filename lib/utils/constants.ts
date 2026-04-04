@@ -10,7 +10,7 @@ export const REACTION_TYPES = {
 
 export type ReactionType = keyof typeof REACTION_TYPES;
 
-export const PROJECT_START_DATE = "2026-03-28";
+export const PROJECT_START_DATE = "2026-04-05";
 export const PROJECT_DAYS = 40;
 
 export const FLOWER_STAGES = {
@@ -33,36 +33,35 @@ export const GARDEN_MAX_VISIBLE = 120;
  * 10열 × 12행 그리드에 자연스러운 지터를 적용해 유기적 배치를 연출한다.
  * 각 슬롯: { x: %, y: %, scale: 깊이감용 크기 비율 }
  */
-export const GARDEN_SLOTS: { x: number; y: number; scale: number }[] =
-  (() => {
-    // 시드 기반 결정적 난수 (매번 같은 결과)
-    function seededRandom(seed: number) {
-      const x = Math.sin(seed * 9301 + 49297) * 49979;
-      return x - Math.floor(x);
+export const GARDEN_SLOTS: { x: number; y: number; scale: number }[] = (() => {
+  // 시드 기반 결정적 난수 (매번 같은 결과)
+  function seededRandom(seed: number) {
+    const x = Math.sin(seed * 9301 + 49297) * 49979;
+    return x - Math.floor(x);
+  }
+
+  const cols = 10;
+  const rows = 12;
+  const slots: { x: number; y: number; scale: number }[] = [];
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const idx = row * cols + col;
+      const jitterX = (seededRandom(idx * 2) - 0.5) * 5; // ±2.5%
+      const jitterY = (seededRandom(idx * 2 + 1) - 0.5) * 4; // ±2%
+
+      const x = col * 9.5 + 5.5 + jitterX; // 5.5~95.5 범위
+      const y = row * 6.5 + 10 + jitterY; // 10~81.5 범위
+
+      // 위쪽(먼 곳)일수록 작게
+      const scale = 0.7 + (row / (rows - 1)) * 0.3;
+
+      slots.push({
+        x: Math.round(x * 10) / 10,
+        y: Math.round(y * 10) / 10,
+        scale: Math.round(scale * 100) / 100,
+      });
     }
-
-    const cols = 10;
-    const rows = 12;
-    const slots: { x: number; y: number; scale: number }[] = [];
-
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const idx = row * cols + col;
-        const jitterX = (seededRandom(idx * 2) - 0.5) * 5; // ±2.5%
-        const jitterY = (seededRandom(idx * 2 + 1) - 0.5) * 4; // ±2%
-
-        const x = col * 9.5 + 5.5 + jitterX; // 5.5~95.5 범위
-        const y = row * 6.5 + 10 + jitterY; // 10~81.5 범위
-
-        // 위쪽(먼 곳)일수록 작게
-        const scale = 0.7 + (row / (rows - 1)) * 0.3;
-
-        slots.push({
-          x: Math.round(x * 10) / 10,
-          y: Math.round(y * 10) / 10,
-          scale: Math.round(scale * 100) / 100,
-        });
-      }
-    }
-    return slots;
-  })();
+  }
+  return slots;
+})();

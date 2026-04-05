@@ -43,6 +43,13 @@
       "when": 1775548800000,
       "tag": "0005_reactions_expansion",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1775404440414,
+      "tag": "0006_sturdy_moonstone",
+      "breakpoints": true
     }
   ]
 }

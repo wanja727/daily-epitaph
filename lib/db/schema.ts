@@ -7,26 +7,33 @@ import {
   date,
   primaryKey,
   unique,
+  index,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
 // ─── Auth.js required tables ───────────────────────────────────────────────
 
-export const users = pgTable("user", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: text("name"), // 카카오 프로필 닉네임 (Auth.js가 자동 저장)
-  email: text("email").unique(),
-  emailVerified: timestamp("emailVerified", { mode: "date" }),
-  image: text("image"),
-  // ─── 앱 커스텀 필드 ──────
-  realName: text("realName"),
-  nickname: text("nickname"),
-  cellId: text("cellId").references(() => cells.id),
-  onboardingCompleted: boolean("onboardingCompleted").default(false).notNull(),
-  isAdmin: boolean("isAdmin").default(false).notNull(),
-});
+export const users = pgTable(
+  "user",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    name: text("name"), // 카카오 프로필 닉네임 (Auth.js가 자동 저장)
+    email: text("email").unique(),
+    emailVerified: timestamp("emailVerified", { mode: "date" }),
+    image: text("image"),
+    // ─── 앱 커스텀 필드 ──────
+    realName: text("realName"),
+    nickname: text("nickname"),
+    cellId: text("cellId").references(() => cells.id),
+    onboardingCompleted: boolean("onboardingCompleted").default(false).notNull(),
+    isAdmin: boolean("isAdmin").default(false).notNull(),
+  },
+  (user) => [
+    index("user_cellId_idx").on(user.cellId),
+  ]
+);
 
 export const accounts = pgTable(
   "account",
@@ -78,15 +85,21 @@ export const cells = pgTable("cell", {
 });
 
 /** 셀 소속 명단 (사전 등록, 실명 매칭용) */
-export const cellMembers = pgTable("cell_member", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  cellId: text("cellId")
-    .notNull()
-    .references(() => cells.id, { onDelete: "cascade" }),
-  name: text("name").notNull(), // 실명
-});
+export const cellMembers = pgTable(
+  "cell_member",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    cellId: text("cellId")
+      .notNull()
+      .references(() => cells.id, { onDelete: "cascade" }),
+    name: text("name").notNull(), // 실명
+  },
+  (member) => [
+    index("cell_member_name_idx").on(member.name),
+  ]
+);
 
 // ─── 묘비명 ─────────────────────────────────────────────────────────────────
 
@@ -106,7 +119,11 @@ export const epitaphs = pgTable(
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
   },
-  (epitaph) => [unique().on(epitaph.userId, epitaph.date)]
+  (epitaph) => [
+    unique().on(epitaph.userId, epitaph.date),
+    index("epitaph_date_idx").on(epitaph.date),
+    index("epitaph_userId_idx").on(epitaph.userId),
+  ]
 );
 
 /** 공감 반응 이력 */
@@ -125,25 +142,35 @@ export const epitaphReactions = pgTable(
     type: text("type").notNull(), // amen, pray, cheer, touch, smile, surprise
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
   },
-  (r) => [unique().on(r.epitaphId, r.userId)]
+  (r) => [
+    unique().on(r.epitaphId, r.userId),
+    index("epitaph_reaction_epitaphId_idx").on(r.epitaphId),
+    index("epitaph_reaction_userId_idx").on(r.userId),
+  ]
 );
 
 // ─── 꽃 키우기 ──────────────────────────────────────────────────────────────
 
-export const flowers = pgTable("flower", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  userId: text("userId")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  type: text("type").notNull(), // flower type id (tulip, rose, ...)
-  stage: integer("stage").default(1).notNull(), // 1=새싹, 2=봉우리, 3=꽃
-  waterCount: integer("waterCount").default(0).notNull(),
-  completedAt: timestamp("completedAt", { mode: "date" }),
-  placedInGarden: boolean("placedInGarden").default(false).notNull(),
-  createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
-});
+export const flowers = pgTable(
+  "flower",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").notNull(), // flower type id (tulip, rose, ...)
+    stage: integer("stage").default(1).notNull(), // 1=새싹, 2=봉우리, 3=꽃
+    waterCount: integer("waterCount").default(0).notNull(),
+    completedAt: timestamp("completedAt", { mode: "date" }),
+    placedInGarden: boolean("placedInGarden").default(false).notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+  },
+  (flower) => [
+    index("flower_userId_idx").on(flower.userId),
+  ]
+);
 
 /** 셀 공동 꽃밭 — 슬롯 기반 자동 배치 */
 export const gardenPlots = pgTable(
@@ -164,7 +191,10 @@ export const gardenPlots = pgTable(
       .references(() => users.id),
     placedAt: timestamp("placedAt", { mode: "date" }).defaultNow().notNull(),
   },
-  (plot) => [unique().on(plot.cellId, plot.slot)]
+  (plot) => [
+    unique().on(plot.cellId, plot.slot),
+    index("garden_plot_cellId_idx").on(plot.cellId),
+  ]
 );
 
 /** 일별 방문 기록 */
@@ -180,7 +210,10 @@ export const dailyVisits = pgTable(
     date: date("date").notNull(),
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
   },
-  (visit) => [unique().on(visit.userId, visit.date)]
+  (visit) => [
+    unique().on(visit.userId, visit.date),
+    index("daily_visit_date_idx").on(visit.date),
+  ]
 );
 
 /** 물뿌리개 보유량 */

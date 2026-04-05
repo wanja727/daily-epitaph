@@ -15,21 +15,23 @@ export async function updateNickname(formData: FormData) {
   if (!nickname) return { error: "닉네임을 입력해주세요." };
   if (nickname.length > 20) return { error: "닉네임은 20자 이내로 입력해주세요." };
 
-  // 타인 실명 사칭 방지: 닉네임이 다른 구성원의 실명과 일치하는지 확인
+  // 타인 실명 사칭 방지: 닉네임에 다른 구성원의 실명이 포함되는지 확인
   const [user] = await db
     .select({ realName: users.realName })
     .from(users)
     .where(eq(users.id, session.user.id))
     .limit(1);
 
-  const [matchedMember] = await db
+  const allMembers = await db
     .select({ name: cellMembers.name })
-    .from(cellMembers)
-    .where(eq(cellMembers.name, nickname))
-    .limit(1);
+    .from(cellMembers);
 
-  if (matchedMember && matchedMember.name !== user?.realName) {
-    return { error: "다른 구성원의 이름은 닉네임으로 사용할 수 없습니다." };
+  const otherNames = allMembers
+    .map((m) => m.name)
+    .filter((name) => name !== user?.realName);
+
+  if (otherNames.some((name) => nickname.includes(name))) {
+    return { error: "다른 구성원의 이름이 포함된 닉네임은 사용할 수 없습니다." };
   }
 
   await db

@@ -16,15 +16,17 @@ export async function completeOnboarding(formData: FormData) {
   if (!realName) return { error: "실명을 입력해주세요." };
   if (!nickname) return { error: "닉네임을 입력해주세요." };
 
-  // 타인 실명 사칭 방지: 닉네임이 다른 구성원의 실명과 일치하는지 확인
-  const [matchedMember] = await db
+  // 타인 실명 사칭 방지: 닉네임에 다른 구성원의 실명이 포함되는지 확인
+  const allMembers = await db
     .select({ name: cellMembers.name })
-    .from(cellMembers)
-    .where(eq(cellMembers.name, nickname))
-    .limit(1);
+    .from(cellMembers);
 
-  if (matchedMember && matchedMember.name !== realName) {
-    return { error: "다른 구성원의 이름은 닉네임으로 사용할 수 없습니다." };
+  const otherNames = allMembers
+    .map((m) => m.name)
+    .filter((name) => name !== realName);
+
+  if (otherNames.some((name) => nickname.includes(name))) {
+    return { error: "다른 구성원의 이름이 포함된 닉네임은 사용할 수 없습니다." };
   }
 
   // 셀 자동 매칭: cellMembers에서 실명으로 검색

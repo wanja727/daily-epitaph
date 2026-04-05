@@ -150,6 +150,7 @@ export default function CellGarden({
                     top: `${pos.y}%`,
                     width: `${10 * pos.scale}%`,
                     transform: "translate(-50%, -100%)",
+                    zIndex: Math.round(pos.y),
                   }}
                   title={plot.placedByNickname ?? undefined}
                 >

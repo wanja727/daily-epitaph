@@ -16,14 +16,19 @@ export async function completeOnboarding(formData: FormData) {
   if (!realName) return { error: "실명을 입력해주세요." };
   if (!nickname) return { error: "닉네임을 입력해주세요." };
 
-  // 타인 실명 사칭 방지: 닉네임에 다른 구성원의 실명이 포함되는지 확인
+  // 셀원 명단 확인
   const allMembers = await db
     .select({ name: cellMembers.name })
     .from(cellMembers);
 
-  const otherNames = allMembers
-    .map((m) => m.name)
-    .filter((name) => name !== realName);
+  const allNames = allMembers.map((m) => m.name);
+
+  if (!allNames.includes(realName)) {
+    return { error: "셀원 명단에 없는 이름입니다. 실명을 정확히 입력해주세요." };
+  }
+
+  // 타인 실명 사칭 방지: 닉네임에 다른 구성원의 실명이 포함되는지 확인
+  const otherNames = allNames.filter((name) => name !== realName);
 
   if (otherNames.some((name) => nickname.includes(name))) {
     return { error: "다른 구성원의 이름이 포함된 닉네임은 사용할 수 없습니다." };

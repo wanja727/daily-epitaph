@@ -45,11 +45,11 @@ export default async function AdminPage() {
     .from(cells)
     .leftJoin(
       users,
-      and(eq(users.cellId, cells.id), eq(users.onboardingCompleted, true))
+      and(eq(users.cellId, cells.id), eq(users.onboardingCompleted, true)),
     )
     .leftJoin(
       epitaphs,
-      and(eq(epitaphs.userId, users.id), eq(epitaphs.date, today))
+      and(eq(epitaphs.userId, users.id), eq(epitaphs.date, today)),
     )
     .groupBy(cells.id, cells.name);
 
@@ -65,8 +65,8 @@ export default async function AdminPage() {
     1,
     Math.floor(
       (new Date(today).getTime() - new Date(PROJECT_START_DATE).getTime()) /
-        (1000 * 60 * 60 * 24)
-    ) + 1
+        (1000 * 60 * 60 * 24),
+    ) + 1,
   );
 
   const cellStatsAll = await db
@@ -79,7 +79,7 @@ export default async function AdminPage() {
     .from(cells)
     .leftJoin(
       users,
-      and(eq(users.cellId, cells.id), eq(users.onboardingCompleted, true))
+      and(eq(users.cellId, cells.id), eq(users.onboardingCompleted, true)),
     )
     .leftJoin(epitaphs, eq(epitaphs.userId, users.id))
     .groupBy(cells.id, cells.name);
@@ -209,7 +209,7 @@ export default async function AdminPage() {
             <tbody>
               {userStats.map((u) => {
                 const rate = Math.round(
-                  (Number(u.writeDays) / daysSinceStart) * 100
+                  (Number(u.writeDays) / daysSinceStart) * 100,
                 );
                 return (
                   <tr
@@ -217,7 +217,7 @@ export default async function AdminPage() {
                     className="border-b border-stone/10 last:border-0"
                   >
                     <td className="px-4 py-2 text-brown-dark">
-                      {u.nickname || u.realName}
+                      {u.realName || u.nickname}
                     </td>
                     <td className="px-4 py-2 text-brown-mid">
                       {u.cellName || "-"}

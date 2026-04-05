@@ -315,7 +315,7 @@ const CELL_DATA: { name: string; members: string[] }[] = [
     members: ["조혜원", "한문종", "오예진", "이윤선"],
   },
   {
-    name: "백향목",
+    name: "백목사님",
     members: ["백향목"],
   },
 ];

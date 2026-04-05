@@ -10,7 +10,7 @@ export const REACTION_TYPES = {
 
 export type ReactionType = keyof typeof REACTION_TYPES;
 
-export const PROJECT_START_DATE = "2026-04-05";
+export const PROJECT_START_DATE = "2026-04-06";
 export const PROJECT_DAYS = 40;
 
 export const FLOWER_STAGES = {
@@ -70,8 +70,9 @@ function buildCenterOutwardSlots(
   // 중심 거리 + 약간의 노이즈로 정렬
   const indexed = slots.map((slot, i) => ({
     i,
-    dist: distance(slot, center) + (seededRandom(layoutSeed + i * 13) - 0.5) * 3,
-    side: slot.x < cx ? "L" : "R" as "L" | "R",
+    dist:
+      distance(slot, center) + (seededRandom(layoutSeed + i * 13) - 0.5) * 3,
+    side: slot.x < cx ? "L" : ("R" as "L" | "R"),
   }));
 
   indexed.sort((a, b) => a.dist - b.dist);
@@ -92,7 +93,8 @@ function buildCenterOutwardSlots(
     const right = band.filter((s) => s.side === "R");
 
     // 좌우 교대로 인터리브
-    let li = 0, ri = 0;
+    let li = 0,
+      ri = 0;
     let pickLeft = seededRandom(layoutSeed + start * 7) < 0.5;
     while (li < left.length || ri < right.length) {
       if (pickLeft && li < left.length) {

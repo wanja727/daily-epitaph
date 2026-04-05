@@ -252,9 +252,9 @@ export default function FlowerIllustration({
           </g>
         )}
 
-        {/* ─── 해바라기 (sunflower) ─── */}
+        {/* ─── 데이지 (sunflower) ─── */}
 
-        {/* stage 2 - 해바라기 봉우리 */}
+        {/* stage 2 - 데이지 봉우리 */}
         {stage === 2 && flowerType === "sunflower" && (
           <g className={animate ? "bud-plant" : ""}>
             <g filter="url(#softShadow)">
@@ -278,7 +278,7 @@ export default function FlowerIllustration({
           </g>
         )}
 
-        {/* stage 3 - 해바라기 만개 */}
+        {/* stage 3 - 데이지 만개 */}
         {stage >= 3 && flowerType === "sunflower" && (
           <g className={animate ? "flower-plant" : ""}>
             <g transform="translate(-8, 0) scale(0.29)">

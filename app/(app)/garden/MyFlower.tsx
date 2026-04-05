@@ -19,8 +19,8 @@ const STAGE_LABELS = ["씨앗", "새싹", "봉오리", "만개"];
 
 const SELECTABLE_FLOWERS = [
   { type: "flower", name: "코스모스" },
-  { type: "purple", name: "클레마티스" },
-  { type: "sunflower", name: "해바라기" },
+  { type: "purple", name: "바이올렛" },
+  { type: "sunflower", name: "데이지" },
 ];
 
 export default function MyFlower({

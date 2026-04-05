@@ -13,6 +13,7 @@ export default function WriteForm({
   defaultToday: string;
   isEdit: boolean;
 }) {
+  const MAX_LENGTH = 1000;
   const [yesterday, setYesterday] = useState(defaultYesterday);
   const [today, setToday] = useState(defaultToday);
   const { isPending, startTransition } = useLoading();
@@ -43,7 +44,8 @@ export default function WriteForm({
         <textarea
           name="yesterday"
           value={yesterday}
-          onChange={(e) => setYesterday(e.target.value)}
+          onChange={(e) => setYesterday(e.target.value.slice(0, MAX_LENGTH))}
+          maxLength={MAX_LENGTH}
           placeholder="내 안의 두려움, 시기, 교만, 거짓, 연약함, 불신, 불순종 등을 솔직히 고백해 보세요."
           rows={6}
           required
@@ -69,7 +71,8 @@ export default function WriteForm({
         <textarea
           name="today"
           value={today}
-          onChange={(e) => setToday(e.target.value)}
+          onChange={(e) => setToday(e.target.value.slice(0, MAX_LENGTH))}
+          maxLength={MAX_LENGTH}
           placeholder="믿음, 용서, 인내, 절제, 섬김, 나눔, 성결 등을 결단하며 기도로 짧게 적어보세요."
           rows={6}
           required

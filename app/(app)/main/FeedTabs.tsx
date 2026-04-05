@@ -153,7 +153,7 @@ function ReactionBar({
 
       {/* 반응 선택 피커 */}
       {pickerOpen && (
-        <div className="absolute bottom-full left-0 mb-2 z-50 rounded-2xl border border-stone bg-white shadow-lg p-2 min-w-[180px]">
+        <div className="absolute bottom-full right-0 mb-2 z-50 rounded-2xl border border-stone bg-white shadow-lg p-2 min-w-[180px]">
           {reactionKeys.map((type) => {
             const { emoji, label } = REACTION_TYPES[type];
             return (

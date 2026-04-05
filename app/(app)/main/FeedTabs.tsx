@@ -174,6 +174,17 @@ function ReactionBar({
   );
 }
 
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function setCookie(name: string, value: string, days = 365) {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires};path=/`;
+}
+
 export default function FeedTabs({
   epitaphs,
   myCellId,
@@ -188,6 +199,29 @@ export default function FeedTabs({
   wroteToday: boolean;
 }) {
   const [filter, setFilter] = useState<"all" | "cell">("all");
+  const [expandAll, setExpandAll] = useState(() => getCookie("feed_expand") !== "0");
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+  function handleToggleAll() {
+    const next = !expandAll;
+    setExpandAll(next);
+    setExpandedIds(new Set());
+    setCookie("feed_expand", next ? "1" : "0");
+  }
+
+  function toggleCard(id: string) {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function isExpanded(id: string) {
+    if (expandedIds.has(id)) return !expandAll;
+    return expandAll;
+  }
 
   const filtered =
     filter === "cell" && myCellId
@@ -196,20 +230,45 @@ export default function FeedTabs({
 
   return (
     <div className="space-y-4">
-      {/* 필터 탭 */}
-      <div className="flex gap-2 overflow-auto pb-1">
-        <Pill
-          tone="green"
-          active={filter === "all"}
-          onClick={() => setFilter("all")}
-        >
-          전체 {epitaphs.length > 0 && `(${epitaphs.length})`}
-        </Pill>
-        {myCellId && (
-          <Pill active={filter === "cell"} onClick={() => setFilter("cell")}>
-            {cellName ?? "우리 셀"}
+      {/* 필터 탭 + 전체 펴기/접기 */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex gap-2 overflow-auto pb-1">
+          <Pill
+            tone={filter === "all" ? "green" : "default"}
+            active={filter === "all"}
+            onClick={() => setFilter("all")}
+          >
+            전체 {epitaphs.length > 0 && `(${epitaphs.length})`}
           </Pill>
-        )}
+          {myCellId && (
+            <Pill
+              tone={filter === "cell" ? "green" : "default"}
+              active={filter === "cell"}
+              onClick={() => setFilter("cell")}
+            >
+              {cellName ?? "우리 셀"}
+            </Pill>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={handleToggleAll}
+          className="shrink-0 flex items-center gap-1 rounded-full px-3 py-1 text-xs bg-sand/60 text-brown-mid hover:bg-sand transition-colors"
+        >
+          {expandAll ? "접기" : "펴기"}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className={`w-3.5 h-3.5 transition-transform ${expandAll ? "rotate-180" : ""}`}
+          >
+            <path
+              fillRule="evenodd"
+              d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
       </div>
 
       {/* 오늘 미작성 안내 */}
@@ -231,59 +290,82 @@ export default function FeedTabs({
         </div>
       ) : (
         <div className="space-y-4">
-          {filtered.map((e) => (
-            <div
-              key={e.id}
-              className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4"
-            >
-              {/* 닉네임 + 작성시간 + 뱃지 */}
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="text-sm font-medium text-brown-dark">
-                    {e.nickname ?? "익명"}
+          {filtered.map((e) => {
+            const open = isExpanded(e.id);
+            return (
+              <div
+                key={e.id}
+                className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4"
+              >
+                {/* 닉네임 + 작성시간 + 뱃지 (클릭으로 개별 토글) */}
+                <button
+                  type="button"
+                  onClick={() => toggleCard(e.id)}
+                  className="flex items-start justify-between gap-3 w-full text-left"
+                >
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm font-medium text-brown-dark">
+                        {e.nickname ?? "익명"}
+                      </span>
+                      {e.userId === myUserId && <Pill tone="gold">나</Pill>}
+                    </div>
+                    <div className="text-[11px] text-brown-light mt-0.5">
+                      {new Date(e.updatedAt).toLocaleTimeString("ko-KR", {
+                        timeZone: "Asia/Seoul",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </div>
                   </div>
-                  <div className="text-[11px] text-brown-light mt-0.5">
-                    {new Date(e.updatedAt).toLocaleTimeString("ko-KR", {
-                      timeZone: "Asia/Seoul",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </div>
-                </div>
-                {e.userId === myUserId && <Pill tone="gold">나</Pill>}
-              </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className={`w-4 h-4 text-brown-light shrink-0 mt-0.5 transition-transform ${open ? "rotate-180" : ""}`}
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
 
-              {/* 두 섹션 */}
-              <div className="mt-4 grid gap-3">
-                <div className="rounded-2xl bg-[#F7F1E7] p-3">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-brown-light">
-                    어제를 돌아보며
-                  </div>
-                  <p className="mt-2 text-sm leading-6 text-brown-mid whitespace-pre-line">
-                    {e.yesterday}
-                  </p>
-                </div>
+                {/* 두 섹션 (접기/펴기) */}
+                {open && (
+                  <div className="mt-4 grid gap-3">
+                    <div className="rounded-2xl bg-[#F7F1E7] p-3">
+                      <div className="text-[11px] uppercase tracking-[0.18em] text-brown-light">
+                        어제를 돌아보며
+                      </div>
+                      <p className="mt-2 text-sm leading-6 text-brown-mid whitespace-pre-line">
+                        {e.yesterday}
+                      </p>
+                    </div>
 
-                <div className="rounded-2xl bg-sage-light p-3">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-[#6C7A62]">
-                    오늘을 기대하며
+                    <div className="rounded-2xl bg-sage-light p-3">
+                      <div className="text-[11px] uppercase tracking-[0.18em] text-[#6C7A62]">
+                        오늘을 기대하며
+                      </div>
+                      <p className="mt-2 text-sm leading-6 text-[#4D5B46] whitespace-pre-line">
+                        {e.today}
+                      </p>
+                    </div>
                   </div>
-                  <p className="mt-2 text-sm leading-6 text-[#4D5B46] whitespace-pre-line">
-                    {e.today}
-                  </p>
+                )}
+
+                {/* 공감 반응 */}
+                <div className={`${open ? "mt-3" : "mt-2"} flex justify-end`}>
+                  <ReactionBar
+                    epitaphId={e.id}
+                    reactions={e.reactions}
+                    myReaction={e.myReaction}
+                  />
                 </div>
               </div>
-
-              {/* 공감 반응 */}
-              <div className="mt-3 flex justify-end">
-                <ReactionBar
-                  epitaphId={e.id}
-                  reactions={e.reactions}
-                  myReaction={e.myReaction}
-                />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

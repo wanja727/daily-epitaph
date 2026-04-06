@@ -29,17 +29,15 @@ export default function WriteForm({
       {/* 어제 돌아보기 — warm 카드 */}
       <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
         <div className="flex items-center justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
-              어제를 돌아보며
-            </div>
-            <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
-              십자가에 못 박을 것은 무엇인가요?
-            </div>
+          <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
+            어제를 돌아보며
           </div>
           <span className="shrink-0 whitespace-nowrap inline-flex rounded-full px-3 py-1 text-xs bg-sand text-brown-mid">
             회개
           </span>
+        </div>
+        <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
+          십자가에 못 박을 것은 무엇인가요?
         </div>
         <textarea
           name="yesterday"
@@ -56,17 +54,15 @@ export default function WriteForm({
       {/* 오늘 기대함 — green 카드 */}
       <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
         <div className="flex items-center justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-[0.18em] text-[#6B7B61]">
-              오늘을 기대하며
-            </div>
-            <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
-              어떻게 예수님과 함께 살까요?
-            </div>
+          <div className="text-xs uppercase tracking-[0.18em] text-[#6B7B61]">
+            오늘을 기대하며
           </div>
           <span className="shrink-0 whitespace-nowrap inline-flex rounded-full px-3 py-1 text-xs bg-[#DCE5D6] text-[#516047]">
             결단
           </span>
+        </div>
+        <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
+          어떻게 예수님과 함께 살까요?
         </div>
         <textarea
           name="today"

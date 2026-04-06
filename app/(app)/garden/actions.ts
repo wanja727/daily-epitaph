@@ -8,6 +8,7 @@ import {
   gardenPlots,
   cells,
   users,
+  epitaphs,
 } from "@/lib/db/schema";
 import { eq, and, asc, sql, desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
@@ -142,18 +143,18 @@ export async function getCellStats() {
 
   const flowerMap = new Map(flowerStats.map((r) => [r.cellId, r.flowerCount]));
 
-  // 셀별 물뿌리개 합산
-  const waterStats = await db
+  // 셀별 작성 카드 누적 수 (물병 누적 = 카드 작성 건수)
+  const cardStats = await db
     .select({
       cellId: users.cellId,
-      waterSum: sql<number>`coalesce(sum(${wateringCans.count}), 0)::int`,
+      cardCount: sql<number>`count(${epitaphs.id})::int`,
     })
     .from(users)
-    .leftJoin(wateringCans, eq(users.id, wateringCans.userId))
+    .leftJoin(epitaphs, eq(users.id, epitaphs.userId))
     .where(sql`${users.cellId} is not null`)
     .groupBy(users.cellId);
 
-  const waterMap = new Map(waterStats.map((r) => [r.cellId!, r.waterSum]));
+  const waterMap = new Map(cardStats.map((r) => [r.cellId!, r.cardCount]));
 
   // 전체 셀 목록
   const allCells = await db.select().from(cells);

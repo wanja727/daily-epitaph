@@ -37,7 +37,7 @@ export default function WriteForm({
               십자가에 못 박을 것은 무엇인가요?
             </div>
           </div>
-          <span className="inline-flex rounded-full px-3 py-1 text-xs bg-sand text-brown-mid">
+          <span className="shrink-0 whitespace-nowrap inline-flex rounded-full px-3 py-1 text-xs bg-sand text-brown-mid">
             회개
           </span>
         </div>
@@ -64,7 +64,7 @@ export default function WriteForm({
               어떻게 예수님과 함께 살까요?
             </div>
           </div>
-          <span className="inline-flex rounded-full px-3 py-1 text-xs bg-[#DCE5D6] text-[#516047]">
+          <span className="shrink-0 whitespace-nowrap inline-flex rounded-full px-3 py-1 text-xs bg-[#DCE5D6] text-[#516047]">
             결단
           </span>
         </div>

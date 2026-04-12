@@ -21,6 +21,12 @@ const SELECTABLE_FLOWERS = [
   { type: "flower", name: "코스모스" },
   { type: "purple", name: "바이올렛" },
   { type: "sunflower", name: "데이지" },
+  { type: "daffodil", name: "별꽃" },
+  { type: "cherry", name: "핑크블라썸" },
+  { type: "zinnia", name: "지니아" },
+  { type: "hyacinth", name: "히아신스" },
+  { type: "rose", name: "튤립" },
+  { type: "dandelion", name: "민들레" },
 ];
 
 export default function MyFlower({
@@ -71,14 +77,14 @@ export default function MyFlower({
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            {SELECTABLE_FLOWERS.map((f) => (
+            {SELECTABLE_FLOWERS.slice(0, 6).map((f) => (
               <button
                 key={f.type}
                 onClick={() => handleSelectFlower(f.type)}
                 disabled={isPending}
                 className="rounded-[20px] border border-stone bg-white/80 p-3 space-y-2 transition-all hover:shadow-md hover:border-sage active:scale-[0.97] disabled:opacity-50"
               >
-                <div className="w-full aspect-square">
+                <div className="w-full aspect-square overflow-hidden">
                   <FlowerIllustration
                     waterCount={3}
                     size="sm"
@@ -86,7 +92,7 @@ export default function MyFlower({
                     flowerType={f.type}
                   />
                 </div>
-                <p className="text-sm font-medium text-brown-dark">{f.name}</p>
+                <p className="text-xs font-medium text-brown-dark truncate">{f.name}</p>
               </button>
             ))}
           </div>

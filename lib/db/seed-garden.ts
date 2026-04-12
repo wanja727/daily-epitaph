@@ -17,7 +17,11 @@ import { eq, inArray } from "drizzle-orm";
 const client = postgres(process.env.DATABASE_URL!);
 const db = drizzle(client);
 
-const FLOWER_TYPES = ["flower", "purple", "sunflower"];
+const FLOWER_TYPES = [
+  "flower", "purple", "sunflower",
+  "daffodil", "cherry", "zinnia",
+  "hyacinth", "rose", "dandelion",
+];
 const TOTAL = 120;
 
 // ─── 헬퍼 ────────────────────────────────────────────────────────────────────

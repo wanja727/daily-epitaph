@@ -13,7 +13,7 @@ export default function WriteForm({
   defaultToday: string;
   isEdit: boolean;
 }) {
-  const MAX_LENGTH = 1000;
+  const MAX_LENGTH = 2000;
   const [yesterday, setYesterday] = useState(defaultYesterday);
   const [today, setToday] = useState(defaultToday);
   const { isPending, startTransition } = useLoading();
@@ -57,19 +57,26 @@ export default function WriteForm({
           <div className="text-xs uppercase tracking-[0.18em] text-[#6B7B61]">
             오늘을 기대하며
           </div>
-          <span className="shrink-0 whitespace-nowrap inline-flex rounded-full px-3 py-1 text-xs bg-[#DCE5D6] text-[#516047]">
-            결단
+          <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-0.5 rounded-full px-1.5 py-1 text-xs bg-[#DCE5D6] text-[#516047]">
+            감사와 결단
+            <span className="inline-flex items-center rounded-full bg-[#516047] px-1.5 py-px text-[9px] font-bold tracking-wide text-[#F6FAF2]">
+              NEW
+            </span>
           </span>
         </div>
         <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
           어떻게 예수님과 함께 살까요?
         </div>
+        <p className="mt-2 text-xs text-[#6B7B61]">
+          ✨ 이제 결단과 함께 <span className="font-semibold">감사</span>도
+          적어보세요
+        </p>
         <textarea
           name="today"
           value={today}
           onChange={(e) => setToday(e.target.value.slice(0, MAX_LENGTH))}
           maxLength={MAX_LENGTH}
-          placeholder="믿음, 용서, 인내, 절제, 섬김, 나눔, 성결 등을 결단하며 기도로 짧게 적어보세요."
+          placeholder="새 생명 주신 주님께 감사하며 믿음, 용서, 인내, 절제, 나눔 등 오늘의 결단을 짧게 적어보세요."
           rows={6}
           required
           className="mt-4 w-full resize-none rounded-3xl border border-stone bg-[#F6FAF2] px-4 py-4 text-sm text-brown leading-7 placeholder:text-brown-light/70 focus:outline-none focus:ring-2 focus:ring-olive/30"

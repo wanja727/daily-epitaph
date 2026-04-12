@@ -11,7 +11,7 @@ export async function upsertEpitaph(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const MAX_LENGTH = 1000;
+  const MAX_LENGTH = 2000;
   const yesterday = (formData.get("yesterday") as string)?.trim().slice(0, MAX_LENGTH);
   const today = (formData.get("today") as string)?.trim().slice(0, MAX_LENGTH);
 

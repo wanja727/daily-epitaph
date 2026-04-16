@@ -3,7 +3,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { users, cellMembers, wateringCans } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq, notInArray } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
 export async function completeOnboarding(formData: FormData) {
@@ -34,11 +34,23 @@ export async function completeOnboarding(formData: FormData) {
     return { error: "다른 구성원의 이름이 포함된 닉네임은 사용할 수 없습니다." };
   }
 
-  // 셀 자동 매칭: cellMembers에서 실명으로 검색
+  // 셀 자동 매칭: 동명이인 대비 — 이미 온보딩 완료된 유저가 배정된 셀은 제외
+  const onboardedCellIds = db
+    .select({ cellId: users.cellId })
+    .from(users)
+    .where(
+      and(eq(users.realName, realName), eq(users.onboardingCompleted, true))
+    );
+
   const [matched] = await db
     .select({ cellId: cellMembers.cellId })
     .from(cellMembers)
-    .where(eq(cellMembers.name, realName))
+    .where(
+      and(
+        eq(cellMembers.name, realName),
+        notInArray(cellMembers.cellId, onboardedCellIds)
+      )
+    )
     .limit(1);
 
   // 사용자 정보 업데이트

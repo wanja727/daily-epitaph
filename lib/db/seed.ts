@@ -6,7 +6,28 @@ import postgres from "postgres";
 import { cells, cellMembers } from "./schema";
 import { eq } from "drizzle-orm";
 
-const client = postgres(process.env.DATABASE_URL!);
+// ━━━ 환경 파라미터 파싱 ━━━
+// 사용법: pnpm db:seed [sync] [dev|prod]
+const args = process.argv.slice(2);
+const mode = args.find((a) => a === "sync"); // "sync" or undefined
+const env = args.find((a) => a === "dev" || a === "prod") ?? "dev";
+
+const dbUrlMap: Record<string, string | undefined> = {
+  dev: process.env.DATABASE_URL_DEV,
+  prod: process.env.DATABASE_URL_PROD,
+};
+
+const databaseUrl = dbUrlMap[env];
+if (!databaseUrl) {
+  console.error(
+    `❌ DATABASE_URL_${env.toUpperCase()} 환경변수가 설정되지 않았습니다.`,
+  );
+  process.exit(1);
+}
+
+console.log(`🔗 환경: ${env.toUpperCase()} DB에 연결합니다.`);
+
+const client = postgres(databaseUrl);
 const db = drizzle(client);
 
 // ━━━ 셀 데이터 (여기에 실제 셀 이름과 구성원을 추가하세요) ━━━
@@ -183,6 +204,7 @@ const CELL_DATA: { name: string; members: string[] }[] = [
       "박지민",
       "손유승",
       "이선민",
+      "고지희",
     ],
   },
   {
@@ -304,11 +326,21 @@ const CELL_DATA: { name: string; members: string[] }[] = [
       "박은총",
       "최수현",
       "김승현",
+      "전현규",
     ],
   },
   {
     name: "민채림셀",
-    members: ["민채림", "한동석", "오영주", "김예은", "이유나", "김보현"],
+    members: [
+      "민채림",
+      "한동석",
+      "오영주",
+      "김예은",
+      "이유나",
+      "김보현",
+      "김보영",
+      "박찬호",
+    ],
   },
   {
     name: "조혜원셀",
@@ -319,8 +351,6 @@ const CELL_DATA: { name: string; members: string[] }[] = [
     members: ["백향목"],
   },
 ];
-
-const mode = process.argv[2]; // "sync" or undefined
 
 async function seed() {
   console.log("🌱 Seeding database...");

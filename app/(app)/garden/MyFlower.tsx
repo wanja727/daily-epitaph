@@ -77,7 +77,7 @@ export default function MyFlower({
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            {SELECTABLE_FLOWERS.slice(0, 6).map((f) => (
+            {SELECTABLE_FLOWERS.slice(0, 9).map((f) => (
               <button
                 key={f.type}
                 onClick={() => handleSelectFlower(f.type)}
@@ -92,7 +92,9 @@ export default function MyFlower({
                     flowerType={f.type}
                   />
                 </div>
-                <p className="text-xs font-medium text-brown-dark truncate">{f.name}</p>
+                <p className="text-xs font-medium text-brown-dark truncate">
+                  {f.name}
+                </p>
               </button>
             ))}
           </div>

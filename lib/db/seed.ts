@@ -177,6 +177,7 @@ const CELL_DATA: { name: string; members: string[] }[] = [
       "신명",
       "하지혜",
       "이혁진",
+      "이준",
     ],
   },
   {
@@ -257,6 +258,7 @@ const CELL_DATA: { name: string; members: string[] }[] = [
       "조강우",
       "고현지",
       "김민주",
+      "이채린",
     ],
   },
   {
@@ -340,6 +342,8 @@ const CELL_DATA: { name: string; members: string[] }[] = [
       "김보현",
       "김보영",
       "박찬호",
+      "안수빈",
+      "이안지",
     ],
   },
   {

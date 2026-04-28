@@ -50,6 +50,13 @@
       "when": 1775404440414,
       "tag": "0006_sturdy_moonstone",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1776124800000,
+      "tag": "0007_scripture_recommendation",
+      "breakpoints": true
     }
   ]
 }

@@ -8,7 +8,9 @@ import {
   primaryKey,
   unique,
   index,
+  jsonb,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import type { AdapterAccountType } from "next-auth/adapters";
 
 // ─── Auth.js required tables ───────────────────────────────────────────────
@@ -116,6 +118,10 @@ export const epitaphs = pgTable(
     today: text("today").notNull(),
     date: date("date").notNull(),
     amenCount: integer("amenCount").default(0).notNull(),
+    requestScriptureRecommendation: boolean("requestScriptureRecommendation")
+      .default(false)
+      .notNull(),
+    recommendationUpdatedAt: timestamp("recommendationUpdatedAt", { mode: "date" }),
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
   },
@@ -147,6 +153,66 @@ export const epitaphReactions = pgTable(
     index("epitaph_reaction_epitaphId_idx").on(r.epitaphId),
     index("epitaph_reaction_userId_idx").on(r.userId),
   ]
+);
+
+// ─── 성경 말씀 추천 (작성자 전용) ────────────────────────────────────────────
+// TODO: 개역개정 원문 직접 저장/노출 전 대한성서공회 저작권 검토 필요
+
+/** 큐레이션된 추천 후보 장절 메타데이터. 본문은 저장하지 않는다. */
+export const verses = pgTable(
+  "verse",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    referenceKo: text("referenceKo").notNull(), // 예: "잠언 24:30-34"
+    bookAbbrEn: text("bookAbbrEn").notNull(), // 예: "PRO"
+    chapter: integer("chapter").notNull(),
+    verseStart: integer("verseStart").notNull(),
+    verseEnd: integer("verseEnd"),
+    deepLinkUrl: text("deepLinkUrl").notNull(),
+    themes: text("themes").array().notNull().default(sql`ARRAY[]::text[]`),
+    situationTags: text("situationTags")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
+    emotionTags: text("emotionTags")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
+    summary: text("summary"),
+    weight: integer("weight").default(0).notNull(),
+    isGeneric: boolean("isGeneric").default(false).notNull(),
+  },
+  (v) => [
+    unique().on(v.bookAbbrEn, v.chapter, v.verseStart, v.verseEnd),
+    index("verse_bookAbbrEn_idx").on(v.bookAbbrEn),
+  ]
+);
+
+/** epitaph 1건에 대한 작성자 전용 추천 결과 */
+export const scriptureRecommendations = pgTable(
+  "scripture_recommendation",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    epitaphId: text("epitaphId")
+      .notNull()
+      .unique()
+      .references(() => epitaphs.id, { onDelete: "cascade" }),
+    themes: jsonb("themes").$type<string[]>().notNull().default([]),
+    situationTags: jsonb("situationTags").$type<string[]>().notNull().default([]),
+    emotionTags: jsonb("emotionTags").$type<string[]>().notNull().default([]),
+    recommendations: jsonb("recommendations")
+      .$type<
+        Array<{ reference: string; reason: string; deepLinkUrl: string }>
+      >()
+      .notNull()
+      .default([]),
+    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
+  }
 );
 
 // ─── 꽃 키우기 ──────────────────────────────────────────────────────────────

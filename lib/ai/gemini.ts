@@ -7,7 +7,9 @@
 
 import type { VerseCandidate } from "@/lib/scripture/verse-repository";
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-1.5-flash-latest";
+// 모델은 환경변수로 오버라이드 가능. 기본은 무료 티어에서 사용 가능한 최신 안정 모델.
+// 사용 가능한 모델 확인: https://ai.google.dev/gemini-api/docs/models
+const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 export type GeminiRecommendation = {

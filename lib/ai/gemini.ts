@@ -7,10 +7,18 @@
 
 import type { VerseCandidate } from "@/lib/scripture/verse-repository";
 
-// 모델은 환경변수로 오버라이드 가능. 기본은 무료 티어에서 사용 가능한 최신 안정 모델.
-// 사용 가능한 모델 확인: https://ai.google.dev/gemini-api/docs/models
-const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+// 콤마로 구분된 폴백 체인을 받는다. 첫 모델이 503/429 등 일시적 오류면 다음 모델로 즉시 시도.
+// 환경변수 미설정 시 기본 체인 사용. 사용 가능한 모델: https://ai.google.dev/gemini-api/docs/models
+const DEFAULT_MODEL_CHAIN = "gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.0-flash";
+function getModelChain(): string[] {
+  return (process.env.GEMINI_MODEL ?? DEFAULT_MODEL_CHAIN)
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+const endpointFor = (model: string) =>
+  `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
 
 export type GeminiRecommendation = {
   reference: string;
@@ -101,24 +109,42 @@ export async function recommendScripturesWithGemini(
   };
 
   const f = opts.fetchImpl ?? fetch;
-  const res = await f(`${GEMINI_ENDPOINT}?key=${encodeURIComponent(apiKey)}`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const models = getModelChain();
+  let lastErr: Error | null = null;
 
-  if (!res.ok) {
-    const errText = await res.text().catch(() => "");
-    throw new Error(`Gemini 호출 실패 ${res.status}: ${errText.slice(0, 300)}`);
+  for (const model of models) {
+    try {
+      const res = await f(`${endpointFor(model)}?key=${encodeURIComponent(apiKey)}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        const err = new Error(
+          `Gemini 호출 실패 ${res.status} (model=${model}): ${errText.slice(0, 300)}`
+        );
+        if (RETRYABLE_STATUS.has(res.status)) {
+          lastErr = err;
+          continue; // 다음 모델로
+        }
+        throw err; // 404/401/400 등 hard error 는 즉시 종료
+      }
+
+      const payload = (await res.json()) as {
+        candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+      };
+      const text = payload.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+      const parsed = extractJson(text) as Partial<GeminiRecommendationResult>;
+      return normalizeResult(parsed, candidates);
+    } catch (err) {
+      // network error 등 fetch 단계 예외 — 다음 모델로 폴백
+      lastErr = err instanceof Error ? err : new Error(String(err));
+    }
   }
 
-  const payload = (await res.json()) as {
-    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-  };
-  const text = payload.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-  const parsed = extractJson(text) as Partial<GeminiRecommendationResult>;
-
-  return normalizeResult(parsed, candidates);
+  throw lastErr ?? new Error("Gemini 호출 실패: 모든 모델 시도 실패");
 }
 
 export function normalizeResult(

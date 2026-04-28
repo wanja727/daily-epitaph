@@ -7,15 +7,20 @@ import { useLoading } from "@/app/components/LoadingProvider";
 export default function WriteForm({
   defaultYesterday,
   defaultToday,
+  defaultRequestRecommendation,
   isEdit,
 }: {
   defaultYesterday: string;
   defaultToday: string;
+  defaultRequestRecommendation: boolean;
   isEdit: boolean;
 }) {
   const MAX_LENGTH = 2000;
   const [yesterday, setYesterday] = useState(defaultYesterday);
   const [today, setToday] = useState(defaultToday);
+  const [requestRecommendation, setRequestRecommendation] = useState(
+    defaultRequestRecommendation
+  );
   const { isPending, startTransition } = useLoading();
 
   function handleSubmit(formData: FormData) {
@@ -82,6 +87,47 @@ export default function WriteForm({
           className="mt-4 w-full resize-none rounded-3xl border border-stone bg-[#F6FAF2] px-4 py-4 text-sm text-brown leading-7 placeholder:text-brown-light/70 focus:outline-none focus:ring-2 focus:ring-olive/30"
         />
       </div>
+
+      {/* AI 말씀 추천 (작성자 전용) */}
+      <input
+        type="hidden"
+        name="requestScriptureRecommendation"
+        value={requestRecommendation ? "true" : "false"}
+      />
+      <button
+        type="button"
+        onClick={() => setRequestRecommendation((v) => !v)}
+        aria-pressed={requestRecommendation}
+        className={`w-full rounded-[28px] border p-4 text-left transition-colors ${
+          requestRecommendation
+            ? "border-olive/40 bg-[#F2F4EC]"
+            : "border-stone bg-white/70"
+        }`}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-sm font-medium text-brown-dark">
+              오늘 카드에 어울리는 말씀 받기
+            </div>
+            <p className="mt-1 text-xs text-brown-light leading-5">
+              내 카드 내용에 가까운 성경 구절 2~3개를 조용히 추천해 드려요.
+              <br />
+              나에게만 보이고, 피드에는 공개되지 않아요.
+            </p>
+          </div>
+          <span
+            className={`shrink-0 inline-flex h-6 w-11 items-center rounded-full p-0.5 transition-colors ${
+              requestRecommendation ? "bg-olive" : "bg-stone"
+            }`}
+          >
+            <span
+              className={`block h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                requestRecommendation ? "translate-x-5" : "translate-x-0"
+              }`}
+            />
+          </span>
+        </div>
+      </button>
 
       <button
         type="submit"

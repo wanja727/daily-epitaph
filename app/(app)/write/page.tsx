@@ -13,6 +13,7 @@ export default async function WritePage() {
     .select({
       yesterday: epitaphs.yesterday,
       today: epitaphs.today,
+      requestScriptureRecommendation: epitaphs.requestScriptureRecommendation,
     })
     .from(epitaphs)
     .where(and(eq(epitaphs.userId, session!.user.id), eq(epitaphs.date, today)))
@@ -39,6 +40,9 @@ export default async function WritePage() {
       <WriteForm
         defaultYesterday={current?.yesterday ?? ""}
         defaultToday={current?.today ?? ""}
+        defaultRequestRecommendation={
+          current?.requestScriptureRecommendation ?? false
+        }
         isEdit={!!current}
       />
     </div>

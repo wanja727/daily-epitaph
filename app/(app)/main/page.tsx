@@ -1,10 +1,17 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { epitaphs, users, cells, epitaphReactions } from "@/lib/db/schema";
+import {
+  epitaphs,
+  users,
+  cells,
+  epitaphReactions,
+  scriptureRecommendations,
+} from "@/lib/db/schema";
 import { eq, and, desc, sql, inArray } from "drizzle-orm";
 import { getTodayKST, getProjectDay } from "@/lib/utils/date";
 import Link from "next/link";
 import FeedTabs from "./FeedTabs";
+import MyRecommendation from "./MyRecommendation";
 
 export default async function MainPage() {
   const session = await auth();
@@ -98,6 +105,36 @@ export default async function MainPage() {
 
   const myEpitaph = todayEpitaphs.find((e) => e.userId === myUserId);
 
+  // 본인 카드 추천 — 피드에 절대 포함되지 않는다.
+  let myRecommendation: {
+    themes: string[];
+    situationTags: string[];
+    emotionTags: string[];
+    recommendations: Array<{ reference: string; reason: string; deepLinkUrl: string }>;
+  } | null = null;
+
+  if (myEpitaph) {
+    const [r] = await db
+      .select({
+        themes: scriptureRecommendations.themes,
+        situationTags: scriptureRecommendations.situationTags,
+        emotionTags: scriptureRecommendations.emotionTags,
+        recommendations: scriptureRecommendations.recommendations,
+      })
+      .from(scriptureRecommendations)
+      .where(eq(scriptureRecommendations.epitaphId, myEpitaph.id))
+      .limit(1);
+
+    if (r && r.recommendations.length > 0) {
+      myRecommendation = {
+        themes: r.themes,
+        situationTags: r.situationTags,
+        emotionTags: r.emotionTags,
+        recommendations: r.recommendations,
+      };
+    }
+  }
+
   return (
     <div className="px-5 py-5 space-y-4">
       {/* 헤더 */}
@@ -122,6 +159,16 @@ export default async function MainPage() {
           {todayFormatted}
         </p>
       </div>
+
+      {/* 작성자 본인 전용 말씀 추천 */}
+      {myRecommendation && (
+        <MyRecommendation
+          themes={myRecommendation.themes}
+          situationTags={myRecommendation.situationTags}
+          emotionTags={myRecommendation.emotionTags}
+          recommendations={myRecommendation.recommendations}
+        />
+      )}
 
       {/* 피드 */}
       <FeedTabs

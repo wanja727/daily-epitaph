@@ -8,10 +8,29 @@
  * TODO: 개역개정 원문 직접 저장/노출 전 대한성서공회 저작권 검토 필요
  */
 
-import "dotenv/config";
-import { db } from "./index";
-import { verses } from "./schema";
+import { config } from "dotenv";
+config({ path: ".env.local" });
+
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import { sql } from "drizzle-orm";
+import { verses } from "./schema";
+
+if (!process.env.DATABASE_URL) {
+  console.error("❌ DATABASE_URL 이 비어 있습니다. .env.local 을 확인하세요.");
+  process.exit(1);
+}
+
+const client = postgres(process.env.DATABASE_URL, { prepare: false });
+const db = drizzle(client);
+
+// 어떤 DB 에 붙는지 시각 확인
+try {
+  const u = new URL(process.env.DATABASE_URL.replace(/^postgresql:/, "http:"));
+  console.log(`[seed-verses] target = ${u.host}`);
+} catch {
+  // URL 파싱 실패는 무시 — 시드 진행 자체에는 영향 없음
+}
 
 type Seed = {
   referenceKo: string;

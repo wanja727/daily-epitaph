@@ -11,7 +11,6 @@ import { eq, and, desc, sql, inArray } from "drizzle-orm";
 import { getTodayKST, getProjectDay } from "@/lib/utils/date";
 import Link from "next/link";
 import FeedTabs from "./FeedTabs";
-import MyRecommendation from "./MyRecommendation";
 
 export default async function MainPage() {
   const session = await auth();
@@ -160,23 +159,14 @@ export default async function MainPage() {
         </p>
       </div>
 
-      {/* 작성자 본인 전용 말씀 추천 */}
-      {myRecommendation && (
-        <MyRecommendation
-          themes={myRecommendation.themes}
-          situationTags={myRecommendation.situationTags}
-          emotionTags={myRecommendation.emotionTags}
-          recommendations={myRecommendation.recommendations}
-        />
-      )}
-
-      {/* 피드 */}
+      {/* 피드 — 본인 카드 안에 부활의 말씀이 함께 노출된다. */}
       <FeedTabs
         epitaphs={enrichedEpitaphs}
         myCellId={session?.user?.cellId ?? null}
         myUserId={myUserId}
         cellName={cellName}
         wroteToday={!!myEpitaph}
+        myRecommendation={myRecommendation}
       />
 
       {/* 플로팅 작성 버튼 */}

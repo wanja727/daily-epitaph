@@ -6,6 +6,14 @@ import {
   REACTION_TYPES,
   type ReactionType,
 } from "@/lib/utils/constants";
+import MyRecommendation from "./MyRecommendation";
+
+type RecommendationData = {
+  themes: string[];
+  situationTags: string[];
+  emotionTags: string[];
+  recommendations: Array<{ reference: string; reason: string; deepLinkUrl: string }>;
+};
 
 interface Epitaph {
   id: string;
@@ -191,12 +199,14 @@ export default function FeedTabs({
   myUserId,
   cellName,
   wroteToday,
+  myRecommendation,
 }: {
   epitaphs: Epitaph[];
   myCellId: string | null;
   myUserId: string;
   cellName: string | null;
   wroteToday: boolean;
+  myRecommendation: RecommendationData | null;
 }) {
   const [filter, setFilter] = useState<"all" | "cell">("all");
   const [expandAll, setExpandAll] = useState(() => getCookie("feed_expand") !== "0");
@@ -352,6 +362,16 @@ export default function FeedTabs({
                         {e.today}
                       </p>
                     </div>
+
+                    {/* 부활의 말씀 — 본인 카드에만, 본인에게만 노출 */}
+                    {e.userId === myUserId && myRecommendation && (
+                      <MyRecommendation
+                        themes={myRecommendation.themes}
+                        situationTags={myRecommendation.situationTags}
+                        emotionTags={myRecommendation.emotionTags}
+                        recommendations={myRecommendation.recommendations}
+                      />
+                    )}
                   </div>
                 )}
 

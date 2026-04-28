@@ -24,9 +24,15 @@ export default function WriteForm({
   const { isPending, startTransition } = useLoading();
 
   function handleSubmit(formData: FormData) {
+    const opts = requestRecommendation
+      ? {
+          message:
+            "본문에 어울리는 말씀을 찾아보고 있어요\n잠시만 기다려 주세요..!",
+        }
+      : undefined;
     startTransition(async () => {
       await upsertEpitaph(formData);
-    });
+    }, opts);
   }
 
   return (

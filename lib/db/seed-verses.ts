@@ -46,8 +46,12 @@ type Seed = {
   isGeneric?: boolean;
 };
 
-const link = (book: string, ch: number, v: number) =>
-  `https://bible.bskorea.or.kr/bible/NKRV/${book}.${ch}.${v}`;
+// 단일 절: BOOK.CH.V / 범위: BOOK.CH.START-BOOK.CH.END
+// 범위 포맷이어야 대한성서공회 사이트에서 하이라이트가 정상 적용된다.
+const link = (book: string, ch: number, vStart: number, vEnd?: number | null) => {
+  const base = `https://bible.bskorea.or.kr/bible/NKRV/${book}.${ch}.${vStart}`;
+  return vEnd && vEnd !== vStart ? `${base}-${book}.${ch}.${vEnd}` : base;
+};
 
 const SEEDS: Seed[] = [
   // ─── 게으름 / 생활질서 무너짐 ────────────────────────────────────
@@ -1035,6 +1039,7 @@ async function main() {
   console.log(`[seed-verses] 총 ${SEEDS.length}개 구절 시드 시작`);
 
   for (const s of SEEDS) {
+    const url = link(s.bookAbbrEn, s.chapter, s.verseStart, s.verseEnd ?? null);
     await db
       .insert(verses)
       .values({
@@ -1043,7 +1048,7 @@ async function main() {
         chapter: s.chapter,
         verseStart: s.verseStart,
         verseEnd: s.verseEnd ?? null,
-        deepLinkUrl: link(s.bookAbbrEn, s.chapter, s.verseStart),
+        deepLinkUrl: url,
         themes: s.themes,
         situationTags: s.situationTags,
         emotionTags: s.emotionTags,
@@ -1055,7 +1060,7 @@ async function main() {
         target: [verses.bookAbbrEn, verses.chapter, verses.verseStart, verses.verseEnd],
         set: {
           referenceKo: s.referenceKo,
-          deepLinkUrl: link(s.bookAbbrEn, s.chapter, s.verseStart),
+          deepLinkUrl: url,
           themes: s.themes,
           situationTags: s.situationTags,
           emotionTags: s.emotionTags,

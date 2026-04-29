@@ -7,6 +7,7 @@ import {
   type ReactionType,
 } from "@/lib/utils/constants";
 import MyRecommendation from "./MyRecommendation";
+import { CandleIcon, SproutIcon } from "@/app/components/icons";
 
 type RecommendationData = {
   themes: string[];
@@ -346,8 +347,11 @@ export default function FeedTabs({
                 {open && (
                   <div className="mt-4 grid gap-3">
                     <div className="rounded-2xl bg-[#F7F1E7] p-3">
-                      <div className="text-[11px] uppercase tracking-[0.18em] text-brown-light">
-                        어제를 돌아보며
+                      <div className="flex items-center gap-1.5">
+                        <CandleIcon className="w-3.5 h-3.5 text-brown-light" />
+                        <div className="text-[11px] uppercase tracking-[0.18em] text-brown-light">
+                          어제를 돌아보며
+                        </div>
                       </div>
                       <p className="mt-2 text-sm leading-6 text-brown-mid whitespace-pre-line">
                         {e.yesterday}
@@ -355,8 +359,11 @@ export default function FeedTabs({
                     </div>
 
                     <div className="rounded-2xl bg-sage-light p-3">
-                      <div className="text-[11px] uppercase tracking-[0.18em] text-[#6C7A62]">
-                        오늘을 기대하며
+                      <div className="flex items-center gap-1.5">
+                        <SproutIcon className="w-3.5 h-3.5 text-[#6C7A62]" />
+                        <div className="text-[11px] uppercase tracking-[0.18em] text-[#6C7A62]">
+                          오늘을 기대하며
+                        </div>
                       </div>
                       <p className="mt-2 text-sm leading-6 text-[#4D5B46] whitespace-pre-line">
                         {e.today}

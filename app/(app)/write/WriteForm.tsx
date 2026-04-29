@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { upsertEpitaph } from "./actions";
 import { useLoading } from "@/app/components/LoadingProvider";
+import { CandleIcon, SproutIcon } from "@/app/components/icons";
 
 export default function WriteForm({
   defaultYesterday,
@@ -19,15 +20,19 @@ export default function WriteForm({
   const [yesterday, setYesterday] = useState(defaultYesterday);
   const [today, setToday] = useState(defaultToday);
   const [requestRecommendation, setRequestRecommendation] = useState(
-    defaultRequestRecommendation
+    defaultRequestRecommendation,
   );
   const { isPending, startTransition } = useLoading();
 
   function handleSubmit(formData: FormData) {
     const opts = requestRecommendation
       ? {
-          message:
-            "본문에 어울리는 말씀을 찾아보고 있어요\n잠시만 기다려 주세요..!",
+          messages: [
+            "✝️ 회개의 고백을 살펴보고 있어요",
+            "📖 어울리는 말씀을 찾고 있어요",
+            "🕊️ 오늘의 결단에 힘이 될 구절을 준비하고 있어요",
+            "🌅 빈무덤의 소망을 기억하며 말씀을 추천하고 있어요",
+          ],
         }
       : undefined;
     startTransition(async () => {
@@ -40,8 +45,11 @@ export default function WriteForm({
       {/* 어제 돌아보기 — warm 카드 */}
       <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
         <div className="flex items-center justify-between">
-          <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
-            어제를 돌아보며
+          <div className="flex items-center gap-1.5">
+            <CandleIcon className="w-3.5 h-3.5 text-brown-light" />
+            <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
+              어제를 돌아보며
+            </div>
           </div>
           <span className="shrink-0 whitespace-nowrap inline-flex rounded-full px-3 py-1 text-xs bg-sand text-brown-mid">
             회개
@@ -65,8 +73,11 @@ export default function WriteForm({
       {/* 오늘 기대함 — green 카드 */}
       <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
         <div className="flex items-center justify-between">
-          <div className="text-xs uppercase tracking-[0.18em] text-[#6B7B61]">
-            오늘을 기대하며
+          <div className="flex items-center gap-1.5">
+            <SproutIcon className="w-3.5 h-3.5 text-[#6B7B61]" />
+            <div className="text-xs uppercase tracking-[0.18em] text-[#6B7B61]">
+              오늘을 기대하며
+            </div>
           </div>
           <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-0.5 rounded-full px-1.5 py-1 text-xs bg-[#DCE5D6] text-[#516047]">
             감사와 결단

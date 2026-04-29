@@ -1,30 +1,13 @@
 // 작성자 본인 전용 — 피드에 절대 노출되지 않는다.
 // TODO: 개역개정 원문 직접 저장/노출 전 대한성서공회 저작권 검토 필요
 
+import { BookIcon, SunriseIcon } from "@/app/components/icons";
+
 type Recommendation = {
   reference: string;
   reason: string;
   deepLinkUrl: string;
 };
-
-function BookIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-    </svg>
-  );
-}
 
 export default function MyRecommendation({
   themes,
@@ -41,10 +24,13 @@ export default function MyRecommendation({
   const tags = [...themes, ...situationTags, ...emotionTags].slice(0, 6);
 
   return (
-    <div className="rounded-2xl bg-[#F2F4EC] p-3 space-y-2.5 border border-olive/15">
+    <div className="rounded-2xl bg-[#FAF1D6] p-3 space-y-2.5 border border-gold/40">
       <div className="flex items-center justify-between">
-        <div className="text-[11px] uppercase tracking-[0.18em] text-[#6B7B61]">
-          부활의 말씀
+        <div className="flex items-center gap-1.5">
+          <SunriseIcon className="w-3.5 h-3.5 text-[#9A8551]" />
+          <div className="text-[11px] uppercase tracking-[0.18em] text-[#7A6841]">
+            부활의 말씀
+          </div>
         </div>
         <span className="text-[10px] text-brown-light">나에게만 보여요</span>
       </div>
@@ -54,7 +40,7 @@ export default function MyRecommendation({
           {tags.map((t) => (
             <span
               key={t}
-              className="inline-flex rounded-full px-2.5 py-0.5 text-[11px] bg-white/70 text-[#516047]"
+              className="inline-flex rounded-full px-2.5 py-0.5 text-[11px] bg-white/70 text-[#7A6841]"
             >
               {t}
             </span>
@@ -66,7 +52,7 @@ export default function MyRecommendation({
         {recommendations.map((r) => (
           <li
             key={r.reference}
-            className="rounded-xl bg-white/80 p-3 border border-stone/60"
+            className="rounded-xl bg-white/80 p-3 border border-gold/30"
           >
             <a
               href={r.deepLinkUrl}
@@ -74,7 +60,7 @@ export default function MyRecommendation({
               rel="noreferrer noopener"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-brown-dark hover:underline"
             >
-              <BookIcon className="w-3.5 h-3.5 text-[#6B7B61]" />
+              <BookIcon className="w-3.5 h-3.5 text-[#9A8551]" />
               <span>{r.reference}</span>
             </a>
             <p className="mt-1 text-xs leading-5 text-brown-mid">{r.reason}</p>

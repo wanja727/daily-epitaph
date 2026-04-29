@@ -127,9 +127,13 @@ export default function WriteForm({
               오늘 카드에 어울리는 말씀 받기
             </div>
             <p className="mt-1 text-xs text-brown-light leading-5">
-              내 카드 내용에 가까운 성경 구절 2~3개를 조용히 추천해 드려요.
-              <br />
-              나에게만 보이고, 피드에는 공개되지 않아요.
+              내 카드 내용에 가까운 성경 구절 2~3개를 추천해 드려요.
+              {/* <br />
+              나에게만 보이고, 피드에는 공개되지 않아요. */}
+            </p>
+            <p className="mt-2 text-[11px] text-brown-light/80 leading-5">
+              ※ 추천 생성을 위해 작성하신 내용이 외부 AI 서비스(Google Gemini)에
+              전달됩니다.
             </p>
           </div>
           <span

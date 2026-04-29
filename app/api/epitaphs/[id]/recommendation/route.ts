@@ -30,10 +30,15 @@ export async function GET(
   if (rows.length === 0) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
-  if (rows[0].userId !== session.user.id) {
-    // 작성자 본인만 조회 가능 — 추천 내용은 절대 공개하지 않는다.
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // [임시] 모든 사용자에게 부활의 말씀 노출 (개발 테스트용).
+  // 추후 작성자 전용으로 복원 시 아래 블록의 주석을 해제한다.
+  // ──────────────────────────────────────────────────────────────────
+  // if (rows[0].userId !== session.user.id) {
+  //   // 작성자 본인만 조회 가능 — 추천 내용은 절대 공개하지 않는다.
+  //   return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  // }
 
   const payload = await loadRecommendationForAuthor(id).catch(() =>
     emptyRecommendation(id)

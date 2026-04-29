@@ -104,28 +104,34 @@ export default async function MainPage() {
 
   const myEpitaph = todayEpitaphs.find((e) => e.userId === myUserId);
 
-  // 본인 카드 추천 — 피드에 절대 포함되지 않는다.
-  let myRecommendation: {
+  // ─────────────────────────────────────────────────────────────────────
+  // [임시] 부활의 말씀을 모든 사용자에게 노출 (개발 테스트용).
+  // 추후 작성자 전용으로 복원 예정 — 아래의 본인 전용 로직은 주석으로 보존.
+  // ─────────────────────────────────────────────────────────────────────
+  type RecPayload = {
     themes: string[];
     situationTags: string[];
     emotionTags: string[];
     recommendations: Array<{ reference: string; reason: string; deepLinkUrl: string }>;
-  } | null = null;
+  };
 
-  if (myEpitaph) {
-    const [r] = await db
+  const recommendationsByEpitaphId: Record<string, RecPayload> = {};
+
+  if (epitaphIds.length > 0) {
+    const recRows = await db
       .select({
+        epitaphId: scriptureRecommendations.epitaphId,
         themes: scriptureRecommendations.themes,
         situationTags: scriptureRecommendations.situationTags,
         emotionTags: scriptureRecommendations.emotionTags,
         recommendations: scriptureRecommendations.recommendations,
       })
       .from(scriptureRecommendations)
-      .where(eq(scriptureRecommendations.epitaphId, myEpitaph.id))
-      .limit(1);
+      .where(inArray(scriptureRecommendations.epitaphId, epitaphIds));
 
-    if (r && r.recommendations.length > 0) {
-      myRecommendation = {
+    for (const r of recRows) {
+      if (r.recommendations.length === 0) continue;
+      recommendationsByEpitaphId[r.epitaphId] = {
         themes: r.themes,
         situationTags: r.situationTags,
         emotionTags: r.emotionTags,
@@ -133,6 +139,30 @@ export default async function MainPage() {
       };
     }
   }
+
+  // ─── 작성자 전용 노출 로직 (복원 시 주석 해제) ────────────────────────
+  // let myRecommendation: RecPayload | null = null;
+  // if (myEpitaph) {
+  //   const [r] = await db
+  //     .select({
+  //       themes: scriptureRecommendations.themes,
+  //       situationTags: scriptureRecommendations.situationTags,
+  //       emotionTags: scriptureRecommendations.emotionTags,
+  //       recommendations: scriptureRecommendations.recommendations,
+  //     })
+  //     .from(scriptureRecommendations)
+  //     .where(eq(scriptureRecommendations.epitaphId, myEpitaph.id))
+  //     .limit(1);
+  //
+  //   if (r && r.recommendations.length > 0) {
+  //     myRecommendation = {
+  //       themes: r.themes,
+  //       situationTags: r.situationTags,
+  //       emotionTags: r.emotionTags,
+  //       recommendations: r.recommendations,
+  //     };
+  //   }
+  // }
 
   return (
     <div className="px-5 py-5 space-y-4">
@@ -159,14 +189,14 @@ export default async function MainPage() {
         </p>
       </div>
 
-      {/* 피드 — 본인 카드 안에 부활의 말씀이 함께 노출된다. */}
+      {/* 피드 — [임시] 부활의 말씀이 모든 카드에 노출됨 (개발 테스트). */}
       <FeedTabs
         epitaphs={enrichedEpitaphs}
         myCellId={session?.user?.cellId ?? null}
         myUserId={myUserId}
         cellName={cellName}
         wroteToday={!!myEpitaph}
-        myRecommendation={myRecommendation}
+        recommendationsByEpitaphId={recommendationsByEpitaphId}
       />
 
       {/* 플로팅 작성 버튼 */}

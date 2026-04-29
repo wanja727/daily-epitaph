@@ -130,9 +130,15 @@ export default function LoadingProvider({
     <Ctx.Provider value={{ isPending, startTransition }}>
       {children}
 
-      {/* 글로벌 로딩 오버레이 — 배경에 블러/딤 적용하지 않음 */}
+      {/* 글로벌 로딩 오버레이 — 배경에 블러/딤 적용하지 않음.
+          단, 로딩 중에는 외부 입력을 차단하기 위해 오버레이가 클릭/터치를
+          모두 흡수한다. */}
       {isPending && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none">
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center"
+          aria-busy="true"
+          aria-live="polite"
+        >
           {messages.length > 0 ? (
             <ProgressCard
               messages={messages}

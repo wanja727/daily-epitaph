@@ -122,19 +122,8 @@ export default function WriteForm({
         }`}
       >
         <div className="flex items-center justify-between gap-3">
-          <div>
-            <div className="text-sm font-medium text-brown-dark">
-              오늘 카드에 어울리는 말씀 받기
-            </div>
-            <p className="mt-1 text-xs text-brown-light leading-5">
-              내 카드 내용에 가까운 성경 구절 2~3개를 추천해 드려요.
-              {/* <br />
-              나에게만 보이고, 피드에는 공개되지 않아요. */}
-            </p>
-            <p className="mt-2 text-[11px] text-brown-light/80 leading-5">
-              ※ 추천 생성을 위해 작성하신 내용이 외부 AI 서비스(Google Gemini)에
-              전달됩니다.
-            </p>
+          <div className="text-sm font-medium text-brown-dark">
+            오늘 카드에 어울리는 말씀 받기
           </div>
           <span
             className={`shrink-0 inline-flex h-6 w-11 items-center rounded-full p-0.5 transition-colors ${
@@ -148,6 +137,15 @@ export default function WriteForm({
             />
           </span>
         </div>
+        <p className="mt-2 text-xs text-brown-light leading-5">
+          내 카드 내용에 가까운 성경 구절 2~3개를 추천해 드려요.
+          {/* <br />
+          나에게만 보이고, 피드에는 공개되지 않아요. */}
+        </p>
+        <p className="mt-2 text-[11px] text-brown-light/80 leading-5">
+          ※ 추천 생성을 위해 작성하신 내용이 외부 AI 서비스(Google Gemini)에
+          전달됩니다.
+        </p>
       </button>
 
       <button

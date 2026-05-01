@@ -31,3 +31,26 @@ export function sanitizeCardText(input: string): string {
 export function buildCardText(yesterday: string, today: string): string {
   return `어제를 돌아보며\n${yesterday.trim()}\n\n오늘을 기대하며\n${today.trim()}`;
 }
+
+/**
+ * epitaph 카드 → Gemini Embedding / 생성 모델에 동일하게 전달되는 텍스트.
+ * 추천 정확도를 위해 섹션 라벨을 포함한 정규 포맷을 사용한다.
+ */
+export function buildEpitaphRecommendationText(input: {
+  yesterday: string;
+  today: string;
+}): string {
+  return [
+    "어제를 돌아보며",
+    input.yesterday.trim(),
+    "",
+    "오늘을 기대하며",
+    input.today.trim(),
+  ].join("\n");
+}
+
+/**
+ * Gemini 전송 직전에 호출하는 sanitize alias.
+ * 의미적으로 "Gemini 에 보내기 전 처리"임을 코드에서 명확히 하기 위한 별칭.
+ */
+export { sanitizeCardText as sanitizeForGemini };

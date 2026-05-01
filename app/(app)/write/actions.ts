@@ -71,7 +71,7 @@ export async function upsertEpitaph(formData: FormData) {
   // 실패해도 카드 저장은 유지하고 조용히 무시한다.
   if (requestScriptureRecommendation) {
     try {
-      await generateAndStoreRecommendation({ epitaphId, yesterday, today });
+      await generateAndStoreRecommendation({ epitaphId, userId, yesterday, today });
       await db
         .update(epitaphs)
         .set({ recommendationUpdatedAt: new Date() })

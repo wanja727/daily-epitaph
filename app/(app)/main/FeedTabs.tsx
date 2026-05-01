@@ -200,16 +200,15 @@ export default function FeedTabs({
   myUserId,
   cellName,
   wroteToday,
-  recommendationsByEpitaphId,
+  myRecommendation,
 }: {
   epitaphs: Epitaph[];
   myCellId: string | null;
   myUserId: string;
   cellName: string | null;
   wroteToday: boolean;
-  // [임시] 모든 사용자에게 노출하기 위해 epitaphId -> 추천 맵으로 받음.
-  // 추후 작성자 전용으로 복원 시 myRecommendation: RecommendationData | null 로 되돌릴 것.
-  recommendationsByEpitaphId: Record<string, RecommendationData>;
+  // 부활의 말씀은 본인 카드에만 표시한다. 공개 피드에는 절대 포함하지 않는다.
+  myRecommendation: RecommendationData | null;
 }) {
   const [filter, setFilter] = useState<"all" | "cell">("all");
   const [expandAll, setExpandAll] = useState(() => getCookie("feed_expand") !== "0");
@@ -372,16 +371,7 @@ export default function FeedTabs({
                       </p>
                     </div>
 
-                    {/* 부활의 말씀 — [임시] 모든 사용자에게 노출 (개발 테스트) */}
-                    {recommendationsByEpitaphId[e.id] && (
-                      <MyRecommendation
-                        themes={recommendationsByEpitaphId[e.id].themes}
-                        situationTags={recommendationsByEpitaphId[e.id].situationTags}
-                        emotionTags={recommendationsByEpitaphId[e.id].emotionTags}
-                        recommendations={recommendationsByEpitaphId[e.id].recommendations}
-                      />
-                    )}
-                    {/* ─── 작성자 전용 노출 로직 (복원 시 주석 해제) ───
+                    {/* 부활의 말씀 — 작성자 본인 카드에만 표시 */}
                     {e.userId === myUserId && myRecommendation && (
                       <MyRecommendation
                         themes={myRecommendation.themes}
@@ -390,7 +380,6 @@ export default function FeedTabs({
                         recommendations={myRecommendation.recommendations}
                       />
                     )}
-                    */}
                   </div>
                 )}
 

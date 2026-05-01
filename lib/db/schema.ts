@@ -9,9 +9,31 @@ import {
   unique,
   index,
   jsonb,
+  customType,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import type { AdapterAccountType } from "next-auth/adapters";
+
+// pgvector — drizzle-orm 0.45 의 안정적 vector 타입을 위해 customType 으로 정의.
+// 저장 시 number[] → "[v1,v2,...]" 문자열로 직렬화하고, 조회 시 그 반대로 파싱한다.
+const vector = customType<{ data: number[]; driverData: string; config: { dimensions: number } }>({
+  dataType(config) {
+    return `vector(${config?.dimensions ?? 768})`;
+  },
+  toDriver(value: number[]): string {
+    return `[${value.join(",")}]`;
+  },
+  fromDriver(value: string): number[] {
+    if (Array.isArray(value)) return value as unknown as number[];
+    if (typeof value !== "string" || value.length === 0) return [];
+    return value
+      .replace(/^\[/, "")
+      .replace(/\]$/, "")
+      .split(",")
+      .map((s) => Number(s.trim()))
+      .filter((n) => Number.isFinite(n));
+  },
+});
 
 // ─── Auth.js required tables ───────────────────────────────────────────────
 
@@ -183,10 +205,25 @@ export const verses = pgTable(
     summary: text("summary"),
     weight: integer("weight").default(0).notNull(),
     isGeneric: boolean("isGeneric").default(false).notNull(),
+    // ─── 임베딩/관점 메타 ─────────────────────────────────────────
+    embeddingText: text("embeddingText"),
+    embedding: vector("embedding", { dimensions: 768 }),
+    embeddingModel: text("embeddingModel"),
+    specificity: integer("specificity").default(3).notNull(),
+    perspectiveKey: text("perspectiveKey"),
+    avoidTags: text("avoidTags").array().notNull().default(sql`ARRAY[]::text[]`),
+    /**
+     * 말씀 톤. Gemini 선택 단계에서 책망 톤을 회피하기 위한 구조 필드.
+     * 값: 권면 | 회복 | 결단 | 위로 | 소망 | 감사 | 지혜 | 책망
+     */
+    tone: text("tone"),
   },
   (v) => [
     unique().on(v.bookAbbrEn, v.chapter, v.verseStart, v.verseEnd),
     index("verse_bookAbbrEn_idx").on(v.bookAbbrEn),
+    index("verse_perspectiveKey_idx").on(v.perspectiveKey),
+    index("verse_isGeneric_idx").on(v.isGeneric),
+    index("verse_tone_idx").on(v.tone),
   ]
 );
 

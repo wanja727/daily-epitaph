@@ -12,6 +12,7 @@ declare module "next-auth" {
       cellId?: string | null;
       onboardingCompleted: boolean;
       isAdmin: boolean;
+      scriptureRecommendationEnabled: boolean;
     };
   }
 }

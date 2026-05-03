@@ -2,7 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { epitaphs, wateringCans } from "@/lib/db/schema";
+import { epitaphs, users, wateringCans } from "@/lib/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { getTodayKST } from "@/lib/utils/date";
@@ -17,13 +17,25 @@ export async function upsertEpitaph(formData: FormData) {
   const MAX_LENGTH = 2000;
   const yesterday = (formData.get("yesterday") as string)?.trim().slice(0, MAX_LENGTH);
   const today = (formData.get("today") as string)?.trim().slice(0, MAX_LENGTH);
-  const requestScriptureRecommendation =
+  const requestedRecommendation =
     formData.get("requestScriptureRecommendation") === "true";
 
   if (!yesterday || !today) return;
 
   const todayDate = getTodayKST();
   const userId = session.user.id;
+
+  // 화이트리스트 가드: 클라이언트에서 어떤 값을 보내든, 권한 없는 사용자는 무시한다.
+  // (UI 에서 토글이 숨겨져 있어도 서버 측에서 다시 한 번 차단)
+  let requestScriptureRecommendation = false;
+  if (requestedRecommendation) {
+    const [u] = await db
+      .select({ enabled: users.scriptureRecommendationEnabled })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    requestScriptureRecommendation = u?.enabled === true;
+  }
 
   // 오늘 이미 작성했는지 확인
   const existing = await db

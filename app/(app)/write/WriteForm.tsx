@@ -10,11 +10,13 @@ export default function WriteForm({
   defaultToday,
   defaultRequestRecommendation,
   isEdit,
+  scriptureRecommendationEnabled,
 }: {
   defaultYesterday: string;
   defaultToday: string;
   defaultRequestRecommendation: boolean;
   isEdit: boolean;
+  scriptureRecommendationEnabled: boolean;
 }) {
   const MAX_LENGTH = 2000;
   const [yesterday, setYesterday] = useState(defaultYesterday);
@@ -105,48 +107,52 @@ export default function WriteForm({
         />
       </div>
 
-      {/* AI 말씀 추천 (작성자 전용) */}
-      <input
-        type="hidden"
-        name="requestScriptureRecommendation"
-        value={requestRecommendation ? "true" : "false"}
-      />
-      <button
-        type="button"
-        onClick={() => setRequestRecommendation((v) => !v)}
-        aria-pressed={requestRecommendation}
-        className={`w-full rounded-[28px] border p-4 text-left transition-colors ${
-          requestRecommendation
-            ? "border-olive/40 bg-[#F2F4EC]"
-            : "border-stone bg-white/70"
-        }`}
-      >
-        <div className="flex items-center justify-between gap-3">
-          <div className="text-sm font-medium text-brown-dark">
-            오늘 카드에 어울리는 말씀 받기
-          </div>
-          <span
-            className={`shrink-0 inline-flex h-6 w-11 items-center rounded-full p-0.5 transition-colors ${
-              requestRecommendation ? "bg-olive" : "bg-stone"
+      {/* AI 말씀 추천 (화이트리스트 사용자에게만 노출) */}
+      {scriptureRecommendationEnabled && (
+        <>
+          <input
+            type="hidden"
+            name="requestScriptureRecommendation"
+            value={requestRecommendation ? "true" : "false"}
+          />
+          <button
+            type="button"
+            onClick={() => setRequestRecommendation((v) => !v)}
+            aria-pressed={requestRecommendation}
+            className={`w-full rounded-[28px] border p-4 text-left transition-colors ${
+              requestRecommendation
+                ? "border-olive/40 bg-[#F2F4EC]"
+                : "border-stone bg-white/70"
             }`}
           >
-            <span
-              className={`block h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                requestRecommendation ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
-          </span>
-        </div>
-        <p className="mt-2 text-xs text-brown-light leading-5">
-          내 카드 내용에 가까운 성경 구절 2~3개를 추천해 드려요.
-          {/* <br />
-          나에게만 보이고, 피드에는 공개되지 않아요. */}
-        </p>
-        <p className="mt-2 text-[11px] text-brown-light/80 leading-5">
-          ※ 추천 생성을 위해 작성하신 내용이 외부 AI 서비스(Google Gemini)에
-          전달됩니다.
-        </p>
-      </button>
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-sm font-medium text-brown-dark">
+                오늘 카드에 어울리는 말씀 받기
+              </div>
+              <span
+                className={`shrink-0 inline-flex h-6 w-11 items-center rounded-full p-0.5 transition-colors ${
+                  requestRecommendation ? "bg-olive" : "bg-stone"
+                }`}
+              >
+                <span
+                  className={`block h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                    requestRecommendation ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </span>
+            </div>
+            <p className="mt-2 text-xs text-brown-light leading-5">
+              내 카드 내용에 가까운 성경 구절 2~3개를 추천해 드려요.
+              {/* <br />
+              나에게만 보이고, 피드에는 공개되지 않아요. */}
+            </p>
+            <p className="mt-2 text-[11px] text-brown-light/80 leading-5">
+              ※ 추천 생성을 위해 작성하신 내용이 외부 AI 서비스(Google
+              Gemini)에 전달됩니다.
+            </p>
+          </button>
+        </>
+      )}
 
       <button
         type="submit"

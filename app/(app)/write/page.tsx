@@ -41,9 +41,14 @@ export default async function WritePage() {
         defaultYesterday={current?.yesterday ?? ""}
         defaultToday={current?.today ?? ""}
         defaultRequestRecommendation={
-          current?.requestScriptureRecommendation ?? false
+          (session!.user.scriptureRecommendationEnabled &&
+            current?.requestScriptureRecommendation) ||
+          false
         }
         isEdit={!!current}
+        scriptureRecommendationEnabled={
+          session!.user.scriptureRecommendationEnabled
+        }
       />
     </div>
   );

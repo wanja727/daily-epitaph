@@ -53,6 +53,13 @@ export const users = pgTable(
     cellId: text("cellId").references(() => cells.id),
     onboardingCompleted: boolean("onboardingCompleted").default(false).notNull(),
     isAdmin: boolean("isAdmin").default(false).notNull(),
+    /**
+     * AI 말씀 추천 기능 사용 권한. 기본 false 이며 운영자가 직접 true 로 켠 사용자만
+     * 작성 화면에서 추천 토글을 보고 사용할 수 있다 (isAdmin 과 동일한 화이트리스트 패턴).
+     */
+    scriptureRecommendationEnabled: boolean("scriptureRecommendationEnabled")
+      .default(false)
+      .notNull(),
   },
   (user) => [
     index("user_cellId_idx").on(user.cellId),

@@ -4,16 +4,19 @@ import { useState } from "react";
 import { upsertEpitaph } from "./actions";
 import { useLoading } from "@/app/components/LoadingProvider";
 import { CandleIcon, SproutIcon } from "@/app/components/icons";
+import { REPENT_CATEGORIES } from "@/lib/utils/constants";
 
 export default function WriteForm({
   defaultYesterday,
   defaultToday,
+  defaultRepentCategories,
   defaultRequestRecommendation,
   isEdit,
   scriptureRecommendationEnabled,
 }: {
   defaultYesterday: string;
   defaultToday: string;
+  defaultRepentCategories: string[];
   defaultRequestRecommendation: boolean;
   isEdit: boolean;
   scriptureRecommendationEnabled: boolean;
@@ -24,9 +27,24 @@ export default function WriteForm({
   const [requestRecommendation, setRequestRecommendation] = useState(
     defaultRequestRecommendation,
   );
+  const [repentCategories, setRepentCategories] = useState<string[]>(
+    defaultRepentCategories,
+  );
+  const [showCategoryError, setShowCategoryError] = useState(false);
   const { isPending, startTransition } = useLoading();
 
+  function toggleCategory(value: string) {
+    setShowCategoryError(false);
+    setRepentCategories((prev) =>
+      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value],
+    );
+  }
+
   function handleSubmit(formData: FormData) {
+    if (repentCategories.length === 0) {
+      setShowCategoryError(true);
+      return;
+    }
     const opts = requestRecommendation
       ? {
           messages: [
@@ -60,6 +78,46 @@ export default function WriteForm({
         <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
           십자가에 못 박을 것은 무엇인가요?
         </div>
+        <p className="mt-2 text-xs text-brown-light">
+          아래 카테고리에서 한 가지를 체크하고, 세부 내용을 적어보세요.
+        </p>
+        <div className="mt-4 space-y-2">
+          {REPENT_CATEGORIES.map((cat) => {
+            const isSelected = repentCategories.includes(cat.value);
+            return (
+              <label
+                key={cat.value}
+                className={`flex cursor-pointer items-start gap-3 rounded-2xl border px-4 py-3 transition-colors ${
+                  isSelected
+                    ? "border-olive/40 bg-[#F2F4EC]"
+                    : "border-stone bg-[#FCFAF6]"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  name="repentCategories"
+                  value={cat.value}
+                  checked={isSelected}
+                  onChange={() => toggleCategory(cat.value)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-olive"
+                />
+                <div>
+                  <div className="font-heading text-base font-bold text-[#6b4226]">
+                    {cat.title}
+                  </div>
+                  <div className="mt-1 text-[13px] font-bold text-brown-mid leading-5">
+                    {cat.detail}
+                  </div>
+                </div>
+              </label>
+            );
+          })}
+        </div>
+        {showCategoryError && (
+          <p className="mt-2 text-xs text-red-500">
+            한 가지 이상 선택해 주세요.
+          </p>
+        )}
         <textarea
           name="yesterday"
           value={yesterday}
@@ -147,8 +205,8 @@ export default function WriteForm({
               나에게만 보이고, 피드에는 공개되지 않아요. */}
             </p>
             <p className="mt-2 text-[11px] text-brown-light/80 leading-5">
-              ※ 추천 생성을 위해 작성하신 내용이 외부 AI 서비스(Google
-              Gemini)에 전달됩니다.
+              ※ 추천 생성을 위해 작성하신 내용이 외부 AI 서비스(Google Gemini)에
+              전달됩니다.
             </p>
           </button>
         </>

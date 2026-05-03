@@ -6,11 +6,13 @@ import {
   cells,
   epitaphReactions,
   scriptureRecommendations,
+  dailyVideos,
 } from "@/lib/db/schema";
-import { eq, and, desc, sql, inArray } from "drizzle-orm";
+import { eq, and, desc, sql, inArray, lte } from "drizzle-orm";
 import { getTodayKST, getProjectDay } from "@/lib/utils/date";
 import Link from "next/link";
 import FeedTabs from "./FeedTabs";
+import PinnedVideoCard from "./PinnedVideoCard";
 
 export default async function MainPage() {
   const session = await auth();
@@ -32,6 +34,7 @@ export default async function MainPage() {
       id: epitaphs.id,
       yesterday: epitaphs.yesterday,
       today: epitaphs.today,
+      repentCategories: epitaphs.repentCategories,
       userId: epitaphs.userId,
       nickname: users.nickname,
       cellId: users.cellId,
@@ -104,6 +107,18 @@ export default async function MainPage() {
 
   const myEpitaph = todayEpitaphs.find((e) => e.userId === myUserId);
 
+  // 메인 피드 상단 고정 영상: 오늘 날짜 등록분이 있으면 그것, 없으면 가장 최근 등록분.
+  const [pinnedVideo] = await db
+    .select({
+      date: dailyVideos.date,
+      youtubeVideoId: dailyVideos.youtubeVideoId,
+      title: dailyVideos.title,
+    })
+    .from(dailyVideos)
+    .where(lte(dailyVideos.date, today))
+    .orderBy(desc(dailyVideos.date))
+    .limit(1);
+
   // ─────────────────────────────────────────────────────────────────────
   // 부활의 말씀(Scripture Recommendation) — 작성자 본인에게만 노출.
   // 공개 피드 응답에는 절대 포함하지 않는다. 본인이 본인 카드에 한해 조회.
@@ -162,6 +177,15 @@ export default async function MainPage() {
           {todayFormatted}
         </p>
       </div>
+
+      {/* 오늘의 묵상 영상 (관리자 등록 시) */}
+      {pinnedVideo && (
+        <PinnedVideoCard
+          videoId={pinnedVideo.youtubeVideoId}
+          title={pinnedVideo.title}
+          date={pinnedVideo.date}
+        />
+      )}
 
       {/* 피드 — 부활의 말씀은 작성자 본인 카드에만 표시된다. */}
       <FeedTabs

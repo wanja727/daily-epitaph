@@ -7,6 +7,7 @@ import { eq, and, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { getTodayKST } from "@/lib/utils/date";
 import { generateAndStoreRecommendation } from "@/lib/scripture/recommendation-service";
+import { REPENT_CATEGORY_VALUES } from "@/lib/utils/constants";
 
 // TODO: 개역개정 원문 직접 저장/노출 전 대한성서공회 저작권 검토 필요
 
@@ -20,7 +21,18 @@ export async function upsertEpitaph(formData: FormData) {
   const requestedRecommendation =
     formData.get("requestScriptureRecommendation") === "true";
 
-  if (!yesterday || !today) return;
+  // 회개 카테고리: 알려진 값만 허용하고 중복 제거. 최소 1개 미만이면 무시(클라이언트 가드 우회 차단).
+  const allowedCategories = new Set<string>(REPENT_CATEGORY_VALUES);
+  const repentCategories = Array.from(
+    new Set(
+      formData
+        .getAll("repentCategories")
+        .filter((v): v is string => typeof v === "string")
+        .filter((v) => allowedCategories.has(v)),
+    ),
+  );
+
+  if (!yesterday || !today || repentCategories.length === 0) return;
 
   const todayDate = getTodayKST();
   const userId = session.user.id;
@@ -54,6 +66,7 @@ export async function upsertEpitaph(formData: FormData) {
       .set({
         yesterday,
         today,
+        repentCategories,
         requestScriptureRecommendation,
         updatedAt: new Date(),
       })
@@ -66,6 +79,7 @@ export async function upsertEpitaph(formData: FormData) {
         userId,
         yesterday,
         today,
+        repentCategories,
         date: todayDate,
         requestScriptureRecommendation,
       })

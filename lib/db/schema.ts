@@ -145,6 +145,14 @@ export const epitaphs = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     yesterday: text("yesterday").notNull(),
     today: text("today").notNull(),
+    /**
+     * 회개 카테고리. 작성 화면에서 한 가지 이상 선택해야 한다.
+     * 값: god | self | others | world (lib/utils/constants 의 REPENT_CATEGORIES 와 동기)
+     */
+    repentCategories: text("repentCategories")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
     date: date("date").notNull(),
     amenCount: integer("amenCount").default(0).notNull(),
     requestScriptureRecommendation: boolean("requestScriptureRecommendation")
@@ -257,6 +265,30 @@ export const scriptureRecommendations = pgTable(
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
   }
+);
+
+// ─── 매일 묵상 영상 (메인 피드 상단 고정) ────────────────────────────────────
+// 매일 아침 6시경 교회 유튜브에 올라오는 묵상 영상을 관리자가 수동 등록한다.
+// 메인 피드는 date <= today 중 가장 최근 1건을 상단 고정 카드로 노출한다.
+
+export const dailyVideos = pgTable(
+  "daily_video",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    date: date("date").notNull().unique(),
+    youtubeVideoId: text("youtubeVideoId").notNull(),
+    title: text("title"),
+    postedBy: text("postedBy")
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
+  },
+  (v) => [
+    index("daily_video_date_idx").on(v.date),
+  ]
 );
 
 // ─── 꽃 키우기 ──────────────────────────────────────────────────────────────

@@ -8,6 +8,7 @@ import {
 } from "@/lib/utils/constants";
 import MyRecommendation from "./MyRecommendation";
 import { CandleIcon, SproutIcon } from "@/app/components/icons";
+import { REPENT_CATEGORY_LABELS } from "@/lib/utils/constants";
 
 type RecommendationData = {
   themes: string[];
@@ -20,6 +21,7 @@ interface Epitaph {
   id: string;
   yesterday: string;
   today: string;
+  repentCategories: string[];
   userId: string;
   nickname: string | null;
   cellId: string | null;
@@ -354,6 +356,24 @@ export default function FeedTabs({
                           어제를 돌아보며
                         </div>
                       </div>
+                      {e.repentCategories.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {e.repentCategories.map((c) => {
+                            const label =
+                              REPENT_CATEGORY_LABELS[
+                                c as keyof typeof REPENT_CATEGORY_LABELS
+                              ] ?? c;
+                            return (
+                              <span
+                                key={c}
+                                className="inline-flex rounded-full bg-white/80 px-2.5 py-0.5 text-[11px] font-medium text-[#a4724a]"
+                              >
+                                {label}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
                       <p className="mt-2 text-sm leading-6 text-brown-mid whitespace-pre-line">
                         {e.yesterday}
                       </p>

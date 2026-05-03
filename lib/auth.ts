@@ -40,6 +40,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           cellId: users.cellId,
           onboardingCompleted: users.onboardingCompleted,
           isAdmin: users.isAdmin,
+          scriptureRecommendationEnabled: users.scriptureRecommendationEnabled,
         })
         .from(users)
         .where(eq(users.id, user.id))
@@ -52,6 +53,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.cellId = dbUser.cellId;
         session.user.onboardingCompleted = dbUser.onboardingCompleted;
         session.user.isAdmin = dbUser.isAdmin;
+        session.user.scriptureRecommendationEnabled =
+          dbUser.scriptureRecommendationEnabled;
       }
 
       return session;

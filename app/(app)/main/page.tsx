@@ -1,10 +1,18 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { epitaphs, users, cells, epitaphReactions } from "@/lib/db/schema";
-import { eq, and, desc, sql, inArray } from "drizzle-orm";
+import {
+  epitaphs,
+  users,
+  cells,
+  epitaphReactions,
+  scriptureRecommendations,
+  dailyVideos,
+} from "@/lib/db/schema";
+import { eq, and, desc, sql, inArray, lte } from "drizzle-orm";
 import { getTodayKST, getProjectDay } from "@/lib/utils/date";
 import Link from "next/link";
 import FeedTabs from "./FeedTabs";
+import PinnedVideoCard from "./PinnedVideoCard";
 
 export default async function MainPage() {
   const session = await auth();
@@ -26,6 +34,7 @@ export default async function MainPage() {
       id: epitaphs.id,
       yesterday: epitaphs.yesterday,
       today: epitaphs.today,
+      repentCategories: epitaphs.repentCategories,
       userId: epitaphs.userId,
       nickname: users.nickname,
       cellId: users.cellId,
@@ -98,6 +107,52 @@ export default async function MainPage() {
 
   const myEpitaph = todayEpitaphs.find((e) => e.userId === myUserId);
 
+  // 메인 피드 상단 고정 영상: 오늘 날짜 등록분이 있으면 그것, 없으면 가장 최근 등록분.
+  const [pinnedVideo] = await db
+    .select({
+      date: dailyVideos.date,
+      youtubeVideoId: dailyVideos.youtubeVideoId,
+      title: dailyVideos.title,
+    })
+    .from(dailyVideos)
+    .where(lte(dailyVideos.date, today))
+    .orderBy(desc(dailyVideos.date))
+    .limit(1);
+
+  // ─────────────────────────────────────────────────────────────────────
+  // 부활의 말씀(Scripture Recommendation) — 작성자 본인에게만 노출.
+  // 공개 피드 응답에는 절대 포함하지 않는다. 본인이 본인 카드에 한해 조회.
+  // ─────────────────────────────────────────────────────────────────────
+  type RecPayload = {
+    themes: string[];
+    situationTags: string[];
+    emotionTags: string[];
+    recommendations: Array<{ reference: string; reason: string; deepLinkUrl: string }>;
+  };
+
+  let myRecommendation: RecPayload | null = null;
+  if (myEpitaph) {
+    const [r] = await db
+      .select({
+        themes: scriptureRecommendations.themes,
+        situationTags: scriptureRecommendations.situationTags,
+        emotionTags: scriptureRecommendations.emotionTags,
+        recommendations: scriptureRecommendations.recommendations,
+      })
+      .from(scriptureRecommendations)
+      .where(eq(scriptureRecommendations.epitaphId, myEpitaph.id))
+      .limit(1);
+
+    if (r && r.recommendations.length > 0) {
+      myRecommendation = {
+        themes: r.themes,
+        situationTags: r.situationTags,
+        emotionTags: r.emotionTags,
+        recommendations: r.recommendations,
+      };
+    }
+  }
+
   return (
     <div className="px-5 py-5 space-y-4">
       {/* 헤더 */}
@@ -123,13 +178,23 @@ export default async function MainPage() {
         </p>
       </div>
 
-      {/* 피드 */}
+      {/* 오늘의 묵상 영상 (관리자 등록 시) */}
+      {pinnedVideo && (
+        <PinnedVideoCard
+          videoId={pinnedVideo.youtubeVideoId}
+          title={pinnedVideo.title}
+          date={pinnedVideo.date}
+        />
+      )}
+
+      {/* 피드 — 부활의 말씀은 작성자 본인 카드에만 표시된다. */}
       <FeedTabs
         epitaphs={enrichedEpitaphs}
         myCellId={session?.user?.cellId ?? null}
         myUserId={myUserId}
         cellName={cellName}
         wroteToday={!!myEpitaph}
+        myRecommendation={myRecommendation}
       />
 
       {/* 플로팅 작성 버튼 */}

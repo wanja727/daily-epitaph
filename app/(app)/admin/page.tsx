@@ -5,6 +5,7 @@ import { users, epitaphs, cells, dailyVisits } from "@/lib/db/schema";
 import { eq, sql, and, count, countDistinct } from "drizzle-orm";
 import { getTodayKST } from "@/lib/utils/date";
 import { PROJECT_START_DATE } from "@/lib/utils/constants";
+import DailyVideoSection from "./DailyVideoSection";
 
 export default async function AdminPage() {
   const session = await auth();
@@ -120,6 +121,9 @@ export default async function AdminPage() {
           서비스 지표
         </h2>
       </div>
+
+      {/* 매일 묵상 영상 등록 */}
+      <DailyVideoSection />
 
       {/* 요약 카드 */}
       <div className="grid grid-cols-2 gap-3">

@@ -3,25 +3,61 @@
 import { useState } from "react";
 import { upsertEpitaph } from "./actions";
 import { useLoading } from "@/app/components/LoadingProvider";
+import { CandleIcon, SproutIcon } from "@/app/components/icons";
+import { REPENT_CATEGORIES } from "@/lib/utils/constants";
 
 export default function WriteForm({
   defaultYesterday,
   defaultToday,
+  defaultRepentCategories,
+  defaultRequestRecommendation,
   isEdit,
+  scriptureRecommendationEnabled,
 }: {
   defaultYesterday: string;
   defaultToday: string;
+  defaultRepentCategories: string[];
+  defaultRequestRecommendation: boolean;
   isEdit: boolean;
+  scriptureRecommendationEnabled: boolean;
 }) {
   const MAX_LENGTH = 2000;
   const [yesterday, setYesterday] = useState(defaultYesterday);
   const [today, setToday] = useState(defaultToday);
+  const [requestRecommendation, setRequestRecommendation] = useState(
+    defaultRequestRecommendation,
+  );
+  const [repentCategories, setRepentCategories] = useState<string[]>(
+    defaultRepentCategories,
+  );
+  const [showCategoryError, setShowCategoryError] = useState(false);
   const { isPending, startTransition } = useLoading();
 
+  function toggleCategory(value: string) {
+    setShowCategoryError(false);
+    setRepentCategories((prev) =>
+      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value],
+    );
+  }
+
   function handleSubmit(formData: FormData) {
+    if (repentCategories.length === 0) {
+      setShowCategoryError(true);
+      return;
+    }
+    const opts = requestRecommendation
+      ? {
+          messages: [
+            "✝️ 회개의 고백을 살펴보고 있어요",
+            "📖 어울리는 말씀을 찾고 있어요",
+            "🕊️ 오늘의 결단에 힘이 될 구절을 준비하고 있어요",
+            "🌅 빈무덤의 소망을 기억하며 말씀을 추천하고 있어요",
+          ],
+        }
+      : undefined;
     startTransition(async () => {
       await upsertEpitaph(formData);
-    });
+    }, opts);
   }
 
   return (
@@ -29,8 +65,11 @@ export default function WriteForm({
       {/* 어제 돌아보기 — warm 카드 */}
       <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
         <div className="flex items-center justify-between">
-          <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
-            어제를 돌아보며
+          <div className="flex items-center gap-1.5">
+            <CandleIcon className="w-3.5 h-3.5 text-brown-light" />
+            <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
+              어제를 돌아보며
+            </div>
           </div>
           <span className="shrink-0 whitespace-nowrap inline-flex rounded-full px-3 py-1 text-xs bg-sand text-brown-mid">
             회개
@@ -39,6 +78,46 @@ export default function WriteForm({
         <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
           십자가에 못 박을 것은 무엇인가요?
         </div>
+        <p className="mt-2 text-xs text-brown-light">
+          아래 카테고리에서 한 가지를 체크하고, 세부 내용을 적어보세요.
+        </p>
+        <div className="mt-4 space-y-2">
+          {REPENT_CATEGORIES.map((cat) => {
+            const isSelected = repentCategories.includes(cat.value);
+            return (
+              <label
+                key={cat.value}
+                className={`flex cursor-pointer items-start gap-3 rounded-2xl border px-4 py-3 transition-colors ${
+                  isSelected
+                    ? "border-olive/40 bg-[#F2F4EC]"
+                    : "border-stone bg-[#FCFAF6]"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  name="repentCategories"
+                  value={cat.value}
+                  checked={isSelected}
+                  onChange={() => toggleCategory(cat.value)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-olive"
+                />
+                <div>
+                  <div className="font-heading text-base font-bold text-[#6b4226]">
+                    {cat.title}
+                  </div>
+                  <div className="mt-1 text-[13px] font-bold text-brown-mid leading-5">
+                    {cat.detail}
+                  </div>
+                </div>
+              </label>
+            );
+          })}
+        </div>
+        {showCategoryError && (
+          <p className="mt-2 text-xs text-red-500">
+            한 가지 이상 선택해 주세요.
+          </p>
+        )}
         <textarea
           name="yesterday"
           value={yesterday}
@@ -54,8 +133,11 @@ export default function WriteForm({
       {/* 오늘 기대함 — green 카드 */}
       <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
         <div className="flex items-center justify-between">
-          <div className="text-xs uppercase tracking-[0.18em] text-[#6B7B61]">
-            오늘을 기대하며
+          <div className="flex items-center gap-1.5">
+            <SproutIcon className="w-3.5 h-3.5 text-[#6B7B61]" />
+            <div className="text-xs uppercase tracking-[0.18em] text-[#6B7B61]">
+              오늘을 기대하며
+            </div>
           </div>
           <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-0.5 rounded-full px-1.5 py-1 text-xs bg-[#DCE5D6] text-[#516047]">
             감사와 결단
@@ -82,6 +164,53 @@ export default function WriteForm({
           className="mt-4 w-full resize-none rounded-3xl border border-stone bg-[#F6FAF2] px-4 py-4 text-sm text-brown leading-7 placeholder:text-brown-light/70 focus:outline-none focus:ring-2 focus:ring-olive/30"
         />
       </div>
+
+      {/* AI 말씀 추천 (화이트리스트 사용자에게만 노출) */}
+      {scriptureRecommendationEnabled && (
+        <>
+          <input
+            type="hidden"
+            name="requestScriptureRecommendation"
+            value={requestRecommendation ? "true" : "false"}
+          />
+          <button
+            type="button"
+            onClick={() => setRequestRecommendation((v) => !v)}
+            aria-pressed={requestRecommendation}
+            className={`w-full rounded-[28px] border p-4 text-left transition-colors ${
+              requestRecommendation
+                ? "border-olive/40 bg-[#F2F4EC]"
+                : "border-stone bg-white/70"
+            }`}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-sm font-medium text-brown-dark">
+                오늘 카드에 어울리는 말씀 받기
+              </div>
+              <span
+                className={`shrink-0 inline-flex h-6 w-11 items-center rounded-full p-0.5 transition-colors ${
+                  requestRecommendation ? "bg-olive" : "bg-stone"
+                }`}
+              >
+                <span
+                  className={`block h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                    requestRecommendation ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </span>
+            </div>
+            <p className="mt-2 text-xs text-brown-light leading-5">
+              내 카드 내용에 가까운 성경 구절 2~3개를 추천해 드려요.
+              {/* <br />
+              나에게만 보이고, 피드에는 공개되지 않아요. */}
+            </p>
+            <p className="mt-2 text-[11px] text-brown-light/80 leading-5">
+              ※ 추천 생성을 위해 작성하신 내용이 외부 AI 서비스(Google Gemini)에
+              전달됩니다.
+            </p>
+          </button>
+        </>
+      )}
 
       <button
         type="submit"

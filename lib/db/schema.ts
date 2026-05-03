@@ -8,8 +8,32 @@ import {
   primaryKey,
   unique,
   index,
+  jsonb,
+  customType,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import type { AdapterAccountType } from "next-auth/adapters";
+
+// pgvector — drizzle-orm 0.45 의 안정적 vector 타입을 위해 customType 으로 정의.
+// 저장 시 number[] → "[v1,v2,...]" 문자열로 직렬화하고, 조회 시 그 반대로 파싱한다.
+const vector = customType<{ data: number[]; driverData: string; config: { dimensions: number } }>({
+  dataType(config) {
+    return `vector(${config?.dimensions ?? 768})`;
+  },
+  toDriver(value: number[]): string {
+    return `[${value.join(",")}]`;
+  },
+  fromDriver(value: string): number[] {
+    if (Array.isArray(value)) return value as unknown as number[];
+    if (typeof value !== "string" || value.length === 0) return [];
+    return value
+      .replace(/^\[/, "")
+      .replace(/\]$/, "")
+      .split(",")
+      .map((s) => Number(s.trim()))
+      .filter((n) => Number.isFinite(n));
+  },
+});
 
 // ─── Auth.js required tables ───────────────────────────────────────────────
 
@@ -29,6 +53,13 @@ export const users = pgTable(
     cellId: text("cellId").references(() => cells.id),
     onboardingCompleted: boolean("onboardingCompleted").default(false).notNull(),
     isAdmin: boolean("isAdmin").default(false).notNull(),
+    /**
+     * AI 말씀 추천 기능 사용 권한. 기본 false 이며 운영자가 직접 true 로 켠 사용자만
+     * 작성 화면에서 추천 토글을 보고 사용할 수 있다 (isAdmin 과 동일한 화이트리스트 패턴).
+     */
+    scriptureRecommendationEnabled: boolean("scriptureRecommendationEnabled")
+      .default(false)
+      .notNull(),
   },
   (user) => [
     index("user_cellId_idx").on(user.cellId),
@@ -114,8 +145,20 @@ export const epitaphs = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     yesterday: text("yesterday").notNull(),
     today: text("today").notNull(),
+    /**
+     * 회개 카테고리. 작성 화면에서 한 가지 이상 선택해야 한다.
+     * 값: god | self | others | world (lib/utils/constants 의 REPENT_CATEGORIES 와 동기)
+     */
+    repentCategories: text("repentCategories")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
     date: date("date").notNull(),
     amenCount: integer("amenCount").default(0).notNull(),
+    requestScriptureRecommendation: boolean("requestScriptureRecommendation")
+      .default(false)
+      .notNull(),
+    recommendationUpdatedAt: timestamp("recommendationUpdatedAt", { mode: "date" }),
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
   },
@@ -146,6 +189,105 @@ export const epitaphReactions = pgTable(
     unique().on(r.epitaphId, r.userId),
     index("epitaph_reaction_epitaphId_idx").on(r.epitaphId),
     index("epitaph_reaction_userId_idx").on(r.userId),
+  ]
+);
+
+// ─── 성경 말씀 추천 (작성자 전용) ────────────────────────────────────────────
+// TODO: 개역개정 원문 직접 저장/노출 전 대한성서공회 저작권 검토 필요
+
+/** 큐레이션된 추천 후보 장절 메타데이터. 본문은 저장하지 않는다. */
+export const verses = pgTable(
+  "verse",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    referenceKo: text("referenceKo").notNull(), // 예: "잠언 24:30-34"
+    bookAbbrEn: text("bookAbbrEn").notNull(), // 예: "PRO"
+    chapter: integer("chapter").notNull(),
+    verseStart: integer("verseStart").notNull(),
+    verseEnd: integer("verseEnd"),
+    deepLinkUrl: text("deepLinkUrl").notNull(),
+    themes: text("themes").array().notNull().default(sql`ARRAY[]::text[]`),
+    situationTags: text("situationTags")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
+    emotionTags: text("emotionTags")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
+    summary: text("summary"),
+    weight: integer("weight").default(0).notNull(),
+    isGeneric: boolean("isGeneric").default(false).notNull(),
+    // ─── 임베딩/관점 메타 ─────────────────────────────────────────
+    embeddingText: text("embeddingText"),
+    embedding: vector("embedding", { dimensions: 768 }),
+    embeddingModel: text("embeddingModel"),
+    specificity: integer("specificity").default(3).notNull(),
+    perspectiveKey: text("perspectiveKey"),
+    avoidTags: text("avoidTags").array().notNull().default(sql`ARRAY[]::text[]`),
+    /**
+     * 말씀 톤. Gemini 선택 단계에서 책망 톤을 회피하기 위한 구조 필드.
+     * 값: 권면 | 회복 | 결단 | 위로 | 소망 | 감사 | 지혜 | 책망
+     */
+    tone: text("tone"),
+  },
+  (v) => [
+    unique().on(v.bookAbbrEn, v.chapter, v.verseStart, v.verseEnd),
+    index("verse_bookAbbrEn_idx").on(v.bookAbbrEn),
+    index("verse_perspectiveKey_idx").on(v.perspectiveKey),
+    index("verse_isGeneric_idx").on(v.isGeneric),
+    index("verse_tone_idx").on(v.tone),
+  ]
+);
+
+/** epitaph 1건에 대한 작성자 전용 추천 결과 */
+export const scriptureRecommendations = pgTable(
+  "scripture_recommendation",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    epitaphId: text("epitaphId")
+      .notNull()
+      .unique()
+      .references(() => epitaphs.id, { onDelete: "cascade" }),
+    themes: jsonb("themes").$type<string[]>().notNull().default([]),
+    situationTags: jsonb("situationTags").$type<string[]>().notNull().default([]),
+    emotionTags: jsonb("emotionTags").$type<string[]>().notNull().default([]),
+    recommendations: jsonb("recommendations")
+      .$type<
+        Array<{ reference: string; reason: string; deepLinkUrl: string }>
+      >()
+      .notNull()
+      .default([]),
+    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
+  }
+);
+
+// ─── 매일 묵상 영상 (메인 피드 상단 고정) ────────────────────────────────────
+// 매일 아침 6시경 교회 유튜브에 올라오는 묵상 영상을 관리자가 수동 등록한다.
+// 메인 피드는 date <= today 중 가장 최근 1건을 상단 고정 카드로 노출한다.
+
+export const dailyVideos = pgTable(
+  "daily_video",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    date: date("date").notNull().unique(),
+    youtubeVideoId: text("youtubeVideoId").notNull(),
+    title: text("title"),
+    postedBy: text("postedBy")
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
+  },
+  (v) => [
+    index("daily_video_date_idx").on(v.date),
   ]
 );
 

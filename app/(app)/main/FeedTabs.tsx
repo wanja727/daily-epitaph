@@ -6,11 +6,22 @@ import {
   REACTION_TYPES,
   type ReactionType,
 } from "@/lib/utils/constants";
+import MyRecommendation from "./MyRecommendation";
+import { CandleIcon, SproutIcon } from "@/app/components/icons";
+import { REPENT_CATEGORY_LABELS } from "@/lib/utils/constants";
+
+type RecommendationData = {
+  themes: string[];
+  situationTags: string[];
+  emotionTags: string[];
+  recommendations: Array<{ reference: string; reason: string; deepLinkUrl: string }>;
+};
 
 interface Epitaph {
   id: string;
   yesterday: string;
   today: string;
+  repentCategories: string[];
   userId: string;
   nickname: string | null;
   cellId: string | null;
@@ -191,12 +202,15 @@ export default function FeedTabs({
   myUserId,
   cellName,
   wroteToday,
+  myRecommendation,
 }: {
   epitaphs: Epitaph[];
   myCellId: string | null;
   myUserId: string;
   cellName: string | null;
   wroteToday: boolean;
+  // 부활의 말씀은 본인 카드에만 표시한다. 공개 피드에는 절대 포함하지 않는다.
+  myRecommendation: RecommendationData | null;
 }) {
   const [filter, setFilter] = useState<"all" | "cell">("all");
   const [expandAll, setExpandAll] = useState(() => getCookie("feed_expand") !== "0");
@@ -336,22 +350,56 @@ export default function FeedTabs({
                 {open && (
                   <div className="mt-4 grid gap-3">
                     <div className="rounded-2xl bg-[#F7F1E7] p-3">
-                      <div className="text-[11px] uppercase tracking-[0.18em] text-brown-light">
-                        어제를 돌아보며
+                      <div className="flex items-center gap-1.5">
+                        <CandleIcon className="w-3.5 h-3.5 text-brown-light" />
+                        <div className="text-[11px] uppercase tracking-[0.18em] text-brown-light">
+                          어제를 돌아보며
+                        </div>
                       </div>
+                      {e.repentCategories.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {e.repentCategories.map((c) => {
+                            const label =
+                              REPENT_CATEGORY_LABELS[
+                                c as keyof typeof REPENT_CATEGORY_LABELS
+                              ] ?? c;
+                            return (
+                              <span
+                                key={c}
+                                className="inline-flex rounded-full bg-white/80 px-2.5 py-0.5 text-[11px] font-medium text-[#a4724a]"
+                              >
+                                {label}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
                       <p className="mt-2 text-sm leading-6 text-brown-mid whitespace-pre-line">
                         {e.yesterday}
                       </p>
                     </div>
 
                     <div className="rounded-2xl bg-sage-light p-3">
-                      <div className="text-[11px] uppercase tracking-[0.18em] text-[#6C7A62]">
-                        오늘을 기대하며
+                      <div className="flex items-center gap-1.5">
+                        <SproutIcon className="w-3.5 h-3.5 text-[#6C7A62]" />
+                        <div className="text-[11px] uppercase tracking-[0.18em] text-[#6C7A62]">
+                          오늘을 기대하며
+                        </div>
                       </div>
                       <p className="mt-2 text-sm leading-6 text-[#4D5B46] whitespace-pre-line">
                         {e.today}
                       </p>
                     </div>
+
+                    {/* 부활의 말씀 — 작성자 본인 카드에만 표시 */}
+                    {e.userId === myUserId && myRecommendation && (
+                      <MyRecommendation
+                        themes={myRecommendation.themes}
+                        situationTags={myRecommendation.situationTags}
+                        emotionTags={myRecommendation.emotionTags}
+                        recommendations={myRecommendation.recommendations}
+                      />
+                    )}
                   </div>
                 )}
 

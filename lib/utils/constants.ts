@@ -13,6 +13,45 @@ export type ReactionType = keyof typeof REACTION_TYPES;
 export const PROJECT_START_DATE = "2026-04-06";
 export const PROJECT_DAYS = 40;
 
+// ─── 회개 카테고리 ──────────────────────────────────────────────────────────
+export const REPENT_CATEGORIES = [
+  {
+    value: "god",
+    title: "하나님과의 관계에서",
+    detail: "교만, 불순종, 불신, 자기 중심성 등",
+    shortLabel: "하나님과의 관계",
+  },
+  {
+    value: "self",
+    title: "나와의 관계에서",
+    detail: "우울, 두려움, 자기 연민, 나태, 무기력 등",
+    shortLabel: "나와의 관계",
+  },
+  {
+    value: "others",
+    title: "다른 사람과의 관계에서",
+    detail: "시기, 증오, 험담 등",
+    shortLabel: "다른 사람과의 관계",
+  },
+  {
+    value: "world",
+    title: "세상과의 관계에서",
+    detail: "탐심, 탐욕, 무절제 등",
+    shortLabel: "세상과의 관계",
+  },
+] as const;
+
+export type RepentCategoryValue = (typeof REPENT_CATEGORIES)[number]["value"];
+
+export const REPENT_CATEGORY_LABELS: Record<RepentCategoryValue, string> =
+  Object.fromEntries(
+    REPENT_CATEGORIES.map((c) => [c.value, c.shortLabel]),
+  ) as Record<RepentCategoryValue, string>;
+
+export const REPENT_CATEGORY_VALUES = REPENT_CATEGORIES.map(
+  (c) => c.value,
+) as readonly RepentCategoryValue[];
+
 export const FLOWER_STAGES = {
   SEEDLING: 1, // 작은 새싹
   BUD: 2, // 줄기가 자란 봉우리

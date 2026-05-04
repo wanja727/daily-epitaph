@@ -28,6 +28,8 @@ const SELECTABLE_FLOWERS = [
   { type: "rose", name: "튤립" },
   { type: "dandelion", name: "민들레" },
   { type: "cactus", name: "선인장" },
+  { type: "poppy", name: "산호 튤립" },
+  { type: "marigold", name: "별빛 수선화" },
 ];
 
 export default function MyFlower({
@@ -78,7 +80,7 @@ export default function MyFlower({
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            {SELECTABLE_FLOWERS.slice(0, 10).map((f) => (
+            {SELECTABLE_FLOWERS.slice(0, 11).map((f) => (
               <button
                 key={f.type}
                 onClick={() => handleSelectFlower(f.type)}

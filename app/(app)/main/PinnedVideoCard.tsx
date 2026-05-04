@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 import { getTodayKST } from "@/lib/utils/date";
 
 export default function PinnedVideoCard({
@@ -13,13 +16,32 @@ export default function PinnedVideoCard({
   const today = getTodayKST();
   const isToday = date === today;
   const watchUrl = `https://youtu.be/${videoId}`;
-  const thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+  // maxresdefault(1280x720, 진짜 16:9)를 우선 시도하고, 존재하지 않으면 hqdefault로 폴백.
+  const [thumbnail, setThumbnail] = useState(
+    `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`,
+  );
+
+  // 카카오톡 인앱 브라우저에선 youtu.be 링크가 카톡 WebView 안의 모바일 유튜브로 열린다.
+  // openExternal 스킴으로 시스템 외부 브라우저로 빼면, 거기서 유튜브 universal link가
+  // 동작해 앱이 설치돼 있으면 앱으로 열린다.
+  function handleClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (
+      typeof navigator !== "undefined" &&
+      /KAKAOTALK/i.test(navigator.userAgent)
+    ) {
+      e.preventDefault();
+      window.location.href = `kakaotalk://web/openExternal?url=${encodeURIComponent(
+        watchUrl,
+      )}`;
+    }
+  }
 
   return (
     <a
       href={watchUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={handleClick}
       className="block rounded-[28px] overflow-hidden border border-stone bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow"
     >
       <div className="relative aspect-video bg-stone/30">
@@ -29,6 +51,9 @@ export default function PinnedVideoCard({
           fill
           sizes="(max-width: 512px) 100vw, 512px"
           className="object-cover"
+          onError={() =>
+            setThumbnail(`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`)
+          }
         />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-14 h-14 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">

@@ -267,6 +267,53 @@ export const scriptureRecommendations = pgTable(
   }
 );
 
+// ─── 빈무덤 소감 (구성원이 1회만 작성, 메인 피드 별도 탭) ───────────────────
+// 작성 화면 하단의 "서비스 이용 소감" 영역에서 입력하며, 사용자당 1건만 허용한다.
+// 메인 피드의 "빈무덤 소감" 탭에서 날짜와 무관하게 모든 구성원의 카드가 노출된다.
+
+export const serviceImpressions = pgTable(
+  "service_impression",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("userId")
+      .notNull()
+      .unique()
+      .references(() => users.id, { onDelete: "cascade" }),
+    content: text("content").notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
+  },
+  (i) => [
+    index("service_impression_userId_idx").on(i.userId),
+    index("service_impression_createdAt_idx").on(i.createdAt),
+  ]
+);
+
+/** 빈무덤 소감 카드에 대한 공감 반응 */
+export const serviceImpressionReactions = pgTable(
+  "service_impression_reaction",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    impressionId: text("impressionId")
+      .notNull()
+      .references(() => serviceImpressions.id, { onDelete: "cascade" }),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+  },
+  (r) => [
+    unique().on(r.impressionId, r.userId),
+    index("service_impression_reaction_impressionId_idx").on(r.impressionId),
+    index("service_impression_reaction_userId_idx").on(r.userId),
+  ]
+);
+
 // ─── 매일 묵상 영상 (메인 피드 상단 고정) ────────────────────────────────────
 // 매일 아침 6시경 교회 유튜브에 올라오는 묵상 영상을 관리자가 수동 등록한다.
 // 메인 피드는 date <= today 중 가장 최근 1건을 상단 고정 카드로 노출한다.

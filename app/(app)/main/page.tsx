@@ -7,6 +7,8 @@ import {
   epitaphReactions,
   scriptureRecommendations,
   dailyVideos,
+  serviceImpressions,
+  serviceImpressionReactions,
 } from "@/lib/db/schema";
 import { eq, and, desc, sql, inArray, lte } from "drizzle-orm";
 import { getTodayKST, getProjectDay } from "@/lib/utils/date";
@@ -107,6 +109,74 @@ export default async function MainPage() {
 
   const myEpitaph = todayEpitaphs.find((e) => e.userId === myUserId);
 
+  // 빈무덤 소감 — 모든 구성원의 소감을 날짜와 무관하게 노출. 별도 탭에서만 보인다.
+  const impressionRows = await db
+    .select({
+      id: serviceImpressions.id,
+      content: serviceImpressions.content,
+      userId: serviceImpressions.userId,
+      nickname: users.nickname,
+      cellId: users.cellId,
+      createdAt: serviceImpressions.createdAt,
+    })
+    .from(serviceImpressions)
+    .innerJoin(users, eq(serviceImpressions.userId, users.id))
+    .orderBy(desc(serviceImpressions.createdAt));
+
+  const impressionIds = impressionRows.map((i) => i.id);
+  let impressionReactionCounts: {
+    impressionId: string;
+    type: string;
+    count: number;
+  }[] = [];
+  let myImpressionReactionRows: { impressionId: string; type: string }[] = [];
+
+  if (impressionIds.length > 0) {
+    [impressionReactionCounts, myImpressionReactionRows] = await Promise.all([
+      db
+        .select({
+          impressionId: serviceImpressionReactions.impressionId,
+          type: serviceImpressionReactions.type,
+          count: sql<number>`count(*)::int`.as("count"),
+        })
+        .from(serviceImpressionReactions)
+        .where(inArray(serviceImpressionReactions.impressionId, impressionIds))
+        .groupBy(
+          serviceImpressionReactions.impressionId,
+          serviceImpressionReactions.type,
+        ),
+      db
+        .select({
+          impressionId: serviceImpressionReactions.impressionId,
+          type: serviceImpressionReactions.type,
+        })
+        .from(serviceImpressionReactions)
+        .where(
+          and(
+            inArray(serviceImpressionReactions.impressionId, impressionIds),
+            eq(serviceImpressionReactions.userId, myUserId),
+          ),
+        ),
+    ]);
+  }
+
+  const impressionReactionMap = new Map<string, Record<string, number>>();
+  for (const r of impressionReactionCounts) {
+    if (!impressionReactionMap.has(r.impressionId))
+      impressionReactionMap.set(r.impressionId, {});
+    impressionReactionMap.get(r.impressionId)![r.type] = r.count;
+  }
+  const myImpressionReactionMap = new Map<string, string>();
+  for (const r of myImpressionReactionRows) {
+    myImpressionReactionMap.set(r.impressionId, r.type);
+  }
+
+  const enrichedImpressions = impressionRows.map((i) => ({
+    ...i,
+    reactions: impressionReactionMap.get(i.id) ?? {},
+    myReaction: myImpressionReactionMap.get(i.id) ?? null,
+  }));
+
   // 메인 피드 상단 고정 영상: 오늘 날짜 등록분이 있으면 그것, 없으면 가장 최근 등록분.
   const [pinnedVideo] = await db
     .select({
@@ -190,6 +260,7 @@ export default async function MainPage() {
       {/* 피드 — 부활의 말씀은 작성자 본인 카드에만 표시된다. */}
       <FeedTabs
         epitaphs={enrichedEpitaphs}
+        impressions={enrichedImpressions}
         myCellId={session?.user?.cellId ?? null}
         myUserId={myUserId}
         cellName={cellName}

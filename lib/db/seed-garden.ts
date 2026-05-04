@@ -21,7 +21,7 @@ const FLOWER_TYPES = [
   "flower", "purple", "sunflower",
   "daffodil", "cherry", "zinnia",
   "hyacinth", "rose", "dandelion",
-  "cactus",
+  "cactus", "poppy", "marigold",
 ];
 const TOTAL = 120;
 

@@ -1,13 +1,17 @@
 "use client";
 
 import { useState, useOptimistic, useTransition, useRef, useEffect } from "react";
-import { toggleReaction } from "./actions";
+import {
+  toggleReaction,
+  toggleImpressionReaction,
+  updateImpression,
+} from "./actions";
 import {
   REACTION_TYPES,
   type ReactionType,
 } from "@/lib/utils/constants";
 import MyRecommendation from "./MyRecommendation";
-import { CandleIcon, SproutIcon } from "@/app/components/icons";
+import { CandleIcon, CompassIcon, SproutIcon } from "@/app/components/icons";
 import { REPENT_CATEGORY_LABELS } from "@/lib/utils/constants";
 
 type RecommendationData = {
@@ -26,6 +30,17 @@ interface Epitaph {
   nickname: string | null;
   cellId: string | null;
   updatedAt: Date;
+  reactions: Record<string, number>;
+  myReaction: string | null;
+}
+
+interface Impression {
+  id: string;
+  content: string;
+  userId: string;
+  nickname: string | null;
+  cellId: string | null;
+  createdAt: Date;
   reactions: Record<string, number>;
   myReaction: string | null;
 }
@@ -63,13 +78,15 @@ function Pill({
 const reactionKeys = Object.keys(REACTION_TYPES) as ReactionType[];
 
 function ReactionBar({
-  epitaphId,
+  targetId,
   reactions,
   myReaction,
+  onToggle,
 }: {
-  epitaphId: string;
+  targetId: string;
   reactions: Record<string, number>;
   myReaction: string | null;
+  onToggle: (id: string, type: ReactionType) => Promise<unknown>;
 }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -115,7 +132,7 @@ function ReactionBar({
     setPickerOpen(false);
     startTransition(async () => {
       setOptimistic(type);
-      await toggleReaction(epitaphId, type);
+      await onToggle(targetId, type);
     });
   }
 
@@ -185,6 +202,138 @@ function ReactionBar({
   );
 }
 
+function ImpressionCard({
+  impression,
+  isMine,
+}: {
+  impression: Impression;
+  isMine: boolean;
+}) {
+  const IMPRESSION_MAX_LENGTH = 1000;
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(impression.content);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function handleSave() {
+    const trimmed = draft.trim();
+    if (trimmed.length === 0) {
+      setError("내용을 입력해 주세요.");
+      return;
+    }
+    setError(null);
+    startTransition(async () => {
+      const res = await updateImpression(impression.id, trimmed);
+      if (res?.error) {
+        setError(res.error);
+        return;
+      }
+      setEditing(false);
+    });
+  }
+
+  function handleCancel() {
+    setDraft(impression.content);
+    setError(null);
+    setEditing(false);
+  }
+
+  return (
+    <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm font-medium text-brown-dark">
+              {impression.nickname ?? "익명"}
+            </span>
+            {isMine && <Pill tone="gold">나</Pill>}
+          </div>
+          <div className="text-[11px] text-brown-light mt-0.5">
+            {new Date(impression.createdAt).toLocaleDateString("ko-KR", {
+              timeZone: "Asia/Seoul",
+              month: "long",
+              day: "numeric",
+            })}
+          </div>
+        </div>
+        {isMine && !editing && (
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs bg-sand/60 text-brown-mid hover:bg-sand transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="w-3 h-3"
+            >
+              <path d="M2.695 14.763l-1.262 3.154a.5.5 0 0 0 .65.65l3.155-1.262a4 4 0 0 0 1.343-.885L17.5 5.5a2.121 2.121 0 0 0-3-3L3.58 13.42a4 4 0 0 0-.885 1.343Z" />
+            </svg>
+            수정
+          </button>
+        )}
+      </div>
+      <div className="mt-4 rounded-2xl bg-[#F7F1E7] p-3">
+        <div className="flex items-center gap-1.5">
+          <CompassIcon className="w-3.5 h-3.5 text-brown-light" />
+          <div className="text-[11px] uppercase tracking-[0.18em] text-brown-light">
+            여정을 돌아보며
+          </div>
+        </div>
+        {editing ? (
+          <>
+            <textarea
+              value={draft}
+              onChange={(e) =>
+                setDraft(e.target.value.slice(0, IMPRESSION_MAX_LENGTH))
+              }
+              maxLength={IMPRESSION_MAX_LENGTH}
+              rows={5}
+              className="mt-2 w-full resize-none rounded-2xl border border-stone bg-white/80 px-3 py-2 text-sm text-brown leading-6 placeholder:text-brown-light/70 focus:outline-none focus:ring-2 focus:ring-olive/30"
+            />
+            {error && (
+              <p className="mt-1 text-xs text-red-500">{error}</p>
+            )}
+            <div className="mt-2 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={handleCancel}
+                disabled={isPending}
+                className="rounded-full px-3 py-1 text-xs bg-sand/60 text-brown-mid hover:bg-sand transition-colors disabled:opacity-50"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={isPending}
+                className="rounded-full px-3 py-1 text-xs bg-olive text-ivory hover:bg-sage transition-colors disabled:opacity-50"
+              >
+                {isPending ? "저장 중…" : "저장"}
+              </button>
+            </div>
+          </>
+        ) : (
+          <p className="mt-2 text-sm leading-6 text-brown-mid whitespace-pre-line">
+            {impression.content}
+          </p>
+        )}
+      </div>
+      {!editing && (
+        <div className="mt-3 flex justify-end">
+          <ReactionBar
+            targetId={impression.id}
+            reactions={impression.reactions}
+            myReaction={impression.myReaction}
+            onToggle={toggleImpressionReaction}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
   const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
@@ -198,6 +347,7 @@ function setCookie(name: string, value: string, days = 365) {
 
 export default function FeedTabs({
   epitaphs,
+  impressions,
   myCellId,
   myUserId,
   cellName,
@@ -205,6 +355,7 @@ export default function FeedTabs({
   myRecommendation,
 }: {
   epitaphs: Epitaph[];
+  impressions: Impression[];
   myCellId: string | null;
   myUserId: string;
   cellName: string | null;
@@ -212,7 +363,7 @@ export default function FeedTabs({
   // 부활의 말씀은 본인 카드에만 표시한다. 공개 피드에는 절대 포함하지 않는다.
   myRecommendation: RecommendationData | null;
 }) {
-  const [filter, setFilter] = useState<"all" | "cell">("all");
+  const [filter, setFilter] = useState<"all" | "cell" | "impressions">("all");
   const [expandAll, setExpandAll] = useState(() => getCookie("feed_expand") !== "0");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
@@ -263,39 +414,67 @@ export default function FeedTabs({
               {cellName ?? "우리 셀"}
             </Pill>
           )}
-        </div>
-        <button
-          type="button"
-          onClick={handleToggleAll}
-          className="shrink-0 flex items-center gap-1 rounded-full px-3 py-1 text-xs bg-sand/60 text-brown-mid hover:bg-sand transition-colors"
-        >
-          {expandAll ? "접기" : "펴기"}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className={`w-3.5 h-3.5 transition-transform ${expandAll ? "rotate-180" : ""}`}
+          <Pill
+            tone={filter === "impressions" ? "green" : "default"}
+            active={filter === "impressions"}
+            onClick={() => setFilter("impressions")}
           >
-            <path
-              fillRule="evenodd"
-              d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
+            빈무덤 소감 {impressions.length > 0 && `(${impressions.length})`}
+          </Pill>
+        </div>
+        {filter !== "impressions" && (
+          <button
+            type="button"
+            onClick={handleToggleAll}
+            className="shrink-0 flex items-center gap-1 rounded-full px-3 py-1 text-xs bg-sand/60 text-brown-mid hover:bg-sand transition-colors"
+          >
+            {expandAll ? "접기" : "펴기"}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className={`w-3.5 h-3.5 transition-transform ${expandAll ? "rotate-180" : ""}`}
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+        )}
       </div>
 
-      {/* 오늘 미작성 안내 */}
-      {!wroteToday && (
-        <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm p-5 text-center space-y-2">
-          <p className="text-sm text-brown-dark font-medium">
-            오늘의 기록을 아직 작성하지 않았어요
-          </p>
-          <p className="text-xs text-brown-light">
-            + 버튼을 눌러 작성을 시작해보세요
-          </p>
-        </div>
-      )}
+      {/* 빈무덤 소감 탭 */}
+      {filter === "impressions" ? (
+        impressions.length === 0 ? (
+          <div className="text-center py-16 text-brown-light text-sm">
+            아직 작성된 소감이 없어요
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {impressions.map((i) => (
+              <ImpressionCard
+                key={i.id}
+                impression={i}
+                isMine={i.userId === myUserId}
+              />
+            ))}
+          </div>
+        )
+      ) : (
+        <>
+          {/* 오늘 미작성 안내 */}
+          {!wroteToday && (
+            <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm p-5 text-center space-y-2">
+              <p className="text-sm text-brown-dark font-medium">
+                오늘의 기록을 아직 작성하지 않았어요
+              </p>
+              <p className="text-xs text-brown-light">
+                + 버튼을 눌러 작성을 시작해보세요
+              </p>
+            </div>
+          )}
 
       {/* 리스트 */}
       {filtered.length === 0 ? (
@@ -406,15 +585,18 @@ export default function FeedTabs({
                 {/* 공감 반응 */}
                 <div className={`${open ? "mt-3" : "mt-2"} flex justify-end`}>
                   <ReactionBar
-                    epitaphId={e.id}
+                    targetId={e.id}
                     reactions={e.reactions}
                     myReaction={e.myReaction}
+                    onToggle={toggleReaction}
                   />
                 </div>
               </div>
             );
           })}
         </div>
+      )}
+        </>
       )}
     </div>
   );

@@ -2,7 +2,12 @@
 
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { epitaphs, users, wateringCans } from "@/lib/db/schema";
+import {
+  epitaphs,
+  serviceImpressions,
+  users,
+  wateringCans,
+} from "@/lib/db/schema";
 import { eq, and, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { getTodayKST } from "@/lib/utils/date";
@@ -16,8 +21,14 @@ export async function upsertEpitaph(formData: FormData) {
   if (!session?.user?.id) redirect("/login");
 
   const MAX_LENGTH = 2000;
+  const IMPRESSION_MAX_LENGTH = 1000;
   const yesterday = (formData.get("yesterday") as string)?.trim().slice(0, MAX_LENGTH);
   const today = (formData.get("today") as string)?.trim().slice(0, MAX_LENGTH);
+  const impressionRaw = formData.get("impression");
+  const impression =
+    typeof impressionRaw === "string"
+      ? impressionRaw.trim().slice(0, IMPRESSION_MAX_LENGTH)
+      : "";
   const requestedRecommendation =
     formData.get("requestScriptureRecommendation") === "true";
 
@@ -91,6 +102,15 @@ export async function upsertEpitaph(formData: FormData) {
       .update(wateringCans)
       .set({ count: sql`${wateringCans.count} + 1` })
       .where(eq(wateringCans.userId, userId));
+  }
+
+  // 빈무덤 소감: 사용자당 1회만 허용. 이미 작성한 사람의 입력은 무시한다.
+  // (UI 에서 영역이 숨겨져 있어도 서버 측에서 다시 한 번 차단)
+  if (impression.length > 0) {
+    await db
+      .insert(serviceImpressions)
+      .values({ userId, content: impression })
+      .onConflictDoNothing({ target: serviceImpressions.userId });
   }
 
   // opt-in인 경우에만 Gemini 호출 — 단일 요청/응답 안에서 동기 처리.

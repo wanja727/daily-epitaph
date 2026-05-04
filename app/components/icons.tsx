@@ -58,6 +58,19 @@ export function SunriseIcon({ className }: IconProps) {
   );
 }
 
+export function CompassIcon({ className }: IconProps) {
+  return (
+    <svg {...baseSvgProps} className={className} aria-hidden="true">
+      {/* 컴퍼스 외곽 */}
+      <circle cx="12" cy="12" r="9" />
+      {/* 바늘 — 북동/남서 방향 다이아몬드 */}
+      <polygon points="16 8 14 14 8 16 10 10" />
+      {/* 바늘 중앙 구분선 (N/S 경계) */}
+      {/* <path d="M11 11 L13 13" strokeWidth={1.6} /> */}
+    </svg>
+  );
+}
+
 export function BookIcon({ className }: IconProps) {
   return (
     <svg {...baseSvgProps} className={className} aria-hidden="true">

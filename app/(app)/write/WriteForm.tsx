@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { upsertEpitaph } from "./actions";
 import { useLoading } from "@/app/components/LoadingProvider";
-import { CandleIcon, SproutIcon } from "@/app/components/icons";
+import { CandleIcon, CompassIcon, SproutIcon } from "@/app/components/icons";
 import { REPENT_CATEGORIES } from "@/lib/utils/constants";
 
 export default function WriteForm({
@@ -13,6 +13,7 @@ export default function WriteForm({
   defaultRequestRecommendation,
   isEdit,
   scriptureRecommendationEnabled,
+  hasImpression,
 }: {
   defaultYesterday: string;
   defaultToday: string;
@@ -20,10 +21,13 @@ export default function WriteForm({
   defaultRequestRecommendation: boolean;
   isEdit: boolean;
   scriptureRecommendationEnabled: boolean;
+  hasImpression: boolean;
 }) {
   const MAX_LENGTH = 2000;
+  const IMPRESSION_MAX_LENGTH = 1000;
   const [yesterday, setYesterday] = useState(defaultYesterday);
   const [today, setToday] = useState(defaultToday);
+  const [impression, setImpression] = useState("");
   const [requestRecommendation, setRequestRecommendation] = useState(
     defaultRequestRecommendation,
   );
@@ -141,9 +145,9 @@ export default function WriteForm({
           </div>
           <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-0.5 rounded-full px-1.5 py-1 text-xs bg-[#DCE5D6] text-[#516047]">
             감사와 결단
-            <span className="inline-flex items-center rounded-full bg-[#516047] px-1.5 py-px text-[9px] font-bold tracking-wide text-[#F6FAF2]">
+            {/* <span className="inline-flex items-center rounded-full bg-[#516047] px-1.5 py-px text-[9px] font-bold tracking-wide text-[#F6FAF2]">
               NEW
-            </span>
+            </span> */}
           </span>
         </div>
         <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
@@ -164,6 +168,44 @@ export default function WriteForm({
           className="mt-4 w-full resize-none rounded-3xl border border-stone bg-[#F6FAF2] px-4 py-4 text-sm text-brown leading-7 placeholder:text-brown-light/70 focus:outline-none focus:ring-2 focus:ring-olive/30"
         />
       </div>
+
+      {/* 빈무덤 소감 — 사용자당 1회만 작성, 이미 작성한 사람에게는 노출하지 않음 */}
+      {!hasImpression && (
+        <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <CompassIcon className="w-3.5 h-3.5 text-brown-light" />
+              <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
+                여정을 돌아보며
+              </div>
+            </div>
+            <span className="shrink-0 whitespace-nowrap inline-flex items-center gap-0.5 rounded-full px-1.5 py-1 text-xs bg-sand text-brown-mid">
+              빈무덤 소감
+              <span className="inline-flex items-center rounded-full bg-brown-mid px-1.5 py-px text-[9px] font-bold tracking-wide text-ivory">
+                NEW
+              </span>
+            </span>
+          </div>
+          <div className="mt-1 text-lg font-heading font-bold text-brown-dark">
+            빈 무덤 프로젝트를 통해 어떤 영적 경험을 하고 있는지 나눠주세요
+          </div>
+          <p className="mt-2 text-xs text-brown-light leading-5">
+            소감은 한 번만 남겨주시면 됩니다. 작성한 내용은 메인 화면의
+            &apos;빈무덤 소감&apos;에서 보실 수 있습니다.
+          </p>
+          <textarea
+            name="impression"
+            value={impression}
+            onChange={(e) =>
+              setImpression(e.target.value.slice(0, IMPRESSION_MAX_LENGTH))
+            }
+            maxLength={IMPRESSION_MAX_LENGTH}
+            placeholder="이 여정을 통해 경험한 은혜, 깨달음, 변화 등을 자유롭게 적어보세요."
+            rows={5}
+            className="mt-4 w-full resize-none rounded-3xl border border-stone bg-[#FCFAF6] px-4 py-4 text-sm text-brown leading-7 placeholder:text-brown-light/70 focus:outline-none focus:ring-2 focus:ring-olive/30"
+          />
+        </div>
+      )}
 
       {/* AI 말씀 추천 (화이트리스트 사용자에게만 노출) */}
       {scriptureRecommendationEnabled && (

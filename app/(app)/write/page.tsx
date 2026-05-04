@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { epitaphs } from "@/lib/db/schema";
+import { epitaphs, serviceImpressions } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { getTodayKST } from "@/lib/utils/date";
 import WriteForm from "./WriteForm";
@@ -9,18 +9,26 @@ export default async function WritePage() {
   const session = await auth();
   const today = getTodayKST();
 
-  const existing = await db
-    .select({
-      yesterday: epitaphs.yesterday,
-      today: epitaphs.today,
-      repentCategories: epitaphs.repentCategories,
-      requestScriptureRecommendation: epitaphs.requestScriptureRecommendation,
-    })
-    .from(epitaphs)
-    .where(and(eq(epitaphs.userId, session!.user.id), eq(epitaphs.date, today)))
-    .limit(1);
+  const [existing, existingImpression] = await Promise.all([
+    db
+      .select({
+        yesterday: epitaphs.yesterday,
+        today: epitaphs.today,
+        repentCategories: epitaphs.repentCategories,
+        requestScriptureRecommendation: epitaphs.requestScriptureRecommendation,
+      })
+      .from(epitaphs)
+      .where(and(eq(epitaphs.userId, session!.user.id), eq(epitaphs.date, today)))
+      .limit(1),
+    db
+      .select({ id: serviceImpressions.id })
+      .from(serviceImpressions)
+      .where(eq(serviceImpressions.userId, session!.user.id))
+      .limit(1),
+  ]);
 
   const current = existing[0] ?? null;
+  const hasImpression = existingImpression.length > 0;
 
   return (
     <div className="px-5 py-5 space-y-4">
@@ -51,6 +59,7 @@ export default async function WritePage() {
         scriptureRecommendationEnabled={
           session!.user.scriptureRecommendationEnabled
         }
+        hasImpression={hasImpression}
       />
     </div>
   );

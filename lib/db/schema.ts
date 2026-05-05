@@ -327,9 +327,11 @@ export const dailyVideos = pgTable(
     date: date("date").notNull().unique(),
     youtubeVideoId: text("youtubeVideoId").notNull(),
     title: text("title"),
-    postedBy: text("postedBy")
-      .notNull()
-      .references(() => users.id),
+    /**
+     * 등록자. 관리자 수동 등록 시 user.id, cron 자동 등록 시 null.
+     * 자동/수동을 구분할 수 있고, postedBy 가 가리키는 user 가 삭제돼도 영상 정보는 유지된다.
+     */
+    postedBy: text("postedBy").references(() => users.id),
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
   },

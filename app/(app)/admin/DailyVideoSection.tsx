@@ -13,7 +13,8 @@ export default async function DailyVideoSection() {
       date: dailyVideos.date,
       youtubeVideoId: dailyVideos.youtubeVideoId,
       title: dailyVideos.title,
-      postedBy: users.realName,
+      postedById: dailyVideos.postedBy,
+      postedByName: users.realName,
       updatedAt: dailyVideos.updatedAt,
     })
     .from(dailyVideos)
@@ -34,6 +35,15 @@ export default async function DailyVideoSection() {
           <div className="flex items-center gap-2">
             <span className="text-xs text-olive font-medium">등록됨</span>
             <span className="text-xs text-brown-mid">{todayVideo.date}</span>
+            {todayVideo.postedById === null ? (
+              <span className="text-[10px] rounded-full bg-sage-light text-[#516047] px-2 py-0.5">
+                자동
+              </span>
+            ) : (
+              <span className="text-[10px] rounded-full bg-sand text-brown-mid px-2 py-0.5">
+                수동 · {todayVideo.postedByName ?? "관리자"}
+              </span>
+            )}
           </div>
           <div className="text-sm text-brown-dark">
             {todayVideo.title || todayVideo.youtubeVideoId}
@@ -114,7 +124,14 @@ export default async function DailyVideoSection() {
                   className="border-b border-stone/10 last:border-0"
                 >
                   <td className="px-3 py-2 text-brown-dark whitespace-nowrap">
-                    {v.date}
+                    <div className="flex items-center gap-1.5">
+                      <span>{v.date}</span>
+                      {v.postedById === null && (
+                        <span className="text-[10px] rounded-full bg-sage-light text-[#516047] px-1.5 py-0.5">
+                          자동
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-3 py-2">
                     <a

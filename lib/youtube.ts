@@ -10,8 +10,10 @@
 export type PlaylistItem = {
   videoId: string;
   title: string;
-  /** ISO 8601 UTC. playlistItems 의 snippet.publishedAt — "재생목록에 추가된 시각" */
+  /** ISO 8601 UTC. snippet.publishedAt — "재생목록에 추가된 시각" */
   publishedAt: string;
+  /** ISO 8601 UTC. contentDetails.videoPublishedAt — 영상 자체가 공개된 시각 */
+  videoPublishedAt: string | null;
 };
 
 const PLAYLIST_ITEMS_URL = "https://www.googleapis.com/youtube/v3/playlistItems";
@@ -26,7 +28,7 @@ export async function fetchLatestPlaylistItems(
   maxResults = 5,
 ): Promise<PlaylistItem[]> {
   const url = new URL(PLAYLIST_ITEMS_URL);
-  url.searchParams.set("part", "snippet");
+  url.searchParams.set("part", "snippet,contentDetails");
   url.searchParams.set("playlistId", playlistId);
   url.searchParams.set("maxResults", String(maxResults));
   url.searchParams.set("key", apiKey);
@@ -44,16 +46,21 @@ export async function fetchLatestPlaylistItems(
         publishedAt?: string;
         resourceId?: { videoId?: string };
       };
+      contentDetails?: {
+        videoId?: string;
+        videoPublishedAt?: string;
+      };
     }>;
   };
 
   const items: PlaylistItem[] = [];
   for (const it of json.items ?? []) {
-    const videoId = it.snippet?.resourceId?.videoId;
+    const videoId = it.snippet?.resourceId?.videoId ?? it.contentDetails?.videoId;
     const publishedAt = it.snippet?.publishedAt;
     const title = it.snippet?.title ?? "";
+    const videoPublishedAt = it.contentDetails?.videoPublishedAt ?? null;
     if (!videoId || !publishedAt) continue;
-    items.push({ videoId, title, publishedAt });
+    items.push({ videoId, title, publishedAt, videoPublishedAt });
   }
 
   items.sort((a, b) =>

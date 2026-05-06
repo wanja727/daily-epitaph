@@ -41,6 +41,8 @@ export async function GET(request: Request) {
   }
 
   const today = getTodayKST();
+  const url = new URL(request.url);
+  const debug = url.searchParams.get("debug") === "1";
 
   let items;
   try {
@@ -53,14 +55,41 @@ export async function GET(request: Request) {
     );
   }
 
-  // 오늘(KST) 업로드된 항목만 채택. 없으면 보류.
-  const todays = items.find((it) => isoToKstDate(it.publishedAt) === today);
+  const itemsDebug = items.map((it) => ({
+    videoId: it.videoId,
+    title: it.title.slice(0, 80),
+    publishedAt: it.publishedAt,
+    publishedAtKst: isoToKstDate(it.publishedAt),
+    videoPublishedAt: it.videoPublishedAt,
+    videoPublishedAtKst: it.videoPublishedAt
+      ? isoToKstDate(it.videoPublishedAt)
+      : null,
+  }));
+
+  // 오늘(KST) 업로드된 항목만 채택. snippet.publishedAt(재생목록 추가 시각) 또는
+  // contentDetails.videoPublishedAt(영상 공개 시각) 중 하나라도 오늘이면 매칭.
+  const todays = items.find((it) => {
+    if (isoToKstDate(it.publishedAt) === today) return true;
+    if (it.videoPublishedAt && isoToKstDate(it.videoPublishedAt) === today)
+      return true;
+    return false;
+  });
+
+  if (debug) {
+    return Response.json({
+      status: "debug",
+      today,
+      matched: todays?.videoId ?? null,
+      items: itemsDebug,
+    });
+  }
+
   if (!todays) {
     return Response.json({
       status: "deferred",
       reason: "no item published today (KST)",
-      checked: items.length,
       today,
+      items: itemsDebug,
     });
   }
 

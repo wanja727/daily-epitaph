@@ -2,9 +2,11 @@
  * 개발 DB용 꽃밭 테스트 유틸리티
  *
  * 사용법:
- *   npx tsx lib/db/seed-garden.ts plant [셀이름]    — 셀 꽃밭에 120송이 심기
- *   npx tsx lib/db/seed-garden.ts give  <닉네임>    — 유저에게 완성된 꽃 120송이 지급
- *   npx tsx lib/db/seed-garden.ts clear [셀이름]    — 셀 꽃밭 비우기
+ *   npx tsx lib/db/seed-garden.ts plant     [셀이름]    — 셀 꽃밭에 120송이 심기
+ *   npx tsx lib/db/seed-garden.ts plant-all            — 모든 셀에 80송이씩 심기 (전체 꽃밭 성능 테스트용)
+ *   npx tsx lib/db/seed-garden.ts give      <닉네임>    — 유저에게 완성된 꽃 120송이 지급
+ *   npx tsx lib/db/seed-garden.ts clear     [셀이름]    — 셀 꽃밭 비우기
+ *   npx tsx lib/db/seed-garden.ts clear-all            — 모든 셀 꽃밭 비우기
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });
@@ -24,6 +26,7 @@ const FLOWER_TYPES = [
   "cactus", "poppy", "marigold",
 ];
 const TOTAL = 120;
+const PLANT_ALL_COUNT = 80;
 
 // ─── 헬퍼 ────────────────────────────────────────────────────────────────────
 
@@ -106,6 +109,65 @@ async function plant(cellName?: string) {
   );
 }
 
+// ─── plant-all: 모든 셀에 80송이씩 심기 ─────────────────────────────────────
+
+async function plantAll() {
+  const allCells = await db.select().from(cells);
+  if (allCells.length === 0) {
+    console.error("셀이 하나도 없습니다.");
+    process.exit(1);
+  }
+
+  const anyUsers = await db.select({ id: users.id }).from(users).limit(1);
+  if (anyUsers.length === 0) {
+    console.error("유저가 한 명도 없어서 꽃을 심을 수 없습니다.");
+    process.exit(1);
+  }
+  const fallbackUserId = anyUsers[0].id;
+
+  console.log(`🌷 ${allCells.length}개 셀에 각각 ${PLANT_ALL_COUNT}송이씩 심는 중...`);
+
+  for (const cell of allCells) {
+    const cellUsers = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.cellId, cell.id));
+
+    await db.delete(gardenPlots).where(eq(gardenPlots.cellId, cell.id));
+
+    for (let i = 0; i < PLANT_ALL_COUNT; i++) {
+      const flowerType = FLOWER_TYPES[i % FLOWER_TYPES.length];
+      const userId =
+        cellUsers.length > 0
+          ? cellUsers[i % cellUsers.length].id
+          : fallbackUserId;
+
+      const [f] = await db
+        .insert(flowers)
+        .values({
+          userId,
+          type: flowerType,
+          stage: 3,
+          waterCount: 3,
+          completedAt: new Date(),
+          placedInGarden: true,
+        })
+        .returning({ id: flowers.id });
+
+      await db.insert(gardenPlots).values({
+        cellId: cell.id,
+        slot: i,
+        flowerId: f.id,
+        placedBy: userId,
+      });
+    }
+
+    console.log(`  ✓ ${cell.name}`);
+  }
+
+  console.log(`✅ 완료! ${allCells.length}개 셀 × ${PLANT_ALL_COUNT}송이 = 총 ${allCells.length * PLANT_ALL_COUNT}송이`);
+}
+
 // ─── give: 유저에게 완성된 꽃 120송이 지급 ──────────────────────────────────
 
 async function give(keyword: string) {
@@ -130,6 +192,28 @@ async function give(keyword: string) {
     `✅ 완료! ${FLOWER_TYPES.map((t) => `${t}: ${Math.floor(TOTAL / FLOWER_TYPES.length)}송이`).join(", ")}`,
   );
   console.log("꽃밭에 심기는 UI에서 직접 해보세요!");
+}
+
+// ─── clear-all: 모든 셀 꽃밭 비우기 ─────────────────────────────────────────
+
+async function clearAll() {
+  const allCells = await db.select().from(cells);
+
+  const plots = await db
+    .select({ flowerId: gardenPlots.flowerId })
+    .from(gardenPlots);
+
+  await db.delete(gardenPlots);
+
+  if (plots.length > 0) {
+    const flowerIds = plots.map((p) => p.flowerId);
+    await db
+      .update(flowers)
+      .set({ placedInGarden: false })
+      .where(inArray(flowers.id, flowerIds));
+  }
+
+  console.log(`🧹 ${allCells.length}개 셀 꽃밭 모두 비움 (${plots.length}송이 제거)`);
 }
 
 // ─── clear: 셀 꽃밭 비우기 ──────────────────────────────────────────────────
@@ -167,6 +251,7 @@ const [command, arg] = process.argv.slice(2);
 
 const COMMANDS: Record<string, () => Promise<void>> = {
   plant: () => plant(arg),
+  "plant-all": () => plantAll(),
   give: () => {
     if (!arg) {
       console.error("사용법: npx tsx lib/db/seed-garden.ts give <닉네임>");
@@ -175,13 +260,16 @@ const COMMANDS: Record<string, () => Promise<void>> = {
     return give(arg);
   },
   clear: () => clear(arg),
+  "clear-all": () => clearAll(),
 };
 
 if (!command || !COMMANDS[command]) {
   console.log(`사용법:
-  npx tsx lib/db/seed-garden.ts plant [셀이름]    셀 꽃밭에 120송이 심기
-  npx tsx lib/db/seed-garden.ts give  <닉네임>    유저에게 완성된 꽃 120송이 지급
-  npx tsx lib/db/seed-garden.ts clear [셀이름]    셀 꽃밭 비우기`);
+  npx tsx lib/db/seed-garden.ts plant     [셀이름]    셀 꽃밭에 120송이 심기
+  npx tsx lib/db/seed-garden.ts plant-all            모든 셀에 80송이씩 심기
+  npx tsx lib/db/seed-garden.ts give      <닉네임>    유저에게 완성된 꽃 120송이 지급
+  npx tsx lib/db/seed-garden.ts clear     [셀이름]    셀 꽃밭 비우기
+  npx tsx lib/db/seed-garden.ts clear-all            모든 셀 꽃밭 비우기`);
   process.exit(0);
 }
 

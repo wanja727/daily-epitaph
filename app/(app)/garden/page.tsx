@@ -8,6 +8,8 @@ import {
   cells,
 } from "@/lib/db/schema";
 import { eq, and, isNull, asc, desc, sql } from "drizzle-orm";
+import { getTodayKST } from "@/lib/utils/date";
+import { isWithinEventPeriod } from "@/lib/utils/event";
 import GardenView from "./GardenView";
 
 export default async function GardenPage() {
@@ -101,6 +103,7 @@ export default async function GardenPage() {
         totalFlowerCount={totalFlowerCount}
         cellName={cellName}
         cellId={cellId ?? null}
+        isInEvent={isWithinEventPeriod(getTodayKST())}
       />
     </div>
   );

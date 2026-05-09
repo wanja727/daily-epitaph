@@ -171,6 +171,62 @@ export async function getCellStats() {
   return result;
 }
 
+/**
+ * 모든 셀의 미니 꽃밭 프리뷰 데이터 (다른셀 구경가기 하단 5×5 그리드용).
+ * 셀당 노출할 꽃 수는 호출 측 cap에 맡기지만, 트래픽 보호를 위해 쿼리 단계에서도 충분히 작게 제한한다.
+ */
+export async function getAllCellsGardenPreview() {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+
+  // 셀별 꽃 (slot 작은 순서로 정렬 — GARDEN_SLOTS 가 center-out 정렬이므로 슬롯이 작을수록 중앙)
+  const allPlots = await db
+    .select({
+      cellId: gardenPlots.cellId,
+      slot: gardenPlots.slot,
+      flowerType: flowers.type,
+    })
+    .from(gardenPlots)
+    .innerJoin(flowers, eq(gardenPlots.flowerId, flowers.id))
+    .orderBy(asc(gardenPlots.cellId), asc(gardenPlots.slot));
+
+  // 셀별 카운트
+  const flowerCountStats = await db
+    .select({
+      cellId: gardenPlots.cellId,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(gardenPlots)
+    .groupBy(gardenPlots.cellId);
+  const countMap = new Map(flowerCountStats.map((r) => [r.cellId, r.count]));
+
+  // 전체 셀 (꽃이 없는 셀도 빈 카드로 노출)
+  const allCells = await db.select().from(cells);
+
+  // 셀별로 plots 묶기 (이미 cellId 정렬되어 있음)
+  const plotsByCell = new Map<
+    string,
+    Array<{ slot: number; flowerType: string; placedByNickname: string | null }>
+  >();
+  for (const p of allPlots) {
+    if (!plotsByCell.has(p.cellId)) plotsByCell.set(p.cellId, []);
+    plotsByCell.get(p.cellId)!.push({
+      slot: p.slot,
+      flowerType: p.flowerType,
+      placedByNickname: null, // 미니뷰엔 닉네임 표시 안 함 (페이로드 절약)
+    });
+  }
+
+  return allCells
+    .map((c) => ({
+      id: c.id,
+      name: c.name,
+      visiblePlots: plotsByCell.get(c.id) ?? [],
+      totalFlowerCount: countMap.get(c.id) ?? 0,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, "ko"));
+}
+
 /** 특정 셀의 꽃밭 데이터 조회 (구경용) */
 export async function getCellGardenData(cellId: string) {
   const session = await auth();

@@ -14,6 +14,7 @@ export default function WriteForm({
   isEdit,
   scriptureRecommendationEnabled,
   hasImpression,
+  rewardAmount,
 }: {
   defaultYesterday: string;
   defaultToday: string;
@@ -22,6 +23,7 @@ export default function WriteForm({
   isEdit: boolean;
   scriptureRecommendationEnabled: boolean;
   hasImpression: boolean;
+  rewardAmount: number;
 }) {
   const MAX_LENGTH = 2000;
   const IMPRESSION_MAX_LENGTH = 1000;
@@ -264,7 +266,7 @@ export default function WriteForm({
 
       {!isEdit && (
         <p className="text-center text-xs text-brown-light">
-          작성 완료 시 물뿌리개 1개를 받아요
+          작성 완료 시 물뿌리개 {rewardAmount}개를 받아요
         </p>
       )}
     </form>

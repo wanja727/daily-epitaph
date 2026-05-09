@@ -6,15 +6,23 @@ interface Props {
   animate?: boolean;
   delay?: number;
   flowerType?: string;
+  /**
+   * 미니 프리뷰용. 켜면 SVG 필터(드롭섀도우)와 sway/leaf 애니메이션을 모두 끈다.
+   * 25개 셀을 한 화면에 그리는 그리드처럼 다수를 동시에 렌더할 때 사용.
+   */
+  compact?: boolean;
 }
 
 export default function FlowerIllustration({
   waterCount,
   size = "lg",
-  animate = true,
+  animate: animateProp = true,
   delay = 0,
   flowerType = "flower",
+  compact = false,
 }: Props) {
+  // compact 모드는 항상 정적으로 렌더한다.
+  const animate = compact ? false : animateProp;
   const stage = Math.min(Math.max(waterCount, 0), 3);
   const isLarge = size === "lg";
 
@@ -36,7 +44,7 @@ export default function FlowerIllustration({
         className="w-full h-full overflow-visible"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <defs>
+        {!compact && <defs>
           <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur in="SourceAlpha" stdDeviation="1.2" result="blur" />
             <feOffset dx="1.2" dy="1.6" result="offset" />
@@ -113,7 +121,7 @@ export default function FlowerIllustration({
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-        </defs>
+        </defs>}
 
         {/* stage 0 - 씨앗 (공통) */}
         {stage === 0 && (

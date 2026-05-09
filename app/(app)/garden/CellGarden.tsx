@@ -18,18 +18,30 @@ interface FlowerData {
   stage: number;
 }
 
+/** compact 모드에서 셀당 노출할 최대 꽃 수 (5×5 미니 그리드 성능 보호용) */
+const COMPACT_MAX_VISIBLE = 60;
+
 export default function CellGarden({
   visiblePlots,
   totalFlowerCount,
   cellName,
   cellId,
   completedFlowers,
+  compact = false,
+  onClick,
 }: {
   visiblePlots: VisiblePlot[];
   totalFlowerCount: number;
   cellName: string | null;
   cellId: string | null;
   completedFlowers: FlowerData[];
+  /**
+   * 미니 프리뷰용. 켜면 헤더/심기 버튼/배경 텍스처/필터/애니메이션을 모두 제거하고
+   * 꽃 수도 cap한다. 25개를 한 화면에 그리는 그리드에서 사용.
+   */
+  compact?: boolean;
+  /** compact 모드에서 카드 전체 클릭 핸들러 (선택사항) */
+  onClick?: () => void;
 }) {
   const router = useRouter();
   const { isPending, startTransition } = useLoading();
@@ -43,6 +55,9 @@ export default function CellGarden({
   }
 
   const placeable = completedFlowers.filter((f) => f.stage >= 3);
+  const renderedPlots = compact
+    ? visiblePlots.slice(0, COMPACT_MAX_VISIBLE)
+    : visiblePlots;
 
   function handlePlant() {
     if (isPending || placeable.length === 0) return;
@@ -52,6 +67,78 @@ export default function CellGarden({
       await placeFlowerInGarden(flower.id);
       router.refresh();
     });
+  }
+
+  // ─── compact: 미니 프리뷰 카드 ───────────────────────────────────────────
+  if (compact) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="group relative w-full overflow-hidden rounded-2xl border border-[#8BBF6A]/30 shadow-sm transition-transform active:scale-[0.97]"
+        style={
+          {
+            aspectRatio: "4 / 4.5",
+            contentVisibility: "auto",
+            containIntrinsicSize: "80px 90px",
+          } as React.CSSProperties
+        }
+        aria-label={`${cellName ?? "셀"} 꽃밭 보기`}
+      >
+        {/* 단순화된 잔디 배경 (그라디언트만) */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, #C2DBA8 0%, #B0D192 60%, #A0C67E 100%)",
+          }}
+        />
+
+        {/* 꽃 배치 */}
+        {renderedPlots.map((plot) => {
+          const pos =
+            plot.slot < GARDEN_MAX_VISIBLE ? GARDEN_SLOTS[plot.slot] : null;
+          if (!pos) return null;
+          return (
+            <div
+              key={plot.slot}
+              className="absolute"
+              style={{
+                left: `${pos.x}%`,
+                top: `${pos.y}%`,
+                width: `${10 * pos.scale}%`,
+                transform: "translate(-50%, -100%)",
+                zIndex: Math.round(pos.y),
+              }}
+            >
+              <FlowerIllustration
+                waterCount={3}
+                size="sm"
+                compact={true}
+                flowerType={plot.flowerType}
+              />
+            </div>
+          );
+        })}
+
+        {/* 빈 셀 안내 */}
+        {renderedPlots.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-[10px] text-[#7A9B62]">아직 비어있어요</span>
+          </div>
+        )}
+
+        {/* 셀 이름 + 꽃 수 (하단 오버레이) */}
+        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-gradient-to-t from-black/45 via-black/15 to-transparent px-1.5 pb-1 pt-3">
+          <span className="truncate text-[10px] font-medium text-white drop-shadow-sm">
+            {cellName ?? "셀"}
+          </span>
+          <span className="shrink-0 text-[9px] tabular-nums text-white/90 drop-shadow-sm">
+            🌷{totalFlowerCount}
+          </span>
+        </div>
+      </button>
+    );
   }
 
   return (
@@ -101,18 +188,81 @@ export default function CellGarden({
               <rect width="400" height="450" fill="url(#grassGrad)" />
 
               {/* 잔디 텍스처 */}
-              <path d="M30,60 Q33,50 36,60" stroke="#7EBF5C" strokeWidth="1" fill="none" opacity="0.25" />
-              <path d="M120,100 Q123,90 126,100" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.2" />
-              <path d="M250,70 Q253,60 256,70" stroke="#7EBF5C" strokeWidth="1" fill="none" opacity="0.25" />
-              <path d="M350,150 Q353,140 356,150" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.2" />
-              <path d="M80,250 Q83,240 86,250" stroke="#7EBF5C" strokeWidth="1" fill="none" opacity="0.2" />
-              <path d="M300,300 Q303,290 306,300" stroke="#6DB04A" strokeWidth="1" fill="none" opacity="0.2" />
-              <path d="M180,350 Q183,340 186,350" stroke="#7EBF5C" strokeWidth="1" fill="none" opacity="0.2" />
+              <path
+                d="M30,60 Q33,50 36,60"
+                stroke="#7EBF5C"
+                strokeWidth="1"
+                fill="none"
+                opacity="0.25"
+              />
+              <path
+                d="M120,100 Q123,90 126,100"
+                stroke="#6DB04A"
+                strokeWidth="1"
+                fill="none"
+                opacity="0.2"
+              />
+              <path
+                d="M250,70 Q253,60 256,70"
+                stroke="#7EBF5C"
+                strokeWidth="1"
+                fill="none"
+                opacity="0.25"
+              />
+              <path
+                d="M350,150 Q353,140 356,150"
+                stroke="#6DB04A"
+                strokeWidth="1"
+                fill="none"
+                opacity="0.2"
+              />
+              <path
+                d="M80,250 Q83,240 86,250"
+                stroke="#7EBF5C"
+                strokeWidth="1"
+                fill="none"
+                opacity="0.2"
+              />
+              <path
+                d="M300,300 Q303,290 306,300"
+                stroke="#6DB04A"
+                strokeWidth="1"
+                fill="none"
+                opacity="0.2"
+              />
+              <path
+                d="M180,350 Q183,340 186,350"
+                stroke="#7EBF5C"
+                strokeWidth="1"
+                fill="none"
+                opacity="0.2"
+              />
 
               {/* 밝은 하이라이트 */}
-              <ellipse cx="100" cy="150" rx="45" ry="22" fill="#C4E4A8" opacity="0.15" />
-              <ellipse cx="320" cy="250" rx="38" ry="18" fill="#C4E4A8" opacity="0.12" />
-              <ellipse cx="200" cy="370" rx="42" ry="20" fill="#C4E4A8" opacity="0.1" />
+              <ellipse
+                cx="100"
+                cy="150"
+                rx="45"
+                ry="22"
+                fill="#C4E4A8"
+                opacity="0.15"
+              />
+              <ellipse
+                cx="320"
+                cy="250"
+                rx="38"
+                ry="18"
+                fill="#C4E4A8"
+                opacity="0.12"
+              />
+              <ellipse
+                cx="200"
+                cy="370"
+                rx="42"
+                ry="20"
+                fill="#C4E4A8"
+                opacity="0.1"
+              />
 
               {/* 하단 울타리 */}
               <g opacity="0.35" stroke="#8B7355" fill="none" strokeWidth="1.8">
@@ -136,9 +286,7 @@ export default function CellGarden({
             {/* 꽃 배치 */}
             {visiblePlots.map((plot) => {
               const pos =
-                plot.slot < GARDEN_MAX_VISIBLE
-                  ? GARDEN_SLOTS[plot.slot]
-                  : null;
+                plot.slot < GARDEN_MAX_VISIBLE ? GARDEN_SLOTS[plot.slot] : null;
               if (!pos) return null;
 
               return (
@@ -191,7 +339,9 @@ export default function CellGarden({
           disabled={isPending}
           className="w-full py-3 rounded-2xl text-sm font-medium transition-colors bg-[#8BBF6A] text-white hover:bg-[#7AB05A] disabled:opacity-50"
         >
-          {isPending ? "심는 중..." : `꽃밭에 심기 (${placeable.length}송이 대기)`}
+          {isPending
+            ? "심는 중..."
+            : `꽃밭에 심기 (${placeable.length}송이 대기)`}
         </button>
       ) : (
         <p className="text-xs text-brown-light text-center">

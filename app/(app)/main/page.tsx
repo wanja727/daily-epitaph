@@ -15,6 +15,7 @@ import { getTodayKST, getProjectDay } from "@/lib/utils/date";
 import Link from "next/link";
 import FeedTabs from "./FeedTabs";
 import PinnedVideoCard from "./PinnedVideoCard";
+import MainEventBanner from "./MainEventBanner";
 
 export default async function MainPage() {
   const session = await auth();
@@ -266,6 +267,13 @@ export default async function MainPage() {
         cellName={cellName}
         wroteToday={!!myEpitaph}
         myRecommendation={myRecommendation}
+      />
+
+      {/* 이벤트 배너 — 이벤트 기간 + 쿠키 미dismiss 일 때만 노출 */}
+      <MainEventBanner
+        todayDate={today}
+        cellId={session?.user?.cellId ?? null}
+        hasWrittenToday={!!myEpitaph}
       />
 
       {/* 플로팅 작성 버튼 */}

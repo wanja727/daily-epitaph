@@ -3,7 +3,9 @@ import { db } from "@/lib/db";
 import { epitaphs, serviceImpressions } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { getTodayKST } from "@/lib/utils/date";
+import { calculateWaterReward } from "@/lib/utils/event";
 import WriteForm from "./WriteForm";
+import EventBanner from "./EventBanner";
 
 export default async function WritePage() {
   const session = await auth();
@@ -29,6 +31,8 @@ export default async function WritePage() {
 
   const current = existing[0] ?? null;
   const hasImpression = existingImpression.length > 0;
+  const cellId = session!.user.cellId ?? null;
+  const reward = await calculateWaterReward(today, cellId);
 
   return (
     <div className="px-5 py-5 space-y-4">
@@ -46,6 +50,12 @@ export default async function WritePage() {
         </p>
       </div>
 
+      <EventBanner
+        todayDate={today}
+        cellId={cellId}
+        hasWrittenToday={!!current}
+      />
+
       <WriteForm
         defaultYesterday={current?.yesterday ?? ""}
         defaultToday={current?.today ?? ""}
@@ -60,6 +70,7 @@ export default async function WritePage() {
           session!.user.scriptureRecommendationEnabled
         }
         hasImpression={hasImpression}
+        rewardAmount={reward.reward}
       />
     </div>
   );

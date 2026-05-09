@@ -31,6 +31,7 @@ export default function GardenView({
   totalFlowerCount,
   cellName,
   cellId,
+  isInEvent,
 }: {
   activeFlower: FlowerData | null;
   completedFlowers: FlowerData[];
@@ -39,6 +40,7 @@ export default function GardenView({
   totalFlowerCount: number;
   cellName: string | null;
   cellId: string | null;
+  isInEvent: boolean;
 }) {
   const searchParams = useSearchParams();
   const initialTab: Tab = searchParams.get("tab") === "cell" ? "cell" : "my";
@@ -163,7 +165,11 @@ export default function GardenView({
       )}
 
       {tab === "explore" && (
-        <CellExplorer currentCellId={cellId} onSelect={handleSelectCell} />
+        <CellExplorer
+          currentCellId={cellId}
+          onSelect={handleSelectCell}
+          isInEvent={isInEvent}
+        />
       )}
 
       {tab === "viewOther" && otherGarden && (

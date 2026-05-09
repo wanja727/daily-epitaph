@@ -9,8 +9,11 @@ import {
 } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import type { ReactionType } from "@/lib/utils/constants";
 import { REACTION_TYPES } from "@/lib/utils/constants";
+import { EVENT_BANNER_COOKIE } from "@/lib/utils/event";
+import { getTodayKST } from "@/lib/utils/date";
 
 export async function toggleReaction(epitaphId: string, type: ReactionType) {
   const session = await auth();
@@ -129,4 +132,20 @@ export async function updateImpression(impressionId: string, content: string) {
 
   revalidatePath("/main");
   return { ok: true as const };
+}
+
+/**
+ * 메인 화면 이벤트 배너의 "오늘 다시 보지 않기" 처리.
+ * 쿠키 값에 KST 오늘 날짜를 저장. 배너 노출 시 쿠키 값과 오늘 날짜가 같으면 숨긴다.
+ * 자정(KST)이 지나면 자동으로 다시 노출된다.
+ */
+export async function dismissEventBanner() {
+  const cookieStore = await cookies();
+  cookieStore.set(EVENT_BANNER_COOKIE, getTodayKST(), {
+    path: "/",
+    maxAge: 60 * 60 * 24, // 24h
+    sameSite: "lax",
+    httpOnly: false,
+  });
+  revalidatePath("/main");
 }

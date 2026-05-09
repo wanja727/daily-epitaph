@@ -13,6 +13,7 @@ import { redirect } from "next/navigation";
 import { getTodayKST } from "@/lib/utils/date";
 import { generateAndStoreRecommendation } from "@/lib/scripture/recommendation-service";
 import { REPENT_CATEGORY_VALUES } from "@/lib/utils/constants";
+import { calculateWaterReward } from "@/lib/utils/event";
 
 // TODO: 개역개정 원문 직접 저장/노출 전 대한성서공회 저작권 검토 필요
 
@@ -97,10 +98,14 @@ export async function upsertEpitaph(formData: FormData) {
       .returning({ id: epitaphs.id });
     epitaphId = inserted[0].id;
 
-    // 물뿌리개 +1 (최초 작성 시에만)
+    // 물뿌리개 보상 (최초 작성 시에만 / 이벤트 기간엔 날짜·셀에 따라 차등)
+    const { reward } = await calculateWaterReward(
+      todayDate,
+      session.user.cellId ?? null,
+    );
     await db
       .update(wateringCans)
-      .set({ count: sql`${wateringCans.count} + 1` })
+      .set({ count: sql`${wateringCans.count} + ${reward}` })
       .where(eq(wateringCans.userId, userId));
   }
 

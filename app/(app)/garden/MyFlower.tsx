@@ -80,7 +80,7 @@ export default function MyFlower({
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            {SELECTABLE_FLOWERS.slice(0, 11).map((f) => (
+            {SELECTABLE_FLOWERS.slice(0, 12).map((f) => (
               <button
                 key={f.type}
                 onClick={() => handleSelectFlower(f.type)}

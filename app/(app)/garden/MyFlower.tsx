@@ -30,16 +30,21 @@ const SELECTABLE_FLOWERS = [
   { type: "cactus", name: "선인장" },
   { type: "poppy", name: "산호 튤립" },
   { type: "marigold", name: "별빛 수선화" },
+  { type: "jesus", name: "예수님꽃" },
 ];
 
 export default function MyFlower({
   flower,
   waterCount,
   completedFlowers,
+  isLastDay,
+  hasPlantedJesus,
 }: {
   flower: FlowerData | null;
   waterCount: number;
   completedFlowers: FlowerData[];
+  isLastDay: boolean;
+  hasPlantedJesus: boolean;
 }) {
   const router = useRouter();
   const { isPending, startTransition } = useLoading();
@@ -80,26 +85,66 @@ export default function MyFlower({
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            {SELECTABLE_FLOWERS.slice(0, 12).map((f) => (
-              <button
-                key={f.type}
-                onClick={() => handleSelectFlower(f.type)}
-                disabled={isPending}
-                className="rounded-[20px] border border-stone bg-white/80 p-3 space-y-2 transition-all hover:shadow-md hover:border-sage active:scale-[0.97] disabled:opacity-50"
-              >
-                <div className="w-full aspect-square overflow-hidden">
-                  <FlowerIllustration
-                    waterCount={3}
-                    size="sm"
-                    animate={true}
-                    flowerType={f.type}
-                  />
-                </div>
-                <p className="text-xs font-medium text-brown-dark truncate">
-                  {f.name}
-                </p>
-              </button>
-            ))}
+            {SELECTABLE_FLOWERS.map((f) => {
+              if (f.type === "jesus") {
+                if (!isLastDay || hasPlantedJesus) return null;
+                return (
+                  <button
+                    key={f.type}
+                    onClick={() => handleSelectFlower(f.type)}
+                    disabled={isPending}
+                    className="col-span-3 relative overflow-hidden rounded-3xl border-2 border-gold bg-linear-to-br from-rose/15 via-white/85 to-gold/20 p-4 transition-all hover:shadow-lg active:scale-[0.98] disabled:opacity-50"
+                  >
+                    <div className="pointer-events-none absolute -top-6 -left-6 h-24 w-24 rounded-full bg-gold/30 blur-2xl" />
+                    <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-rose/25 blur-2xl" />
+
+                    <div className="relative flex items-center gap-4">
+                      <div className="h-28 w-24 shrink-0">
+                        <FlowerIllustration
+                          waterCount={3}
+                          size="sm"
+                          animate={true}
+                          flowerType={f.type}
+                        />
+                      </div>
+                      <div className="flex-1 space-y-1.5 text-left">
+                        <div className="text-[10px] uppercase tracking-[0.22em] text-olive">
+                          Final Day · Special
+                        </div>
+                        <p className="text-base font-heading font-bold text-brown-dark">
+                          {f.name}
+                        </p>
+                        <p className="text-xs leading-relaxed text-brown-mid">
+                          마지막 날을 위한 특별한 꽃<br />
+                          물을 한 번만 줘도 만개해요
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              }
+
+              return (
+                <button
+                  key={f.type}
+                  onClick={() => handleSelectFlower(f.type)}
+                  disabled={isPending}
+                  className="rounded-[20px] border border-stone bg-white/80 p-3 space-y-2 transition-all hover:shadow-md hover:border-sage active:scale-[0.97] disabled:opacity-50"
+                >
+                  <div className="w-full aspect-square overflow-hidden">
+                    <FlowerIllustration
+                      waterCount={3}
+                      size="sm"
+                      animate={true}
+                      flowerType={f.type}
+                    />
+                  </div>
+                  <p className="text-xs font-medium text-brown-dark truncate">
+                    {f.name}
+                  </p>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -187,9 +232,15 @@ export default function MyFlower({
   if (!flower) return null;
 
   const isComplete = flower.stage >= FLOWER_STAGES.BLOOM;
+  const isJesus = flower.type === "jesus";
   const visualStage = Math.min(flower.waterCount, 3);
-  const totalNeeded = WATER_THRESHOLDS[FLOWER_STAGES.BLOOM];
+  const totalNeeded = isJesus ? 1 : WATER_THRESHOLDS[FLOWER_STAGES.BLOOM];
   const progress = Math.min(100, (flower.waterCount / totalNeeded) * 100);
+  const stageLabel = isJesus
+    ? flower.waterCount === 0
+      ? "물 한 번이면 만개해요"
+      : "만개"
+    : STAGE_LABELS[visualStage];
 
   // ──── 완성 화면: 큰 이미지 + 심으러 가기 ────
   if (isComplete) {
@@ -277,7 +328,7 @@ export default function MyFlower({
 
         {/* 단계 라벨 */}
         <div className="text-center mt-2">
-          <p className="text-sm text-brown-mid">{STAGE_LABELS[visualStage]}</p>
+          <p className="text-sm text-brown-mid">{stageLabel}</p>
         </div>
 
         {/* 성장 바 */}

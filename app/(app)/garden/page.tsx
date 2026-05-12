@@ -8,7 +8,8 @@ import {
   cells,
 } from "@/lib/db/schema";
 import { eq, and, isNull, asc, desc, sql } from "drizzle-orm";
-import { getTodayKST } from "@/lib/utils/date";
+import { getTodayKST, getProjectDay } from "@/lib/utils/date";
+import { PROJECT_DAYS } from "@/lib/utils/constants";
 import { isWithinEventPeriod } from "@/lib/utils/event";
 import GardenView from "./GardenView";
 
@@ -79,6 +80,15 @@ export default async function GardenPage() {
     totalFlowerCount = countRow?.count ?? 0;
   }
 
+  // 예수님꽃: 마지막 날(40일차)에만 노출, 1인당 1회만
+  const isLastDay = getProjectDay() === PROJECT_DAYS;
+  const [jesusFlower] = await db
+    .select({ id: flowers.id })
+    .from(flowers)
+    .where(and(eq(flowers.userId, userId), eq(flowers.type, "jesus")))
+    .limit(1);
+  const hasPlantedJesus = !!jesusFlower;
+
   return (
     <div className="px-5 py-5 space-y-4">
       {/* 헤더 */}
@@ -104,6 +114,8 @@ export default async function GardenPage() {
         cellName={cellName}
         cellId={cellId ?? null}
         isInEvent={isWithinEventPeriod(getTodayKST())}
+        isLastDay={isLastDay}
+        hasPlantedJesus={hasPlantedJesus}
       />
     </div>
   );

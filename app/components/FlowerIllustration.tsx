@@ -29,7 +29,7 @@ export default function FlowerIllustration({
   const wrapperClass = isLarge ? "w-52 h-64 mx-auto" : "w-full h-full";
 
   const swayStyle =
-    animate && stage > 0
+    animate && (stage > 0 || flowerType === "jesus")
       ? {
           animation: "flower-sway 5s ease-in-out infinite",
           transformOrigin: "center bottom",
@@ -121,10 +121,22 @@ export default function FlowerIllustration({
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
+
+          <radialGradient id="jesusHalo" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#fff8d8" stopOpacity="0.95" />
+            <stop offset="35%" stopColor="#f0e1a9" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#f0e1a9" stopOpacity="0" />
+          </radialGradient>
+
+          <radialGradient id="jesusRay" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#fff8d8" stopOpacity="0.4" />
+            <stop offset="60%" stopColor="#f0e1a9" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="#f0e1a9" stopOpacity="0" />
+          </radialGradient>
         </defs>}
 
         {/* stage 0 - 씨앗 (공통) */}
-        {stage === 0 && (
+        {stage === 0 && flowerType !== "jesus" && (
           <g filter="url(#softShadow)">
             <ellipse cx="50" cy="117" rx="4.4" ry="2.9" fill="#9B8B76" />
             <ellipse cx="48.6" cy="116.2" rx="1.3" ry="0.8" fill="#B7A694" opacity="0.65" />
@@ -133,7 +145,7 @@ export default function FlowerIllustration({
         )}
 
         {/* stage 1 - 새싹 (공통) */}
-        {stage === 1 && (
+        {stage === 1 && flowerType !== "jesus" && (
           <g className={animate ? "sprout-plant" : ""} filter="url(#softShadow)">
             <path d="M50 118 C50 111, 50 103, 50 94 C50 88, 50.1 83, 49.9 79" stroke="#A7AC9C" strokeWidth="4" strokeLinecap="round" fill="none" />
             <g className={animate ? "sprout-leaf-left" : ""}>
@@ -918,6 +930,63 @@ export default function FlowerIllustration({
               <path d="M55.2 55 C63 49.2, 68.2 38.5, 67.5 25.5 C67 17.5, 62.8 11.2, 57.2 8.5 C55.3 9, 54.3 12.5, 54 17.5 C53.5 28, 54 42, 55.2 55 Z" fill="#d69001" />
               <path d="M50 56 C43.5 51, 39 41.8, 39 30.2 C39 20.8, 42.8 13.2, 50 9.5 C57.2 13.2, 61 20.8, 61 30.2 C61 41.8, 56.5 51, 50 56 Z" fill="#ffd300" />
               <path d="M50 52.5 C45.7 48.8, 43 41.5, 43 32.5 C43 24.8, 45.6 18.7, 50 15.5 C54.4 18.7, 57 24.8, 57 32.5 C57 41.5, 54.3 48.8, 50 52.5 Z" fill="#ffe680" opacity="0.42" />
+            </g>
+          </g>
+        )}
+
+        {/* ─── 예수님꽃 (jesus) ─── */}
+
+        {/* 물 주기 전 - 실루엣 */}
+        {flowerType === "jesus" && waterCount === 0 && (
+          <g style={{ opacity: 0.32 }}>
+            <image
+              href="/jesus.svg"
+              x="0"
+              y="0"
+              width="100"
+              height="130"
+              preserveAspectRatio="xMidYMid meet"
+              style={{ filter: "grayscale(0.85) blur(0.6px)" }}
+            />
+          </g>
+        )}
+
+        {/* 만개 */}
+        {flowerType === "jesus" && waterCount >= 1 && (
+          <g>
+            {/* 후광 + 빛기둥 */}
+            {!compact && (
+              <>
+                <g className={animate ? "jesus-ray" : ""}>
+                  <ellipse cx="50" cy="50" rx="58" ry="62" fill="url(#jesusRay)" />
+                </g>
+                <g className={animate ? "jesus-halo" : ""}>
+                  <circle cx="50" cy="50" r="40" fill="url(#jesusHalo)" />
+                </g>
+              </>
+            )}
+
+            {/* 반짝임 */}
+            {!compact && animate && (
+              <g>
+                <circle className="jesus-sparkle jesus-sparkle-a" cx="18" cy="30" r="1.4" fill="#fff8d8" />
+                <circle className="jesus-sparkle jesus-sparkle-b" cx="82" cy="38" r="1.6" fill="#fff8d8" />
+                <circle className="jesus-sparkle jesus-sparkle-c" cx="28" cy="68" r="1.2" fill="#fff8d8" />
+                <circle className="jesus-sparkle jesus-sparkle-d" cx="78" cy="72" r="1.3" fill="#fff8d8" />
+                <circle className="jesus-sparkle jesus-sparkle-a" cx="50" cy="18" r="1.1" fill="#fff8d8" style={{ animationDelay: "2.1s" }} />
+              </g>
+            )}
+
+            {/* 꽃 본체 */}
+            <g className={animate ? "jesus-bloom" : ""}>
+              <image
+                href="/jesus.svg"
+                x="0"
+                y="0"
+                width="100"
+                height="130"
+                preserveAspectRatio="xMidYMid meet"
+              />
             </g>
           </g>
         )}

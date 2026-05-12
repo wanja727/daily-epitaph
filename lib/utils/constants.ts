@@ -176,13 +176,18 @@ function buildGardenSlots(): GardenSlot[] {
       const idx = row * cols + col;
 
       const x = clamp(
-        left + col * xStep + offsetX + jitter(idx * 17, 0.6 + perspective * 0.15),
+        left +
+          col * xStep +
+          offsetX +
+          jitter(idx * 17, 0.6 + perspective * 0.15),
         4,
         96,
       );
 
       const y = clamp(
-        top + perspective * yRange + jitter(idx * 19, 0.45 + perspective * 0.12),
+        top +
+          perspective * yRange +
+          jitter(idx * 19, 0.45 + perspective * 0.12),
         11,
         95,
       );

@@ -19,7 +19,7 @@ interface FlowerData {
 }
 
 /** compact 모드에서 셀당 노출할 최대 꽃 수 (5×5 미니 그리드 성능 보호용) */
-const COMPACT_MAX_VISIBLE = 60;
+const COMPACT_MAX_VISIBLE = 100;
 
 export default function CellGarden({
   visiblePlots,
@@ -99,6 +99,8 @@ export default function CellGarden({
           const pos =
             plot.slot < GARDEN_MAX_VISIBLE ? GARDEN_SLOTS[plot.slot] : null;
           if (!pos) return null;
+          const isJesus = plot.flowerType === "jesus";
+          const sizeMultiplier = isJesus ? 1.5 : 1;
           return (
             <div
               key={plot.slot}
@@ -106,9 +108,9 @@ export default function CellGarden({
               style={{
                 left: `${pos.x}%`,
                 top: `${pos.y}%`,
-                width: `${10 * pos.scale}%`,
+                width: `${10 * pos.scale * sizeMultiplier}%`,
                 transform: "translate(-50%, -100%)",
-                zIndex: Math.round(pos.y),
+                zIndex: isJesus ? Math.round(pos.y) + 500 : Math.round(pos.y),
               }}
             >
               <FlowerIllustration
@@ -289,6 +291,9 @@ export default function CellGarden({
                 plot.slot < GARDEN_MAX_VISIBLE ? GARDEN_SLOTS[plot.slot] : null;
               if (!pos) return null;
 
+              const isJesus = plot.flowerType === "jesus";
+              const sizeMultiplier = isJesus ? 1.5 : 1;
+
               return (
                 <div
                   key={plot.slot}
@@ -296,9 +301,11 @@ export default function CellGarden({
                   style={{
                     left: `${pos.x}%`,
                     top: `${pos.y}%`,
-                    width: `${10 * pos.scale}%`,
+                    width: `${10 * pos.scale * sizeMultiplier}%`,
                     transform: "translate(-50%, -100%)",
-                    zIndex: Math.round(pos.y),
+                    zIndex: isJesus
+                      ? Math.round(pos.y) + 500
+                      : Math.round(pos.y),
                   }}
                   title={plot.placedByNickname ?? undefined}
                 >

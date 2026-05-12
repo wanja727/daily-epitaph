@@ -12,7 +12,12 @@ import {
 } from "@/lib/db/schema";
 import { eq, and, asc, sql, desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { WATER_THRESHOLDS, FLOWER_STAGES } from "@/lib/utils/constants";
+import {
+  WATER_THRESHOLDS,
+  FLOWER_STAGES,
+  PROJECT_DAYS,
+} from "@/lib/utils/constants";
+import { getProjectDay } from "@/lib/utils/date";
 
 export async function waterFlower(flowerId: string) {
   const session = await auth();
@@ -47,6 +52,10 @@ export async function waterFlower(flowerId: string) {
   let newStage = flower.stage;
   let completedAt: Date | null = null;
 
+  // 예수님꽃: 물 1번으로 바로 만개
+  const bloomThreshold =
+    flower.type === "jesus" ? 1 : WATER_THRESHOLDS[FLOWER_STAGES.BLOOM];
+
   // 단계 확인
   if (
     newStage === FLOWER_STAGES.SEEDLING &&
@@ -56,7 +65,7 @@ export async function waterFlower(flowerId: string) {
   }
   if (
     newStage === FLOWER_STAGES.BUD &&
-    newWaterCount >= WATER_THRESHOLDS[FLOWER_STAGES.BLOOM]
+    newWaterCount >= bloomThreshold
   ) {
     newStage = FLOWER_STAGES.BLOOM;
     completedAt = new Date();
@@ -75,9 +84,30 @@ export async function waterFlower(flowerId: string) {
 export async function startNewFlower(flowerType: string = "flower") {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+  const userId = session.user.id;
+
+  // 예수님꽃은 마지막 날(40일차)에만, 1인당 1회만 심을 수 있음
+  if (flowerType === "jesus") {
+    if (getProjectDay() !== PROJECT_DAYS) return;
+
+    const existing = await db
+      .select({ id: flowers.id })
+      .from(flowers)
+      .where(and(eq(flowers.userId, userId), eq(flowers.type, "jesus")))
+      .limit(1);
+    if (existing.length > 0) return;
+
+    await db.insert(flowers).values({
+      userId,
+      type: "jesus",
+      stage: FLOWER_STAGES.BUD, // 새싹/봉우리 단계 건너뜀
+      waterCount: 0,
+    });
+    return;
+  }
 
   await db.insert(flowers).values({
-    userId: session.user.id,
+    userId,
     type: flowerType,
     stage: 1,
     waterCount: 0,

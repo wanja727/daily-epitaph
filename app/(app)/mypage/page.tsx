@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { auth, signOut } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { epitaphs, cells, epitaphReactions } from "@/lib/db/schema";
@@ -126,8 +127,18 @@ export default async function MyPage() {
 
       {/* 내 묘비명 히스토리 */}
       <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-4">
-        <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
-          Recent archive
+        <div className="flex items-center justify-between gap-2">
+          <div className="text-xs uppercase tracking-[0.18em] text-brown-light">
+            Recent archive
+          </div>
+          {myEpitaphs.length > 0 && (
+            <Link
+              href="/mypage/print"
+              className="text-xs text-brown-light hover:text-brown px-3 py-1.5 rounded-full border border-stone hover:bg-sand transition-colors"
+            >
+              PDF로 저장
+            </Link>
+          )}
         </div>
         {myEpitaphs.length === 0 ? (
           <div className="text-center py-8 text-brown-light text-sm">

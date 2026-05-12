@@ -24,6 +24,7 @@ const FLOWER_TYPES = [
   "daffodil", "cherry", "zinnia",
   "hyacinth", "rose", "dandelion",
   "cactus", "poppy", "marigold",
+  "jesus",
 ];
 const TOTAL = 120;
 const PLANT_ALL_COUNT = 80;

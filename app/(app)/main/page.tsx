@@ -11,7 +11,11 @@ import {
   serviceImpressionReactions,
 } from "@/lib/db/schema";
 import { eq, and, desc, sql, inArray, lte } from "drizzle-orm";
-import { getTodayKST, getProjectDay } from "@/lib/utils/date";
+import {
+  getTodayKST,
+  getProjectDay,
+  isWritingPeriodOver,
+} from "@/lib/utils/date";
 import { PROJECT_DAYS } from "@/lib/utils/constants";
 import Link from "next/link";
 import FeedTabs from "./FeedTabs";
@@ -33,6 +37,7 @@ export default async function MainPage() {
 
   const myUserId = session?.user?.id ?? "";
   const isLastDay = projectDay === PROJECT_DAYS;
+  const writingOver = isWritingPeriodOver();
 
   // 오늘의 모든 묘비명 + 사용자 정보
   const todayEpitaphs = await db
@@ -284,25 +289,47 @@ export default async function MainPage() {
         />
       )}
 
-      {/* 플로팅 작성 버튼 */}
-      <Link
-        href="/write"
-        className="fixed bottom-24 right-6 z-40 w-14 h-14 rounded-full bg-olive hover:bg-sage shadow-lg shadow-olive/20 flex items-center justify-center transition-colors"
-      >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#F8F3EA"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      {/* 플로팅 작성 버튼 (작성 기간 종료 시 비활성화) */}
+      {writingOver ? (
+        <div
+          aria-disabled="true"
+          title="작성 기간 종료"
+          className="fixed bottom-24 right-6 z-40 w-14 h-14 rounded-full bg-stone shadow-sm flex items-center justify-center cursor-not-allowed"
         >
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-      </Link>
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#8a786a"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="5" y="11" width="14" height="9" rx="2" />
+            <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+          </svg>
+        </div>
+      ) : (
+        <Link
+          href="/write"
+          className="fixed bottom-24 right-6 z-40 w-14 h-14 rounded-full bg-olive hover:bg-sage shadow-lg shadow-olive/20 flex items-center justify-center transition-colors"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#F8F3EA"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </Link>
+      )}
     </div>
   );
 }

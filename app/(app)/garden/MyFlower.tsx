@@ -35,12 +35,14 @@ const SELECTABLE_FLOWERS = [
 
 export default function MyFlower({
   flower,
+  jesusFlower,
   waterCount,
   completedFlowers,
   isLastDay,
   hasPlantedJesus,
 }: {
   flower: FlowerData | null;
+  jesusFlower: FlowerData | null;
   waterCount: number;
   completedFlowers: FlowerData[];
   isLastDay: boolean;
@@ -66,9 +68,98 @@ export default function MyFlower({
     });
   }
 
+  function handleStartJesus() {
+    startTransition(async () => {
+      await startNewFlower("jesus");
+      router.refresh();
+    });
+  }
+
+  function handleWaterJesus() {
+    if (!jesusFlower) return;
+    startTransition(async () => {
+      await waterFlower(jesusFlower.id);
+      router.refresh();
+    });
+  }
+
   // 완성되었지만 아직 심지 않은 꽃이 있으면 축하 화면 표시
   const unplacedCompleted =
     completedFlowers.length > 0 ? completedFlowers[0] : null;
+
+  // ─── 예수님꽃 안전장치 ───
+  // 마지막 날에 아직 예수님꽃을 심지 않았다면 어디서든 접근 가능한 배너 노출
+  const showJesusBanner = isLastDay && !hasPlantedJesus && !jesusFlower;
+
+  const jesusBanner = showJesusBanner && (
+    <button
+      onClick={handleStartJesus}
+      disabled={isPending}
+      className="w-full relative overflow-hidden rounded-3xl border-2 border-gold bg-linear-to-br from-rose/15 via-white/85 to-gold/20 p-4 transition-all hover:shadow-lg active:scale-[0.98] disabled:opacity-50"
+    >
+      <div className="pointer-events-none absolute -top-6 -left-6 h-24 w-24 rounded-full bg-gold/30 blur-2xl" />
+      <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-rose/25 blur-2xl" />
+      <div className="relative flex items-center gap-4">
+        <div className="h-28 w-24 shrink-0">
+          <FlowerIllustration
+            waterCount={3}
+            size="sm"
+            animate={true}
+            flowerType="jesus"
+          />
+        </div>
+        <div className="flex-1 space-y-1.5 text-left">
+          <div className="text-[10px] uppercase tracking-[0.22em] text-olive">
+            Final Day · Special
+          </div>
+          <p className="text-base font-heading font-bold text-brown-dark">
+            예수님꽃 심기
+          </p>
+          <p className="text-xs leading-relaxed text-brown-mid">
+            마지막 날을 위한 특별한 꽃
+            <br />
+            물뿌리개 없이 한 번 물주면 만개해요
+          </p>
+        </div>
+      </div>
+    </button>
+  );
+
+  // 예수님꽃이 활성 상태(만개 전)이면 별도 카드로 항상 노출
+  const jesusCard = jesusFlower && (
+    <div className="relative overflow-visible rounded-3xl border-2 border-gold bg-white/70 backdrop-blur-sm shadow-sm p-5">
+      <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 h-32 w-32 rounded-full bg-gold/30 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-rose/25 blur-2xl" />
+
+      <div className="relative">
+        <div className="text-[10px] uppercase tracking-[0.22em] text-olive text-center">
+          Final Day · Special
+        </div>
+        <p className="mt-1 text-base font-heading font-bold text-brown-dark text-center">
+          예수님꽃
+        </p>
+
+        <div className="w-48 h-56 mx-auto">
+          <FlowerIllustration
+            waterCount={jesusFlower.waterCount}
+            flowerType="jesus"
+          />
+        </div>
+
+        <p className="text-center text-sm text-brown-mid">
+          물 한 번이면 만개해요 (물뿌리개 무료)
+        </p>
+
+        <button
+          onClick={handleWaterJesus}
+          disabled={isPending}
+          className="mt-3 w-full rounded-3xl bg-olive py-3 text-sm font-medium text-ivory shadow-sm transition-colors hover:bg-sage disabled:opacity-50"
+        >
+          예수님꽃에 물 주기
+        </button>
+      </div>
+    </div>
+  );
 
   // ──── 꽃 선택 화면 ────
   if (selecting) {
@@ -155,6 +246,8 @@ export default function MyFlower({
   if (!flower && !unplacedCompleted) {
     return (
       <div className="space-y-4">
+        {jesusBanner}
+        {jesusCard}
         <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-6 text-center space-y-6">
           <FlowerIllustration waterCount={0} animate={false} />
 
@@ -183,6 +276,8 @@ export default function MyFlower({
   if (!flower && unplacedCompleted) {
     return (
       <div className="space-y-4">
+        {jesusBanner}
+        {jesusCard}
         <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-6 relative overflow-visible">
           {/* 축하 글로우 */}
           <div className="absolute -top-10 left-1/2 -translate-x-1/2 h-40 w-40 rounded-full bg-gold/30 blur-3xl" />
@@ -246,6 +341,8 @@ export default function MyFlower({
   if (isComplete) {
     return (
       <div className="space-y-4">
+        {jesusBanner}
+        {jesusCard}
         <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-6 relative overflow-visible">
           {/* 축하 글로우 */}
           <div className="absolute -top-10 left-1/2 -translate-x-1/2 h-40 w-40 rounded-full bg-gold/30 blur-3xl" />
@@ -299,6 +396,8 @@ export default function MyFlower({
   // ──── 성장 중 화면 ────
   return (
     <div className="space-y-4">
+      {jesusBanner}
+      {jesusCard}
       <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm shadow-sm p-5 relative overflow-visible">
         {/* 글로우 */}
         <div className="absolute -top-6 right-3 h-24 w-24 rounded-full bg-gold/25 blur-2xl" />

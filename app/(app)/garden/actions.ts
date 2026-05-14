@@ -24,15 +24,6 @@ export async function waterFlower(flowerId: string) {
   if (!session?.user?.id) redirect("/login");
   const userId = session.user.id;
 
-  // 물뿌리개 확인
-  const [can] = await db
-    .select({ count: wateringCans.count })
-    .from(wateringCans)
-    .where(eq(wateringCans.userId, userId))
-    .limit(1);
-
-  if (!can || can.count <= 0) return;
-
   // 꽃 조회
   const [flower] = await db
     .select()
@@ -42,11 +33,25 @@ export async function waterFlower(flowerId: string) {
 
   if (!flower || flower.completedAt) return;
 
-  // 물뿌리개 -1
-  await db
-    .update(wateringCans)
-    .set({ count: sql`${wateringCans.count} - 1` })
-    .where(eq(wateringCans.userId, userId));
+  // 예수님꽃은 무료 물주기 (모두가 마지막 날 심을 수 있도록 안전장치)
+  const isJesus = flower.type === "jesus";
+
+  if (!isJesus) {
+    // 물뿌리개 확인
+    const [can] = await db
+      .select({ count: wateringCans.count })
+      .from(wateringCans)
+      .where(eq(wateringCans.userId, userId))
+      .limit(1);
+
+    if (!can || can.count <= 0) return;
+
+    // 물뿌리개 -1
+    await db
+      .update(wateringCans)
+      .set({ count: sql`${wateringCans.count} - 1` })
+      .where(eq(wateringCans.userId, userId));
+  }
 
   const newWaterCount = flower.waterCount + 1;
   let newStage = flower.stage;

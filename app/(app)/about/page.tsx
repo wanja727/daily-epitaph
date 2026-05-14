@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { isWritingPeriodOver } from "@/lib/utils/date";
 
 export default function AboutPage() {
+  const writingOver = isWritingPeriodOver();
+
   return (
     <div className="pb-8">
       {/* ── 히어로 영역 ── */}
@@ -142,13 +145,23 @@ export default function AboutPage() {
           <p className="text-xs text-brown-mid tracking-wide">로마서 6:8</p>
         </div>
 
-        {/* ── 하단 CTA 버튼 ── */}
-        <Link
-          href="/write"
-          className="block w-full rounded-3xl bg-olive py-4 text-center text-sm text-ivory shadow-sm transition-colors hover:bg-sage"
-        >
-          오늘의 기록 시작하기
-        </Link>
+        {/* ── 하단 CTA 버튼 (작성 기간 종료 시 비활성화) ── */}
+        {writingOver ? (
+          <button
+            type="button"
+            disabled
+            className="block w-full rounded-3xl bg-stone py-4 text-center text-sm text-brown-light cursor-not-allowed"
+          >
+            작성 기간이 종료되었습니다
+          </button>
+        ) : (
+          <Link
+            href="/write"
+            className="block w-full rounded-3xl bg-olive py-4 text-center text-sm text-ivory shadow-sm transition-colors hover:bg-sage"
+          >
+            오늘의 기록 시작하기
+          </Link>
+        )}
       </div>
     </div>
   );

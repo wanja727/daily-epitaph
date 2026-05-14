@@ -30,6 +30,13 @@ export function getDateForDay(day: number): string {
   return start.toISOString().split("T")[0];
 }
 
+/** 프로젝트 종료일(40일차)을 지나면 true. 41일차부터 신규 기록 작성 불가. */
+export function isWritingPeriodOver(): boolean {
+  const today = getTodayKST();
+  const endDate = getDateForDay(PROJECT_DAYS);
+  return today > endDate;
+}
+
 /** KST 기준 오늘 날짜를 보기 좋게 포맷 */
 export function formatDateKR(dateStr: string): string {
   const d = new Date(dateStr + "T00:00:00");

@@ -25,6 +25,7 @@ type Tab = "my" | "cell" | "explore" | "viewOther";
 
 export default function GardenView({
   activeFlower,
+  activeJesusFlower,
   completedFlowers,
   waterCount,
   visiblePlots,
@@ -36,6 +37,7 @@ export default function GardenView({
   hasPlantedJesus,
 }: {
   activeFlower: FlowerData | null;
+  activeJesusFlower: FlowerData | null;
   completedFlowers: FlowerData[];
   waterCount: number;
   visiblePlots: VisiblePlot[];
@@ -153,6 +155,7 @@ export default function GardenView({
       {tab === "my" && (
         <MyFlower
           flower={activeFlower}
+          jesusFlower={activeJesusFlower}
           waterCount={waterCount}
           completedFlowers={completedFlowers}
           isLastDay={isLastDay}

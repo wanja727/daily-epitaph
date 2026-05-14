@@ -26,12 +26,15 @@ export default async function GardenPage() {
     .limit(1);
   const waterCount = can?.count ?? 0;
 
-  // 현재 키우고 있는 꽃 (완성되지 않은 꽃)
-  const [activeFlower] = await db
+  // 현재 키우고 있는 꽃 (완성되지 않은 꽃) - 일반 꽃과 예수님꽃은 동시 보유 가능
+  const activeFlowers = await db
     .select()
     .from(flowers)
-    .where(and(eq(flowers.userId, userId), isNull(flowers.completedAt)))
-    .limit(1);
+    .where(and(eq(flowers.userId, userId), isNull(flowers.completedAt)));
+
+  const activeFlower = activeFlowers.find((f) => f.type !== "jesus") ?? null;
+  const activeJesusFlower =
+    activeFlowers.find((f) => f.type === "jesus") ?? null;
 
   // 완성되었지만 아직 꽃밭에 심지 않은 꽃들
   const completedFlowers = await db
@@ -106,7 +109,8 @@ export default async function GardenPage() {
       </div>
 
       <GardenView
-        activeFlower={activeFlower ?? null}
+        activeFlower={activeFlower}
+        activeJesusFlower={activeJesusFlower}
         completedFlowers={completedFlowers}
         waterCount={waterCount}
         visiblePlots={visiblePlots}

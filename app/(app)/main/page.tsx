@@ -12,10 +12,12 @@ import {
 } from "@/lib/db/schema";
 import { eq, and, desc, sql, inArray, lte } from "drizzle-orm";
 import { getTodayKST, getProjectDay } from "@/lib/utils/date";
+import { PROJECT_DAYS } from "@/lib/utils/constants";
 import Link from "next/link";
 import FeedTabs from "./FeedTabs";
 import PinnedVideoCard from "./PinnedVideoCard";
 import MainEventBanner from "./MainEventBanner";
+import FinalDayBanner from "./FinalDayBanner";
 
 export default async function MainPage() {
   const session = await auth();
@@ -30,6 +32,7 @@ export default async function MainPage() {
   });
 
   const myUserId = session?.user?.id ?? "";
+  const isLastDay = projectDay === PROJECT_DAYS;
 
   // 오늘의 모든 묘비명 + 사용자 정보
   const todayEpitaphs = await db
@@ -249,6 +252,9 @@ export default async function MainPage() {
         </p>
       </div>
 
+      {/* 마지막 날 안내 배너 (40일차에만 노출, Blooming Week 배너 대체) */}
+      {isLastDay && <FinalDayBanner />}
+
       {/* 오늘의 묵상 영상 (관리자 등록 시) */}
       {pinnedVideo && (
         <PinnedVideoCard
@@ -269,12 +275,14 @@ export default async function MainPage() {
         myRecommendation={myRecommendation}
       />
 
-      {/* 이벤트 배너 — 이벤트 기간 + 쿠키 미dismiss 일 때만 노출 */}
-      <MainEventBanner
-        todayDate={today}
-        cellId={session?.user?.cellId ?? null}
-        hasWrittenToday={!!myEpitaph}
-      />
+      {/* 이벤트 배너 — 이벤트 기간 + 쿠키 미dismiss 일 때만 노출 (마지막 날엔 FinalDayBanner 가 대체) */}
+      {!isLastDay && (
+        <MainEventBanner
+          todayDate={today}
+          cellId={session?.user?.cellId ?? null}
+          hasWrittenToday={!!myEpitaph}
+        />
+      )}
 
       {/* 플로팅 작성 버튼 */}
       <Link

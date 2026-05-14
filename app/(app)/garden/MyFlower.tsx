@@ -17,6 +17,7 @@ interface FlowerData {
 
 const STAGE_LABELS = ["씨앗", "새싹", "봉오리", "만개"];
 
+// 예수님꽃은 별도 배너로만 접근. 이 목록은 일반 꽃만.
 const SELECTABLE_FLOWERS = [
   { type: "flower", name: "코스모스" },
   { type: "purple", name: "바이올렛" },
@@ -30,7 +31,6 @@ const SELECTABLE_FLOWERS = [
   { type: "cactus", name: "선인장" },
   { type: "poppy", name: "산호 튤립" },
   { type: "marigold", name: "별빛 수선화" },
-  { type: "jesus", name: "예수님꽃" },
 ];
 
 export default function MyFlower({
@@ -177,44 +177,6 @@ export default function MyFlower({
 
           <div className="grid grid-cols-3 gap-3">
             {SELECTABLE_FLOWERS.map((f) => {
-              if (f.type === "jesus") {
-                if (!isLastDay || hasPlantedJesus) return null;
-                return (
-                  <button
-                    key={f.type}
-                    onClick={() => handleSelectFlower(f.type)}
-                    disabled={isPending}
-                    className="col-span-3 relative overflow-hidden rounded-3xl border-2 border-gold bg-linear-to-br from-rose/15 via-white/85 to-gold/20 p-4 transition-all hover:shadow-lg active:scale-[0.98] disabled:opacity-50"
-                  >
-                    <div className="pointer-events-none absolute -top-6 -left-6 h-24 w-24 rounded-full bg-gold/30 blur-2xl" />
-                    <div className="pointer-events-none absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-rose/25 blur-2xl" />
-
-                    <div className="relative flex items-center gap-4">
-                      <div className="h-28 w-24 shrink-0">
-                        <FlowerIllustration
-                          waterCount={3}
-                          size="sm"
-                          animate={true}
-                          flowerType={f.type}
-                        />
-                      </div>
-                      <div className="flex-1 space-y-1.5 text-left">
-                        <div className="text-[10px] uppercase tracking-[0.22em] text-olive">
-                          Final Day · Special
-                        </div>
-                        <p className="text-base font-heading font-bold text-brown-dark">
-                          {f.name}
-                        </p>
-                        <p className="text-xs leading-relaxed text-brown-mid">
-                          마지막 날을 위한 특별한 꽃<br />
-                          물을 한 번만 줘도 만개해요
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-                );
-              }
-
               return (
                 <button
                   key={f.type}

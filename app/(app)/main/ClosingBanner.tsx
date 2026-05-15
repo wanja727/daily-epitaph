@@ -19,7 +19,7 @@ export default function ClosingBanner() {
             Closing · Read-only Mode
           </div>
           <h3 className="mt-1 text-lg font-heading font-bold text-brown-dark">
-            40일 여정이 마무리되었습니다 🤍
+            40일 여정이 마무리되었습니다 🕊️
           </h3>
           <p className="mt-1.5 text-sm text-brown-mid leading-relaxed">
             함께 새겨온 기록은 잠시 더 이곳에 머무릅니다.
@@ -28,19 +28,29 @@ export default function ClosingBanner() {
           </p>
         </div>
 
-        {/* 감사 메시지 */}
+        {/* 감사 메시지 (FinalDayBanner 와 동일) */}
         <div className="rounded-2xl bg-white/65 px-4 py-3">
           <div className="text-[10px] uppercase tracking-[0.2em] text-olive">
             Thank you
           </div>
           <p className="mt-1 text-sm text-brown-dark leading-relaxed">
-            함께해주신{" "}
+            지난 40일 동안 매일의 회개와 결단을 함께 새겨주신{" "}
             <span className="font-heading font-bold text-olive">
               캠프1 가족
             </span>{" "}
-            여러분, 진심으로 감사합니다.
-            <br />이 40일의 은혜가 우리의 일상 속에서도 계속 이어지기를
-            축복합니다. 🙏
+            여러분, 정말 수고 많으셨습니다.
+          </p>
+          <p className="mt-3 text-sm text-brown-dark leading-relaxed">
+            우리가 남긴 한 줄 한 줄의 고백이
+            <br />
+            예수 그리스도의 십자가 앞에 우리의 죄를 못박는 시간이었고,
+            <br />
+            함께 새 사람을 입어가는 여정이었습니다. 🙏
+          </p>
+          <p className="mt-3 text-sm text-brown-dark leading-relaxed">
+            이 40일의 은혜가 오늘로 멈추지 않고,
+            <br />
+            우리의 일상 속에서도 계속 이어지기를 축복합니다. 🤍
           </p>
         </div>
 

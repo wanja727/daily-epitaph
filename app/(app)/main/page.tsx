@@ -264,8 +264,8 @@ export default async function MainPage() {
       {/* 종료 안내 배너 (41일차+ 조회 모드, 5/22까지 운영 후 종료) */}
       {writingOver && <ClosingBanner />}
 
-      {/* 오늘의 묵상 영상 (관리자 등록 시) */}
-      {pinnedVideo && (
+      {/* 오늘의 묵상 영상 (관리자 등록 시, 작성 기간 내에만 노출) */}
+      {pinnedVideo && !writingOver && (
         <PinnedVideoCard
           videoId={pinnedVideo.youtubeVideoId}
           title={pinnedVideo.title}
@@ -281,6 +281,7 @@ export default async function MainPage() {
         myUserId={myUserId}
         cellName={cellName}
         wroteToday={!!myEpitaph}
+        writingOver={writingOver}
         myRecommendation={myRecommendation}
       />
 

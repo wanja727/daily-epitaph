@@ -17,7 +17,7 @@ import {
   FLOWER_STAGES,
   PROJECT_DAYS,
 } from "@/lib/utils/constants";
-import { getProjectDay } from "@/lib/utils/date";
+import { getProjectDay, isWritingPeriodOver } from "@/lib/utils/date";
 
 export async function waterFlower(flowerId: string) {
   const session = await auth();
@@ -44,13 +44,18 @@ export async function waterFlower(flowerId: string) {
       .where(eq(wateringCans.userId, userId))
       .limit(1);
 
-    if (!can || can.count <= 0) return;
+    const canCount = can?.count ?? 0;
 
-    // 물뿌리개 -1
-    await db
-      .update(wateringCans)
-      .set({ count: sql`${wateringCans.count} - 1` })
-      .where(eq(wateringCans.userId, userId));
+    // 작성 기간 종료(41일차+) 후엔 보유한 물을 모두 소진한 사용자도
+    // 진행중인 꽃을 은혜로 마무리할 수 있도록 차감을 건너뜀.
+    if (canCount <= 0 && !isWritingPeriodOver()) return;
+
+    if (canCount > 0) {
+      await db
+        .update(wateringCans)
+        .set({ count: sql`${wateringCans.count} - 1` })
+        .where(eq(wateringCans.userId, userId));
+    }
   }
 
   const newWaterCount = flower.waterCount + 1;
@@ -109,6 +114,17 @@ export async function startNewFlower(flowerType: string = "flower") {
       waterCount: 0,
     });
     return;
+  }
+
+  // 작성 기간 종료 후엔 보유한 물뿌리개가 있을 때만 새 꽃을 시작할 수 있음
+  // (은혜 모드로 무한정 새 꽃을 만들어내는 것을 방지)
+  if (isWritingPeriodOver()) {
+    const [can] = await db
+      .select({ count: wateringCans.count })
+      .from(wateringCans)
+      .where(eq(wateringCans.userId, userId))
+      .limit(1);
+    if (!can || can.count <= 0) return;
   }
 
   await db.insert(flowers).values({

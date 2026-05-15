@@ -34,6 +34,7 @@ export default function GardenView({
   cellId,
   isLastDay,
   hasPlantedJesus,
+  writingOver,
 }: {
   activeFlower: FlowerData | null;
   activeJesusFlower: FlowerData | null;
@@ -45,6 +46,7 @@ export default function GardenView({
   cellId: string | null;
   isLastDay: boolean;
   hasPlantedJesus: boolean;
+  writingOver: boolean;
 }) {
   const searchParams = useSearchParams();
   const initialTab: Tab = searchParams.get("tab") === "cell" ? "cell" : "my";
@@ -158,6 +160,7 @@ export default function GardenView({
           completedFlowers={completedFlowers}
           isLastDay={isLastDay}
           hasPlantedJesus={hasPlantedJesus}
+          writingOver={writingOver}
         />
       )}
 

@@ -40,6 +40,7 @@ export default function MyFlower({
   completedFlowers,
   isLastDay,
   hasPlantedJesus,
+  writingOver,
 }: {
   flower: FlowerData | null;
   jesusFlower: FlowerData | null;
@@ -47,6 +48,7 @@ export default function MyFlower({
   completedFlowers: FlowerData[];
   isLastDay: boolean;
   hasPlantedJesus: boolean;
+  writingOver: boolean;
 }) {
   const router = useRouter();
   const { isPending, startTransition } = useLoading();
@@ -86,6 +88,9 @@ export default function MyFlower({
   // 완성되었지만 아직 심지 않은 꽃이 있으면 축하 화면 표시
   const unplacedCompleted =
     completedFlowers.length > 0 ? completedFlowers[0] : null;
+
+  // 작성 기간 종료 + 보유 물 0 → 새 꽃 시작 금지 (은혜 모드는 진행중 꽃 마무리에만)
+  const cannotStartNew = writingOver && waterCount <= 0;
 
   // ─── 예수님꽃 안전장치 ───
   // 마지막 날에 아직 예수님꽃을 심지 않았다면 어디서든 접근 가능한 배너 노출
@@ -224,11 +229,16 @@ export default function MyFlower({
 
           <button
             onClick={() => setSelecting(true)}
-            disabled={isPending}
+            disabled={isPending || cannotStartNew}
             className="w-full rounded-3xl bg-olive py-4 text-sm text-ivory shadow-sm transition-colors hover:bg-sage disabled:opacity-50"
           >
             씨앗 심기
           </button>
+          {cannotStartNew && (
+            <p className="text-xs text-brown-light">
+              남은 물뿌리개가 없어 새 꽃은 시작할 수 없어요
+            </p>
+          )}
         </div>
       </div>
     );
@@ -277,11 +287,16 @@ export default function MyFlower({
 
         <button
           onClick={() => setSelecting(true)}
-          disabled={isPending}
+          disabled={isPending || cannotStartNew}
           className="w-full rounded-3xl border border-stone bg-white/70 py-4 text-sm text-brown-mid transition-colors hover:bg-sand disabled:opacity-50"
         >
           새 꽃 시작하기
         </button>
+        {cannotStartNew && (
+          <p className="text-xs text-brown-light text-center">
+            남은 물뿌리개가 없어 새 꽃은 시작할 수 없어요
+          </p>
+        )}
       </div>
     );
   }
@@ -342,11 +357,16 @@ export default function MyFlower({
         {/* 새 꽃 시작 */}
         <button
           onClick={() => setSelecting(true)}
-          disabled={isPending}
+          disabled={isPending || cannotStartNew}
           className="w-full rounded-3xl border border-stone bg-white/70 py-4 text-sm text-brown-mid transition-colors hover:bg-sand disabled:opacity-50"
         >
           새 꽃 시작하기
         </button>
+        {cannotStartNew && (
+          <p className="text-xs text-brown-light text-center">
+            남은 물뿌리개가 없어 새 꽃은 시작할 수 없어요
+          </p>
+        )}
 
         {completedFlowers.length > 0 && (
           <CompletedList flowers={completedFlowers} />
@@ -368,11 +388,17 @@ export default function MyFlower({
         <div className="flex items-center justify-between relative">
           <div>
             <div className="text-xs uppercase tracking-[0.2em] text-brown-light">
-              Daily grace
+              {writingOver && waterCount <= 0 ? "Final grace" : "Daily grace"}
             </div>
-            <div className="mt-1 text-2xl font-heading font-bold text-brown-dark">
-              {waterCount}개
-            </div>
+            {writingOver && waterCount <= 0 ? (
+              <div className="mt-1 text-sm text-brown-mid">
+                마지막 꽃을 완성하도록 돕습니다
+              </div>
+            ) : (
+              <div className="mt-1 text-2xl font-heading font-bold text-brown-dark">
+                {waterCount}개
+              </div>
+            )}
           </div>
           <div className="h-14 w-14 rounded-full bg-sand flex items-center justify-center text-2xl">
             🪣
@@ -406,13 +432,17 @@ export default function MyFlower({
         </div>
       </div>
 
-      {/* 물 주기 버튼 */}
+      {/* 물 주기 버튼 — 작성 기간 종료 후엔 물뿌리개가 없어도 은혜로 마무리할 수 있게 활성화 */}
       <button
         onClick={handleWater}
-        disabled={waterCount <= 0 || isPending}
-        className="w-full rounded-3xl bg-sage py-4 text-sm text-ivory shadow-sm transition-colors hover:bg-olive disabled:opacity-40"
+        disabled={isPending || (waterCount <= 0 && !writingOver)}
+        className={`w-full rounded-3xl py-4 text-sm shadow-sm transition-all disabled:opacity-40 ${
+          writingOver && waterCount <= 0
+            ? "bg-amber-200 text-brown-dark font-medium border border-amber-400/50 hover:brightness-105"
+            : "bg-sage text-ivory hover:bg-olive"
+        }`}
       >
-        물 주기
+        {writingOver && waterCount <= 0 ? "은혜로 물 주기" : "물 주기"}
       </button>
 
       {completedFlowers.length > 0 && (

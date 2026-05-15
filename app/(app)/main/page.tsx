@@ -22,6 +22,7 @@ import FeedTabs from "./FeedTabs";
 import PinnedVideoCard from "./PinnedVideoCard";
 import MainEventBanner from "./MainEventBanner";
 import FinalDayBanner from "./FinalDayBanner";
+import ClosingBanner from "./ClosingBanner";
 
 export default async function MainPage() {
   const session = await auth();
@@ -260,8 +261,11 @@ export default async function MainPage() {
       {/* 마지막 날 안내 배너 (40일차에만 노출, Blooming Week 배너 대체) */}
       {isLastDay && <FinalDayBanner />}
 
-      {/* 오늘의 묵상 영상 (관리자 등록 시) */}
-      {pinnedVideo && (
+      {/* 종료 안내 배너 (41일차+ 조회 모드, 5/22까지 운영 후 종료) */}
+      {writingOver && <ClosingBanner />}
+
+      {/* 오늘의 묵상 영상 (관리자 등록 시, 작성 기간 내에만 노출) */}
+      {pinnedVideo && !writingOver && (
         <PinnedVideoCard
           videoId={pinnedVideo.youtubeVideoId}
           title={pinnedVideo.title}
@@ -277,11 +281,12 @@ export default async function MainPage() {
         myUserId={myUserId}
         cellName={cellName}
         wroteToday={!!myEpitaph}
+        writingOver={writingOver}
         myRecommendation={myRecommendation}
       />
 
-      {/* 이벤트 배너 — 이벤트 기간 + 쿠키 미dismiss 일 때만 노출 (마지막 날엔 FinalDayBanner 가 대체) */}
-      {!isLastDay && (
+      {/* 이벤트 배너 — 이벤트 기간 + 쿠키 미dismiss 일 때만 노출 (마지막 날/종료 후엔 별도 배너가 대체) */}
+      {!isLastDay && !writingOver && (
         <MainEventBanner
           todayDate={today}
           cellId={session?.user?.cellId ?? null}

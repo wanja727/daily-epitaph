@@ -32,9 +32,9 @@ export default function GardenView({
   totalFlowerCount,
   cellName,
   cellId,
-  isInEvent,
   isLastDay,
   hasPlantedJesus,
+  writingOver,
 }: {
   activeFlower: FlowerData | null;
   activeJesusFlower: FlowerData | null;
@@ -44,9 +44,9 @@ export default function GardenView({
   totalFlowerCount: number;
   cellName: string | null;
   cellId: string | null;
-  isInEvent: boolean;
   isLastDay: boolean;
   hasPlantedJesus: boolean;
+  writingOver: boolean;
 }) {
   const searchParams = useSearchParams();
   const initialTab: Tab = searchParams.get("tab") === "cell" ? "cell" : "my";
@@ -160,6 +160,7 @@ export default function GardenView({
           completedFlowers={completedFlowers}
           isLastDay={isLastDay}
           hasPlantedJesus={hasPlantedJesus}
+          writingOver={writingOver}
         />
       )}
 
@@ -173,13 +174,7 @@ export default function GardenView({
         />
       )}
 
-      {tab === "explore" && (
-        <CellExplorer
-          currentCellId={cellId}
-          onSelect={handleSelectCell}
-          isInEvent={isInEvent}
-        />
-      )}
+      {tab === "explore" && <CellExplorer onSelect={handleSelectCell} />}
 
       {tab === "viewOther" && otherGarden && (
         <div className="space-y-3">

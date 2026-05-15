@@ -352,6 +352,7 @@ export default function FeedTabs({
   myUserId,
   cellName,
   wroteToday,
+  writingOver,
   myRecommendation,
 }: {
   epitaphs: Epitaph[];
@@ -360,6 +361,8 @@ export default function FeedTabs({
   myUserId: string;
   cellName: string | null;
   wroteToday: boolean;
+  /** 작성 기간 종료(41일차+) 여부. 안내 문구를 조회 모드에 맞게 바꿈. */
+  writingOver: boolean;
   // 부활의 말씀은 본인 카드에만 표시한다. 공개 피드에는 절대 포함하지 않는다.
   myRecommendation: RecommendationData | null;
 }) {
@@ -464,8 +467,8 @@ export default function FeedTabs({
         )
       ) : (
         <>
-          {/* 오늘 미작성 안내 */}
-          {!wroteToday && (
+          {/* 오늘 미작성 안내 — 작성 기간 종료 후엔 노출하지 않음 (상단 ClosingBanner 가 대체) */}
+          {!wroteToday && !writingOver && (
             <div className="rounded-[28px] border border-stone bg-white/70 backdrop-blur-sm p-5 text-center space-y-2">
               <p className="text-sm text-brown-dark font-medium">
                 오늘의 기록을 아직 작성하지 않았어요
@@ -479,7 +482,9 @@ export default function FeedTabs({
       {/* 리스트 */}
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-brown-light text-sm">
-          아직 오늘의 기록을 작성한 분이 없어요
+          {writingOver
+            ? "작성 기간이 종료되어 오늘의 기록은 없어요"
+            : "아직 오늘의 기록을 작성한 분이 없어요"}
         </div>
       ) : (
         <div className="space-y-4">

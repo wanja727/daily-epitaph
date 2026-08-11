@@ -1,36 +1,279 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 빈 무덤 프로젝트 🌱
 
-## Getting Started
+> **"매일 나는 죽고, 예수로 사는 삶"** — 부활절 이후 40일간의 회개·결단 기록 서비스
 
-First, run the development server:
+부활절 이후 40일 동안, 매일 **어제 십자가에 못 박을 것(회개)** 과 **오늘 예수와 함께
+살아낼 것(감사·결단)** 을 한 장의 카드에 적는 웹 서비스입니다. 기록을 남기면 물을 주어
+나만의 꽃을 키우고, 완성된 꽃은 **셀(소그룹) 공동 꽃밭**에 심겨 공동체가 함께 정원을
+채워갑니다.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+<!-- 📷 [스크린샷 추가 영역] 서비스 대표 이미지(메인 피드 or 셀 꽃밭) -->
+> 📷 **[대표 스크린샷]**
+
+---
+
+## 📌 개요
+
+| 항목 | 내용 |
+|---|---|
+| **제작 배경** | 교회 공동체가 부활절 이후 40일간 함께 회개·결단을 기록하기 위해 제작 |
+| **서비스 기간** | 2026.04.06 ~ 2026.05.15 (40일) · 이후 조회 모드 전환 |
+| **개발 기간** | 2026.02.18 ~ 2026.05.16 (총 83 커밋, 운영 중 지속 개선) |
+| **사용 인원** | 가입 기준 **167명** |
+| **역할** | 기획 · 디자인 · 개발 · 운영 1인 |
+| **배포** | Vercel + Supabase (Seoul) |
+
+---
+
+## 🛠️ 기술 스택
+
+**Frontend / Framework**
+- Next.js 16 (App Router, React Server Components, Server Actions)
+- React 19 (`useOptimistic`, `useTransition`), TypeScript
+- Tailwind CSS v4, 순수 SVG 일러스트 + CSS 애니메이션
+
+**Backend / Data**
+- Drizzle ORM + PostgreSQL (Supabase, Transaction Pooler)
+- **pgvector** — 말씀 추천용 768차원 임베딩 검색
+- Auth.js (NextAuth v5) — 카카오 OAuth
+- Vercel Cron — 매일 묵상 영상 자동 등록
+
+**AI / External API**
+- **Google Gemini** — 임베딩(`gemini-embedding-001`) + 생성 모델(`gemini-2.5-flash`)
+- YouTube Data API — 교회 채널 플레이리스트 연동
+
+---
+
+## ✨ 주요 기능
+
+### 1. 매일의 묘비명 — 회개와 결단 기록
+
+"어제를 돌아보며 십자가에 못 박을 것"과 "오늘 예수님과 함께 살아낼 결단"을 한 장의
+카드로 작성합니다. 회개 카테고리(하나님/자신/타인/세상)를 선택해 기록의 결을 남기고,
+하루 1건만 작성할 수 있습니다.
+
+<!-- 📷 [스크린샷 추가 영역] 작성 화면 — 어제/오늘 카드 + 회개 카테고리 -->
+> 📷 **[작성 화면 — 회개와 결단]**
+
+### 2. 셀 공동 꽃밭 🌷
+
+기록을 남기면 물뿌리개를 받고, 물을 3번 주면 **새싹 → 봉우리 → 꽃**으로 자랍니다.
+완성된 꽃은 셀 공동 꽃밭에 심겨 최대 120송이까지 자동 배치되며, 다른 셀의 꽃밭도
+구경할 수 있습니다. 12종의 꽃 중 원하는 것을 골라 심을 수 있습니다.
+
+<!-- 📷 [스크린샷 추가 영역] 셀 공동 꽃밭 — 자동 배치된 꽃들 -->
+> 📷 **[셀 공동 꽃밭]**
+
+### 3. 공감 반응
+
+다른 사람의 기록에 6종(아멘·기도·응원·감동·미소·놀람)의 이모지로 반응할 수 있습니다.
+1인 1반응 제한으로 과열을 막고, 반응은 누른 즉시 화면에 반영됩니다.
+
+<!-- 📷 [스크린샷 추가 영역] 메인 피드 — 카드 + 공감 반응 -->
+> 📷 **[메인 피드 · 공감 반응]**
+
+### 4. 부활의 말씀 추천 (AI)
+
+작성한 기록의 내용을 분석해 **작성자 본인에게만** 어울리는 성경 구절 2~3개를
+추천합니다. 추천 이유와 함께 성경 앱 딥링크를 제공하며, 피드에는 절대 노출되지 않습니다.
+
+<!-- 📷 [스크린샷 추가 영역] 부활의 말씀 추천 카드 -->
+> 📷 **[AI 말씀 추천]**
+
+### 5. 그 외
+
+- **매일 묵상 영상** — 교회 유튜브에 올라온 당일 묵상 영상을 메인 상단에 자동 고정
+- **Blooming Week 이벤트** — 마지막 주간 한정 차등 보상 및 전체 꽃밭 공개
+- **예수님꽃** — 40일차 한정 1인 1회, 후광 애니메이션이 적용된 특별한 꽃
+- **마이페이지** — 40일 출석 그리드, 내 기록 PDF 저장
+- **관리자 대시보드** — 참여율·방문 추이·셀별 지표, 묵상 영상 관리
+
+---
+
+## 🧭 구현 과정에서 신경 쓴 점
+
+### 1. 셀 공동 꽃밭 — "예쁘게 보이는 것"을 알고리즘으로 풀기
+
+가장 공을 들인 부분입니다. 초기에는 5×5 격자에 꽃을 순서대로 채웠는데, 격자가 너무
+기계적이고 꽃이 몇 송이 없을 때 휑해 보였습니다. **실제 정원처럼 자연스럽게 보이도록**
+배치 시스템을 다시 만들었습니다.
+
+**① 벌집(hexagonal) 배치 + 원근감** — 10×12로 120개 슬롯을 만들되, 홀수 행을 반 칸씩
+밀어 격자 티를 없앴습니다. 아래로 갈수록 행간이 넓어지고(원근) 꽃도 커지도록
+(0.76배 → 1.3배) 곡선을 적용해 깊이감을 만들었습니다.
+
+```ts
+const depth = row / (rows - 1);                       // 0(뒤) → 1(앞)
+// 선형 20% + 곡선 80% 블렌드 → 상단이 과하게 압축되지 않으면서 아래로 갈수록 넓어짐
+const perspective = 0.2 * depth + 0.8 * Math.pow(depth, 1.5);
+const offsetX = row % 2 === 1 ? xStep / 2 : 0;        // 벌집 어긋나기
+const scale = 0.76 + Math.pow(depth, 1.8) * 0.54;     // 뒤는 작게, 앞은 크게
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**② 자연스러운 흐트러짐(jitter)** — 좌표를 그대로 쓰면 여전히 반듯해 보여서 각 슬롯에
+미세한 흔들림을 더했습니다. 단 `Math.random()` 을 쓰면 새로고침마다 꽃이 이사를 가므로,
+**슬롯 번호를 seed 로 쓰는 결정론적 난수**를 만들어 항상 같은 자리에 있으면서도
+불규칙해 보이게 했습니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```ts
+function seededRandom(seed: number) {
+  const x = Math.sin(seed * 9301 + 49297) * 49979;
+  return x - Math.floor(x);   // 같은 슬롯 = 항상 같은 값
+}
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**③ 중심에서 바깥으로, 좌우 균등하게 채우기** — 꽃이 3송이일 때 구석에 몰려 있으면
+허전합니다. 슬롯을 중심 기준 동심원(ring)으로 묶고, 안쪽 링부터 **좌·우를 번갈아**
+채우도록 순서를 미리 정렬해두었습니다. 덕분에 꽃이 몇 송이든 항상 가운데부터 균형 있게
+피어납니다.
 
-## Learn More
+**④ 앞뒤 겹침 처리** — 아래쪽 꽃이 위쪽 꽃을 자연스럽게 가리도록 `y좌표를 z-index로`
+변환해, 원근에 맞는 앞뒤 관계를 만들었습니다.
 
-To learn more about Next.js, take a look at the following resources:
+### 2. 꽃 성장 애니메이션 — 바람에 흔들리는 정원
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+꽃은 이미지가 아니라 **직접 그린 SVG**입니다. 단계(새싹/봉우리/꽃)마다 다른 도형을
+그리고, CSS 애니메이션으로 살아있는 느낌을 만들었습니다.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **부위별 계층 애니메이션** — 줄기 전체가 땅을 축(`transform-origin`)으로 ±1.4° 흔들리고,
+  잎은 그보다 훨씬 작은 ±0.4° 로 **살짝 늦게 따라 움직이며**, 꽃봉오리는 미세하게 위아래로
+  흔들립니다. 세 움직임이 겹쳐 뻣뻣하지 않은 바람 효과가 납니다.
+- **시차(stagger)** — 꽃마다 `animation-delay` 를 다르게 주어 정원 전체가 한 몸처럼
+  움직이지 않고 물결치듯 흔들립니다.
+- **성능** — 꽃이 120송이까지 늘어나므로 `transform` / `opacity` 만 사용해 GPU 합성으로
+  처리하고, 목록에 작게 표시되는 축소 뷰(`compact`)에서는 애니메이션을 끕니다.
 
-## Deploy on Vercel
+### 3. 공감 반응 — 서버 왕복을 기다리지 않는 UX
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+반응은 "누르는 순간 반영"돼야 자연스러운데, 서버 응답을 기다리면 모바일에서 눌리지 않은
+것처럼 느껴집니다. React 19 의 **`useOptimistic`** 으로 화면을 먼저 바꾸고 서버 저장은
+뒤에서 처리했습니다. 실패하면 자동으로 이전 상태로 되돌아갑니다.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```tsx
+const [optimistic, setOptimistic] = useOptimistic(
+  { reactions, myReaction },
+  (state, chosen) => {
+    // 같은 걸 또 누르면 취소, 다른 걸 누르면 교체 (1인 1반응)
+    ...
+  },
+);
+
+startTransition(async () => {
+  setOptimistic(type);        // 화면 즉시 반영
+  await onToggle(id, type);   // 서버 저장은 뒤에서
+});
+```
+
+또한 피드에 카드가 쌓이면서 **카드마다 반응을 조회하는 N+1 쿼리**가 문제가 됐습니다.
+카드 ID를 모아 `inArray` + `groupBy` 로 **한 번에 집계**하고, 내 반응 여부도 한 쿼리로
+받아와 카드 수와 무관하게 쿼리 2개로 처리했습니다.
+
+### 4. AI 말씀 추천 — 환각 없이, 개인정보 없이
+
+기록에 맞는 성경 구절을 추천하되 두 가지가 중요했습니다. **없는 구절을 지어내면 안 되고**,
+**개인의 내밀한 고백이 외부로 새면 안 됩니다.**
+
+- **후보 안에서만 고르게 하기** — LLM 에게 성경 구절을 직접 생성하게 하면 존재하지 않는
+  장절을 만들어냅니다. 그래서 미리 큐레이션한 구절 DB 에서 후보 24개를 뽑아 주고,
+  **후보의 `verseId` 만 고르게** 했습니다. 응답에 후보 밖 ID가 오면 서버에서 폐기하고,
+  실제 장절·딥링크는 **DB 값으로 다시 붙입니다.**
+- **의미 기반 후보 검색(RAG)** — 기록 텍스트를 Gemini 임베딩으로 768차원 벡터화하고
+  **pgvector 코사인 검색**으로 의미가 가까운 구절을 찾습니다.
+- **개인정보 마스킹** — 외부 API 전송 전 이메일·전화번호·URL·긴 숫자열을 플레이스홀더로
+  치환합니다.
+- **단계별 폴백** — 임베딩 실패 시 가중치 기반 후보로, 생성 모델이 503/429 를 뱉으면
+  다음 모델로 자동 재시도해 추천이 통째로 실패하지 않게 했습니다.
+- **본인 전용 보장** — 추천은 별도 API 라우트에서 **작성자 본인인지 확인 후**에만
+  내려줍니다. 피드 쿼리에는 아예 포함되지 않습니다.
+- 추천 파이프라인의 검증 로직(후보 밖 ID 폐기, 다양성 규칙 등)은 **테스트 코드**로
+  고정했습니다. (`lib/scripture/recommendation.test.ts`)
+
+### 5. 공동체 서비스에서의 안전장치
+
+실명을 쓰는 교회 공동체 서비스라 **신뢰를 깨뜨리지 않는 장치**에 신경 썼습니다.
+
+- **동명이인 셀 배정** — 실명이 같은 사람이 있을 때, 이미 온보딩을 마친 사용자가 배정된
+  셀은 후보에서 제외해 엉뚱한 셀로 들어가는 것을 막았습니다.
+- **타인 실명 사칭 방지** — 닉네임에 다른 구성원의 실명이 포함되면 사용할 수 없습니다.
+  등록된 명단에 없는 실명으로는 가입할 수 없습니다.
+- **기본값은 익명** — 가입 시 "싱그러운 튤립 07" 처럼 랜덤 꽃 닉네임을 자동 생성해,
+  솔직한 회개를 부담 없이 적을 수 있게 했습니다.
+- **AI 기능 화이트리스트** — 말씀 추천은 운영자가 켜준 사용자에게만 노출해, 비용과
+  품질을 확인하며 단계적으로 열었습니다.
+
+### 6. 운영 자동화와 마무리
+
+- **묵상 영상 자동 등록** — 매일 아침 교회 유튜브에 올라오는 영상을 관리자가 손으로
+  등록하던 것을, **Vercel Cron(KST 06:05)** 이 YouTube Data API 로 당일 영상을 찾아
+  자동 등록하도록 바꿨습니다. 멱등하게 만들어 여러 번 실행돼도 안전하고, 아직 영상이
+  없으면 최근 영상을 보여주는 폴백이 동작합니다.
+- **PDF 저장** — 40일의 기록을 간직할 수 있도록, 라이브러리 없이 브라우저 인쇄 기능을
+  활용하되 **내용 높이를 측정해 `@page` 크기를 동적으로 지정**해 잘림 없이 한 장으로
+  저장되도록 했습니다.
+- **종료 후 은혜 모드** — 41일차부터는 새 기록을 막되, **진행 중이던 꽃은 마무리할 수
+  있게** 열어두고 조회 모드로 전환했습니다.
+
+---
+
+## 🗂️ 프로젝트 구조
+
+```
+app/
+  (public)/       커버·로그인·온보딩
+  (app)/
+    main/         메인 피드 (카드·공감·묵상 영상·이벤트 배너)
+    write/        묘비명 작성 (회개 카테고리·말씀 추천 요청)
+    garden/       내 꽃 / 셀 공동 꽃밭 / 다른 셀 구경
+    mypage/       출석 그리드·닉네임·기록 PDF 저장
+    admin/        참여 지표·묵상 영상 관리
+  api/
+    cron/daily-video/          묵상 영상 자동 등록 (Vercel Cron)
+    epitaphs/[id]/recommendation/  작성자 전용 말씀 추천 조회
+lib/
+  scripture/      말씀 추천 파이프라인 (후보 검색·검증·테스트)
+  ai/             Gemini 임베딩·생성 (모델 폴백 체인)
+  utils/          꽃밭 슬롯 배치 알고리즘·이벤트 규칙·상수
+  db/             Drizzle 스키마·시드
+```
+
+---
+
+## 📅 개발 타임라인 (커밋 기반)
+
+- **02.18** — 묘비명 서비스 초기 구현
+- **03.23** — DB 드라이버 Neon → Supabase(서울) 전환
+- **03.28–31** — v2 대규모 리뉴얼: SVG 꽃 일러스트·성장 애니메이션, 꽃밭 **자동 배치
+  시스템** 도입, 공감 기능 추가
+- **04.01–08** — 꽃 종류 확장, 꽃밭 120칸 확장 및 배치 개선(좌우 균등·겹침 방지),
+  공감 6종·1인 1반응, DB 인덱스 추가, 사칭 방지 등 안전장치
+- **04.13–19** — 꽃 6종 추가, 감사 키워드 강조, 동명이인 처리, 셀 탐색기 개선
+- **04.28–05.03** — **AI 말씀 추천** MVP(Gemini) → 임베딩 기반 추천 고도화, 화이트리스트
+- **05.03–07** — 회개 카테고리, 매일 묵상 영상 + **Cron 자동 등록**, 관리자 탭 구조화
+- **05.09–13** — **Blooming Week 이벤트**, 기록 PDF 저장, 꽃 12종 확장
+- **05.13–16** — 40일차 **예수님꽃**, 종료 배너, 41일차+ 조회·은혜 모드
+
+---
+
+## 🚀 로컬 실행
+
+```bash
+pnpm install
+pnpm dev          # http://localhost:3000
+
+pnpm db:push      # Drizzle 스키마 반영
+pnpm db:seed      # 셀·명단·추천 구절 시드
+```
+
+`.env.local` 에 카카오 OAuth, Supabase(Postgres) 연결 정보, Gemini API 키,
+YouTube API 키 / 플레이리스트 ID, `CRON_SECRET` 이 필요합니다.
+
+---
+
+## ⚠️ 저작권
+
+성경 본문(개역개정)의 저장·노출은 대한성서공회 저작권 검토 대상입니다. 이 서비스는
+본문을 저장하지 않고 **장절 메타데이터와 성경 앱 딥링크만** 제공합니다.
+
+---
+
+<p align="center"><em>매일 나는 죽고, 예수로 사는 삶.</em></p>

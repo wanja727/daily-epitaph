@@ -1,7 +1,20 @@
 import { PROJECT_START_DATE, PROJECT_DAYS } from "./constants";
 
+/**
+ * 개발 환경 전용 날짜 고정용 값.
+ * `.env.local` 에 `NEXT_PUBLIC_DEV_TODAY=2026-04-20` 처럼 지정하면
+ * 모든 화면이 해당 날짜 기준으로 렌더링된다 (캡처/테스트용).
+ * 프로덕션 빌드에서는 무시된다.
+ */
+const DEV_TODAY =
+  process.env.NODE_ENV !== "production"
+    ? process.env.NEXT_PUBLIC_DEV_TODAY
+    : undefined;
+
 /** 오늘 날짜를 KST YYYY-MM-DD 형식으로 반환 */
 export function getTodayKST(): string {
+  if (DEV_TODAY && /^\d{4}-\d{2}-\d{2}$/.test(DEV_TODAY)) return DEV_TODAY;
+
   return new Date()
     .toLocaleDateString("ko-KR", {
       timeZone: "Asia/Seoul",

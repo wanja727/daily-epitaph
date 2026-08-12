@@ -10,6 +10,18 @@
 <!-- 📷 [스크린샷 추가 영역] 서비스 대표 이미지(메인 피드 or 셀 꽃밭) -->
 > 📷 **[대표 스크린샷]**
 
+<p>
+  <img width="250" alt="1" src="https://github.com/user-attachments/assets/011fbca3-d4d2-4a92-a8eb-2146599a1a88" />
+  <img width="250" alt="3" src="https://github.com/user-attachments/assets/2d27b45b-b5f4-4211-8426-2d2087f42776" />
+  <img width="250" alt="4" src="https://github.com/user-attachments/assets/7ced2aae-6f94-4f90-947b-a5cfb7731a14" />
+  <img width="250" alt="7" src="https://github.com/user-attachments/assets/36d5ff16-c85c-4204-9b82-2acd5f827efc" />
+  <img width="250" alt="8" src="https://github.com/user-attachments/assets/fc11915c-5d84-4fad-8297-d1559d6ed72c" />
+  <img width="250" alt="13" src="https://github.com/user-attachments/assets/660beb1c-ad5d-4b39-bdd5-3eaa23df274d" />
+  <img width="250" alt="14" src="https://github.com/user-attachments/assets/ae91bc7a-5724-4398-9db9-eb34a117ced2" />
+  <img width="250" alt="15" src="https://github.com/user-attachments/assets/792fb4e4-5826-41d1-8560-5379e3e10c42" />
+  <img width="250" alt="18" src="https://github.com/user-attachments/assets/deea3b67-472f-4653-b284-0041bb3b9665" />
+</p>
+
 ---
 
 ## 📌 개요
@@ -55,6 +67,11 @@
 <!-- 📷 [스크린샷 추가 영역] 작성 화면 — 어제/오늘 카드 + 회개 카테고리 -->
 > 📷 **[작성 화면 — 회개와 결단]**
 
+<p>
+  <img width="250" alt="5" src="https://github.com/user-attachments/assets/25564334-28d9-4081-9d3a-aee6b6f316f3" />
+  <img width="250" alt="6" src="https://github.com/user-attachments/assets/9f7b8b2d-eaac-4121-8b16-454f20871d62" />
+</p>
+
 ### 2. 셀 공동 꽃밭 🌷
 
 기록을 남기면 물뿌리개를 받고, 물을 3번 주면 **새싹 → 봉우리 → 꽃**으로 자랍니다.
@@ -64,6 +81,16 @@
 <!-- 📷 [스크린샷 추가 영역] 셀 공동 꽃밭 — 자동 배치된 꽃들 -->
 > 📷 **[셀 공동 꽃밭]**
 
+<p>
+  <img width="250" alt="7" src="https://github.com/user-attachments/assets/2800c069-b1d5-4bad-a779-3f6e05b01bfe" />
+  <img width="250" alt="8" src="https://github.com/user-attachments/assets/e7c9ad86-da86-4608-a2bf-214218659490" />
+  <img width="250" alt="10" src="https://github.com/user-attachments/assets/a472807c-e3c2-4e48-9d57-6c7926fdac16" />
+  <img width="250" alt="11" src="https://github.com/user-attachments/assets/c70d6d60-a58f-4ed1-af8a-4e2de70c6ae8" />
+  <img width="250" alt="12" src="https://github.com/user-attachments/assets/7dd95689-d8f2-49c1-a36e-18e3f647ee73" />
+  <img width="250" alt="13" src="https://github.com/user-attachments/assets/db8959c4-6405-4b04-850e-8ea6187f77d3" />
+  <img width="250" alt="14" src="https://github.com/user-attachments/assets/f383798c-7a81-4fad-84fe-a77d8c78291a" />
+</p>
+
 ### 3. 공감 반응
 
 다른 사람의 기록에 6종(아멘·기도·응원·감동·미소·놀람)의 이모지로 반응할 수 있습니다.
@@ -72,6 +99,10 @@
 <!-- 📷 [스크린샷 추가 영역] 메인 피드 — 카드 + 공감 반응 -->
 > 📷 **[메인 피드 · 공감 반응]**
 
+<p>
+  <img width="250" alt="2026-08-12 19 54 17" src="https://github.com/user-attachments/assets/1d18c298-63a7-4eba-9d4c-3bc867b3047d" />
+</p>
+
 ### 4. 부활의 말씀 추천 (AI)
 
 작성한 기록의 내용을 분석해 **작성자 본인에게만** 어울리는 성경 구절 2~3개를
@@ -79,6 +110,11 @@
 
 <!-- 📷 [스크린샷 추가 영역] 부활의 말씀 추천 카드 -->
 > 📷 **[AI 말씀 추천]**
+
+<p>
+  <img width="250" alt="20" src="https://github.com/user-attachments/assets/be7a4909-ec6d-43c5-8862-89e2b8569be8" />
+  <img width="250" alt="21" src="https://github.com/user-attachments/assets/98785d94-2961-4eaa-a28e-b3033d6470ee" />
+</p>
 
 ### 5. 그 외
 
